@@ -53,9 +53,7 @@ export default function ButtonAppBar() {
             color="inherit"
             aria-label="menu"
             sx={{ mr: 2 }}
-          >
-            <MenuIcon />
-          </IconButton>
+          ></IconButton>
           <Typography
             className="whitespace-nowrap"
             variant="h6"

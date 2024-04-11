@@ -57,9 +57,10 @@ function Map() {
   return (
     <div
       dir="ltr"
-      className="bg-amber-700  flex items-center  justify-center text-white"
+      className="bg-amber-700  flex flex-col items-center  justify-center text-white"
     >
       <button onClick={getSeats}>הצג מפה</button>
+
       <table>
         <tbody>
           {seats?.length > 1 &&
