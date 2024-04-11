@@ -3,17 +3,17 @@ import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import Kmodal from "./Kmodal";
 import { useState, useEffect } from "react";
-import axios from "axios";
 import User from "../types/user";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "..";
 
 export default function ButtonAppBar() {
-  const [user, setUser] = useState<User>();
-  const [users, setUsers] = useState<User[]>();
+  const [user, setUser] = useState<any>();
+  const [users, setUsers] = useState<any[]>();
 
   useEffect(() => {
     async function fetchData() {
@@ -35,11 +35,13 @@ export default function ButtonAppBar() {
     }
   };
   const getUsers = async () => {
-    try {
-      const { data } = await axios.get("/api/users");
-      console.log("getParasha", "data", data);
-      setUsers(data);
-    } catch (err) {}
+    await getDocs(collection(db, "users"))
+      .then((shot) => {
+        const news = shot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
+        setUsers(news);
+        console.log("news", news);
+      })
+      .catch((error) => console.log(error));
   };
   return (
     <Box sx={{ flexGrow: 1 }}>

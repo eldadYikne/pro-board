@@ -1,51 +1,73 @@
-import React, { useEffect } from "react";
-import logo from "./logo.svg";
 import "./App.css";
 import Navbar from "./components/Navbar";
 import ConfirmedPlace from "./components/ConfirmedPlace";
 import { BrowserRouter, Route, Link, Routes } from "react-router-dom";
 import Map from "./components/Map";
-import mongoose from "mongoose";
+import {
+  addDoc,
+  collection,
+  getDoc,
+  getDocs,
+  writeBatch,
+  getFirestore,
+  doc,
+  updateDoc,
+} from "firebase/firestore";
+import { useState } from "react";
+import { db } from ".";
+import { initializeApp } from "firebase/app";
+import { dbUsers } from "./utils/const";
 
 function App() {
-  let cached = (global as any).mongoose;
-  const MONGODB_URI =
-    "mongodb+srv://reutyikne:iY9LJ5G5sD8xl5Ts@cluster0.cuxuy5g.mongodb.net/test";
-  if (!cached) {
-    cached = (global as any).mongoose = { conn: null, promise: null };
-  }
-  useEffect(() => {
-    async function fetchData() {
-      await dbConnect();
-    }
-    fetchData();
-  }, []);
-  async function dbConnect() {
-    if (cached.conn) {
-      return cached.conn;
-    }
+  const [users, setUsers] = useState<any>();
 
-    if (!cached.promise) {
-      const opts = {
-        bufferCommands: false,
-      };
+  const postUsers = async () => {
+    const batch = writeBatch(db);
+    const usersCollectionRef = collection(db, "users");
 
-      cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
-        return mongoose;
-      });
+    // Iterate through the array of user objects
+    dbUsers.forEach((user) => {
+      // Create a new document reference for each user
+      const newDocRef = doc(usersCollectionRef);
+
+      // Set the data for the document
+      batch.set(newDocRef, user);
+    });
+
+    // Commit the batch write
+    await batch.commit();
+  };
+
+  const updateUser = async (userId: string, userData: any) => {
+    const userRef = doc(collection(db, "users"), userId); // Get reference to the user document
+
+    try {
+      await updateDoc(userRef, userData); // Update the user document with new data
+      console.log("User updated successfully!");
+    } catch (error) {
+      console.error("Error updating user:", error);
     }
-    cached.conn = await cached.promise;
-    mongoose.set("strictQuery", false);
-    await mongoose.connect(cached.conn);
-
-    return cached.conn;
-  }
+  };
+  const postUser = async () => {
+    const docRef = await addDoc(collection(db, "users"), {
+      user: { name: "יעקב כהן", seats: ["1"], present: false },
+    });
+    console.log("doc !!!", docRef);
+  };
+  const getUsers = async () => {
+    await getDocs(collection(db, "users"))
+      .then((shot) => {
+        const news = shot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
+        setUsers(news);
+        console.log("news", news);
+      })
+      .catch((error) => console.log(error));
+  };
 
   return (
     <div dir="rtl" className="">
       <BrowserRouter>
         <Navbar />
-
         <Routes>
           <Route path="/" element={<ConfirmedPlace />} />
           <Route path="map" element={<Map />} />
