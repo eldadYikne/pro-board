@@ -34,7 +34,7 @@ function ConfirmedPlace() {
     console.log("getParasha");
     let currentData;
     try {
-      const { data } = await axios.get("http://localhost:8080/users");
+      const { data } = await axios.get("/api/users");
       console.log("getParasha", "data", data);
 
       setUsers(data);
