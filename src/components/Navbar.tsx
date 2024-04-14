@@ -11,7 +11,7 @@ import User from "../types/user";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "..";
 
-export default function ButtonAppBar() {
+export default function Navbar(props: Props) {
   const [user, setUser] = useState<any>();
   const [users, setUsers] = useState<any[]>();
 
@@ -30,8 +30,10 @@ export default function ButtonAppBar() {
 
   const onPickUsername = (user: User) => {
     if (user) {
+      console.log(user);
       localStorage.setItem("user", JSON.stringify(user));
       setUser(user);
+      props.setNewUser(user);
     }
   };
   const getUsers = async () => {
@@ -42,6 +44,9 @@ export default function ButtonAppBar() {
         console.log("news", news);
       })
       .catch((error) => console.log(error));
+  };
+  const setUsersAgain = async () => {
+    await getUsers();
   };
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -64,10 +69,22 @@ export default function ButtonAppBar() {
           </Typography>
 
           {users && (
-            <Kmodal onPickUsername={onPickUsername} users={users} user={user} />
+            <Kmodal
+              onPickUsername={onPickUsername}
+              setUsersAgain={setUsersAgain}
+              users={users}
+              user={user}
+            />
           )}
         </Toolbar>
       </AppBar>
     </Box>
   );
+}
+Navbar.defaultProps = {
+  setNewUser: () => {},
+};
+
+interface Props {
+  setNewUser: Function;
 }

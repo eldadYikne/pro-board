@@ -1,7 +1,6 @@
 import * as React from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import OutoComplete from "./OutoComplete";
 import User from "../types/user";
@@ -21,7 +20,10 @@ const style = {
 
 export default function Kmodal(props: Props) {
   const [open, setOpen] = React.useState(false);
-  const handleOpen = () => setOpen(true);
+  const handleOpen = () => {
+    props.setUsersAgain();
+    setOpen(true);
+  };
   const handleClose = () => setOpen(false);
 
   return (
@@ -55,11 +57,13 @@ export default function Kmodal(props: Props) {
 Kmodal.defaultProps = {
   users: [],
   onPickUsername: () => {},
+  setUsersAgain: () => {},
   user: undefined,
 };
 
 interface Props {
   onPickUsername: Function;
+  setUsersAgain: Function;
   users: User[];
   user: User | undefined;
 }

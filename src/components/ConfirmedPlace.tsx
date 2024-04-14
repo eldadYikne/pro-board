@@ -1,19 +1,20 @@
 import { useState, useEffect } from "react";
 import User from "../types/user";
+import Seat from "../types/user";
 import Switch from "@mui/material/Switch";
 import axios from "axios";
 import firebase from "firebase/compat/app";
 import "firebase/compat/firestore";
 import { dbUsers } from "../utils/const";
-import { collection, doc, updateDoc } from "firebase/firestore";
+import { collection, doc, getDocs, updateDoc } from "firebase/firestore";
 import { db } from "..";
 
-function ConfirmedPlace() {
+function ConfirmedPlace(props: Props) {
   const [parasha, setParasha] = useState("");
   const [candles, setCandles] = useState("");
   const [havdalah, setHavdalah] = useState("");
   const [user, setUser] = useState<User>();
-  const [checked, setChecked] = useState(user?.present ?? true);
+  const [checked, setChecked] = useState(!!props.user.present);
   const [users, setUsers] = useState<User[]>();
 
   const label = {
@@ -25,14 +26,14 @@ function ConfirmedPlace() {
       await getParasha();
     }
     fetchData();
-    const user = localStorage.getItem("user");
 
-    console.log(user);
-    if (user) {
-      let userToSet = JSON.parse(user);
-      setUser(userToSet);
+    console.log("props.user.name", props.user);
+    if (props.user.name) {
+      // let userToSet = JSON.parse(user);
+      setUser(props.user);
+      setChecked(props.user.present);
     }
-  }, []);
+  }, [props.user]);
   const getParasha = async () => {
     console.log("getParasha");
     let currentData;
@@ -73,6 +74,8 @@ function ConfirmedPlace() {
 
   const handleChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     setChecked(event.target.checked);
+    const newUserToUse: any = props.user;
+    console.log("newUserToUse", newUserToUse);
     if (!user?.id) {
       const userWithId = users?.find(
         (currUser) => user?.name === currUser.name
@@ -82,7 +85,20 @@ function ConfirmedPlace() {
       }
     }
     try {
-      await updateUser(user?.id!, { name: user?.name, present: !checked });
+      let newUser: any = {
+        id: newUserToUse?.id,
+        seats: newUserToUse?.seats,
+        name: newUserToUse?.name ?? "",
+        present: !checked,
+      };
+      if (newUser?.name) {
+        localStorage.setItem("user", JSON.stringify(newUser));
+        setUser(newUser);
+        await updateUser(newUser?.id!, {
+          name: newUser?.name,
+          present: !checked,
+        });
+      }
     } catch (err) {
       console.log(err);
     }
@@ -133,3 +149,10 @@ function ConfirmedPlace() {
 }
 
 export default ConfirmedPlace;
+ConfirmedPlace.defaultProps = {
+  user: {},
+};
+
+interface Props {
+  user: User;
+}

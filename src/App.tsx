@@ -3,6 +3,7 @@ import Navbar from "./components/Navbar";
 import ConfirmedPlace from "./components/ConfirmedPlace";
 import { BrowserRouter, Route, Link, Routes } from "react-router-dom";
 import Map from "./components/Map";
+import Seat from "./types/user";
 import {
   addDoc,
   collection,
@@ -17,27 +18,45 @@ import { useState } from "react";
 import { db } from ".";
 import { initializeApp } from "firebase/app";
 import { dbUsers } from "./utils/const";
+import User from "./types/user";
 
 function App() {
   const [users, setUsers] = useState<any>();
-
-  const postUsers = async () => {
+  const [seats, setSeats] = useState<any>();
+  const [newUser, setNewUser] = useState<any>();
+  const postCollection = async (
+    collectionName: string,
+    collectionValues: any[]
+  ) => {
     const batch = writeBatch(db);
-    const usersCollectionRef = collection(db, "users");
+    const usersCollectionRef = collection(db, collectionName);
 
     // Iterate through the array of user objects
-    dbUsers.forEach((user) => {
+    collectionValues.forEach((value) => {
       // Create a new document reference for each user
       const newDocRef = doc(usersCollectionRef);
 
       // Set the data for the document
-      batch.set(newDocRef, user);
+      batch.set(newDocRef, value);
     });
 
     // Commit the batch write
     await batch.commit();
   };
+  const postDataByNumberSeats = async () => {
+    let array: Seat[] = [];
+    users?.forEach((user: User) => {
+      user.seats?.forEach((seat: string) =>
+        array.push({
+          name: user.name,
+          seat,
+          present: user.present,
+        })
+      );
+    });
 
+    await postCollection("seats", array);
+  };
   const updateUser = async (userId: string, userData: any) => {
     const userRef = doc(collection(db, "users"), userId); // Get reference to the user document
 
@@ -63,19 +82,34 @@ function App() {
       })
       .catch((error) => console.log(error));
   };
+  const getSeats = async () => {
+    await getDocs(collection(db, "seats"))
+      .then((shot) => {
+        const news = shot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
+        setSeats(news);
+        console.log("SEATS", news);
+      })
+      .catch((error) => console.log(error));
+  };
 
   return (
     <div dir="rtl" className="">
       <BrowserRouter>
-        <Navbar />
+        <Navbar setNewUser={setNewUser} />
+        {/* <button onClick={getUsers}>לחץ כאן להביא משתמשים</button>
+        <button onClick={postDataByNumberSeats}>לחץ כאן להעלות</button>
+        <button onClick={getSeats}>לחץ כאן לבדוק</button> */}
+
         <Routes>
-          <Route path="/" element={<ConfirmedPlace />} />
+          <Route path="/" element={<ConfirmedPlace user={newUser} />} />
           <Route path="map" element={<Map />} />
         </Routes>
 
         {/* <header className="flex bg-red-800 App-header">
         <img src={logo} className="App-logo" alt="logo" />
-      </header> */}
+      </header> 
+       
+      */}
       </BrowserRouter>
     </div>
   );

@@ -4,3 +4,9 @@ export default interface User {
   present: boolean;
   id?: string;
 }
+export default interface Seat {
+  name: string;
+  present: boolean;
+  seat: string;
+  id?: string;
+}

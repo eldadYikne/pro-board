@@ -1,22 +1,19 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import User from "../types/user";
 import chair from "../assets/chair.svg";
 import man from "../assets/man.svg";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "..";
+import Seat from "../types/user";
 
 function Map() {
   const seat = [8, 18];
   const allSeats: any = [];
-  const [seats, setseats] = useState<any>();
-  const [users, setUsers] = useState<any>();
+  const [seats, setSeats] = useState<any>();
+  const [dbSeats, setDbSeats] = useState<any>();
   useEffect(() => {
     async function fetchData() {
       await getUsers();
-      setTimeout(async () => {
-        // await getSeats();
-      }, 100);
     }
     fetchData();
   }, []);
@@ -25,14 +22,27 @@ function Map() {
     await getDocs(collection(db, "users"))
       .then((shot) => {
         const news = shot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
-        setUsers(news);
+        // setUsers(news);
         console.log("news", news);
+        getSeats(news as User[]);
       })
       .catch((error) => console.log(error));
   };
-
-  const getSeats = async () => {
+  // const getSeatsFromDb = async () => {
+  //   await getDocs(collection(db, "seats"))
+  //     .then((shot) => {
+  //       const news = shot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
+  //       // setDbSeats(news);
+  //       console.log("SEATS news", news);
+  //       if (news) {
+  //         getSeats(news as Seat[]);
+  //       }
+  //     })
+  //     .catch((error) => console.log(error));
+  // };
+  const getSeats = async (users: User[]) => {
     try {
+      console.log("dbSeats", dbSeats);
       for (var i = 0; i < seat[0]; i++) {
         allSeats[i] = [];
         for (var j = 0; j < seat[1]; j++) {
@@ -40,16 +50,15 @@ function Map() {
             allSeats[i][j] = "";
           } else {
             let currentSeat = `${i}${j}`;
-            const currentUserSeat = users?.find((user: User) =>
-              user.seats?.includes(currentSeat) ? user.name : false
-            );
-            allSeats[i][j] = currentUserSeat ?? currentSeat;
+            allSeats[i][j] =
+              users.find((user: User) =>
+                user.seats?.find((seat: string) => seat === currentSeat)
+              ) ?? currentSeat;
           }
         }
       }
-      setseats(allSeats);
+      setSeats(allSeats);
       console.table(allSeats);
-      console.log(allSeats);
     } catch (err) {
       console.log(err);
     }
@@ -59,12 +68,9 @@ function Map() {
       dir="ltr"
       className="bg-amber-700  flex flex-col items-center  justify-center text-white"
     >
-      <button onClick={getSeats}>הצג מפה</button>
-
       <table>
         <tbody>
           {seats?.length > 1 &&
-            users?.length > 1 &&
             seats?.map((row: any, rowIndex: number) => (
               <tr className="py-2 flex" key={rowIndex}>
                 {row.map((seatData: any, columnIndex: number) => {
