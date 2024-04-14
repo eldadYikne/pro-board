@@ -24,6 +24,7 @@ export default function Navbar(props: Props) {
 
     if (user) {
       let userToSet = JSON.parse(user);
+      props.setNewUser(userToSet);
       setUser(userToSet);
     }
   }, []);
@@ -39,8 +40,18 @@ export default function Navbar(props: Props) {
   const getUsers = async () => {
     await getDocs(collection(db, "users"))
       .then((shot) => {
-        const news = shot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
-        setUsers(news);
+        const news: any[] = shot.docs.map((doc) => ({
+          ...doc.data(),
+          id: doc.id,
+        }));
+        // news.sort((a,b)=>)
+        const sortedArray = news.sort((a, b) => {
+          const nameA = a.name;
+          const nameB = b.name;
+          // Use localeCompare with 'he' locale to compare Hebrew characters
+          return nameA.localeCompare(nameB, "he");
+        });
+        setUsers(sortedArray);
         console.log("news", news);
       })
       .catch((error) => console.log(error));

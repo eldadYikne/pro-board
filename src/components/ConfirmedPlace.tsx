@@ -1,14 +1,15 @@
 import { useState, useEffect } from "react";
 import User from "../types/user";
-import Seat from "../types/user";
 import Switch from "@mui/material/Switch";
-import axios from "axios";
-import firebase from "firebase/compat/app";
 import "firebase/compat/firestore";
-import { dbUsers } from "../utils/const";
 import { collection, doc, getDocs, updateDoc } from "firebase/firestore";
 import { db } from "..";
-
+import * as React from "react";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import CardMedia from "@mui/material/CardMedia";
+import Typography from "@mui/material/Typography";
+import Img1 from "../assets/img1.jpg";
 function ConfirmedPlace(props: Props) {
   const [parasha, setParasha] = useState("");
   const [candles, setCandles] = useState("");
@@ -24,6 +25,10 @@ function ConfirmedPlace(props: Props) {
   useEffect(() => {
     async function fetchData() {
       await getParasha();
+      // const existUser = JSON.parse(localStorage.getItem("user") ?? "");
+      // if (existUser.name) {
+      //   setUser(existUser);
+      // }
     }
     fetchData();
 
@@ -115,35 +120,42 @@ function ConfirmedPlace(props: Props) {
     }
   };
   return (
-    <div className="flex flex-col items-center">
-      <div className="bg-amber-500 h-40 p-4 flex w-4/5 my-5 rounded-2xl flex-col justify-center cursor-pointer items-center text-xl">
-        <span>נוכחות לשבת -{parasha}</span>
-        <div className="text-sm w-36">
-          <div className="flex justify-between">
-            הדלקת נרות : <span>{candles}</span>
-          </div>
-          <div className="flex justify-between">
-            הבדלה : <span>{havdalah}</span>
-          </div>
-        </div>
-        {user && (
-          <div className="text-black  transition-all flex items-center justify-center">
-            {checked ? "נמצא" : "לא נמצא"}
-            <Switch
-              {...label}
-              defaultChecked
-              checked={checked}
-              onChange={handleChange}
-            />
-          </div>
-        )}
-      </div>
+    <div className="flex justify-center items-center w-full p-2">
+      <Card sx={{ maxWidth: 345 }}>
+        <CardMedia
+          component="img"
+          height="140"
+          image={Img1}
+          alt="green iguana"
+        />
 
-      {users && (
-        <div className="bg-gray-300 h-24 flex flex-col items-center justify-center"></div>
-      )}
-
-      {/* {user && <div>{user.present}</div>} */}
+        <CardContent>
+          <Typography gutterBottom variant="h5" component="div">
+            <span>נוכחות לשבת -{parasha}</span>
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            <div className="text-sm w-36">
+              <div className="flex justify-between">
+                הדלקת נרות : <span>{candles}</span>
+              </div>
+              <div className="flex justify-between">
+                הבדלה : <span>{havdalah}</span>
+              </div>
+            </div>
+          </Typography>
+          {props.user && (
+            <div className="text-black  transition-all flex items-center justify-center">
+              {checked ? "נמצא" : "לא נמצא"}
+              <Switch
+                {...label}
+                defaultChecked
+                checked={checked}
+                onChange={handleChange}
+              />
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

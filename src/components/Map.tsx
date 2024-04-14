@@ -5,6 +5,8 @@ import man from "../assets/man.svg";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "..";
 import Seat from "../types/user";
+import { doc, onSnapshot } from "firebase/firestore";
+import { Button } from "@mui/material";
 
 function Map() {
   const seat = [8, 18];
@@ -13,20 +15,34 @@ function Map() {
   const [dbSeats, setDbSeats] = useState<any>();
   useEffect(() => {
     async function fetchData() {
-      await getUsers();
+      // await getUsers();
     }
     fetchData();
-  }, []);
+  }, [seats]);
 
   const getUsers = async () => {
-    await getDocs(collection(db, "users"))
-      .then((shot) => {
-        const news = shot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
-        // setUsers(news);
-        console.log("news", news);
-        getSeats(news as User[]);
-      })
-      .catch((error) => console.log(error));
+    let updatedUsers: User[] = [];
+    const unsub = await onSnapshot(collection(db, "users"), (querySnapshot) => {
+      querySnapshot.forEach((doc) => {
+        let updatedUser: any = { id: String(doc.id), ...doc.data() };
+        if (doc.data().name === "הלוי") {
+          console.log("Document ID: ", doc.id);
+          console.log("Document data: ", doc.data());
+        }
+        updatedUsers.push(updatedUser);
+      });
+      getSeats(JSON.parse(JSON.stringify(updatedUsers)));
+      updatedUsers = [];
+    });
+
+    // await getDocs(collection(db, "users"))
+    //   .then((shot) => {
+    //     const news = shot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
+    //     // setUsers(news);
+    //     console.log("news", news);
+    //     getSeats(news as User[]);
+    //   })
+    //   .catch((error) => console.log(error));
   };
   // const getSeatsFromDb = async () => {
   //   await getDocs(collection(db, "seats"))
@@ -40,9 +56,9 @@ function Map() {
   //     })
   //     .catch((error) => console.log(error));
   // };
-  const getSeats = async (users: User[]) => {
+  const getSeats = (users: User[]) => {
     try {
-      console.log("dbSeats", dbSeats);
+      console.log("users", users);
       for (var i = 0; i < seat[0]; i++) {
         allSeats[i] = [];
         for (var j = 0; j < seat[1]; j++) {
@@ -57,7 +73,7 @@ function Map() {
           }
         }
       }
-      setSeats(allSeats);
+      setSeats(JSON.parse(JSON.stringify(allSeats)));
       console.table(allSeats);
     } catch (err) {
       console.log(err);
@@ -68,6 +84,9 @@ function Map() {
       dir="ltr"
       className="bg-amber-700  flex flex-col items-center  justify-center text-white"
     >
+      <Button onClick={getUsers} color="inherit">
+        הצג מפה
+      </Button>
       <table>
         <tbody>
           {seats?.length > 1 &&
