@@ -12,7 +12,7 @@ import {
   doc,
   updateDoc,
 } from "firebase/firestore";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { db } from ".";
 import User from "./types/user";
 import Box from "@mui/material/Box";
@@ -29,6 +29,53 @@ function App() {
   const [seats, setSeats] = useState<any>();
   const [newUser, setNewUser] = useState<any>();
   const [value, setValue] = useState(0);
+  const [parasha, setParasha] = useState("");
+  const [candles, setCandles] = useState("");
+  const [havdalah, setHavdalah] = useState("");
+
+  useEffect(() => {
+    async function fetchData() {
+      await getParasha();
+    }
+    fetchData();
+  }, []);
+  const getParasha = async () => {
+    console.log("getParasha");
+    let currentData;
+
+    fetch(
+      "https://www.hebcal.com/shabbat?cfg=json&geonameid=293619&ue=off&b=18&M=on&lg=he&lg=s&tgt=_top"
+    )
+      .then((response) => response.text())
+      .then((data) => {
+        currentData = JSON.parse(data);
+        // console.log("currentData from fetch", currentData.items[2].hebrew);
+        // console.log("currentData ", currentData);
+        const currentParasha = currentData.items.find(
+          (item: any) => item.category === "parashat"
+        );
+        const currentCandles = currentData.items.find(
+          (item: any) => item.category === "candles"
+        );
+        const currentHavdalah = currentData.items.find(
+          (item: any) => item.category === "havdalah"
+        );
+
+        const currentHavdalahDate = `${new Date(
+          currentHavdalah.date
+        ).getHours()}:${new Date(currentHavdalah.date).getMinutes()}`;
+
+        const currentCandlesDate = `${new Date(
+          currentCandles.date
+        ).getHours()}:${new Date(currentCandles.date).getMinutes()}`;
+
+        setHavdalah(currentHavdalahDate);
+        setCandles(currentCandlesDate);
+        setParasha(currentParasha.hebrew);
+      })
+
+      .catch((err) => console.log(err));
+  };
 
   const postCollection = async (
     collectionName: string,
@@ -108,8 +155,18 @@ function App() {
         <button onClick={getSeats}>לחץ כאן לבדוק</button> */}
 
           <Routes>
-            <Route path="/" element={<ConfirmedPlace user={newUser} />} />
-            <Route path="map" element={<Map />} />
+            <Route
+              path="/"
+              element={
+                <ConfirmedPlace
+                  havdalah={havdalah}
+                  candles={candles}
+                  parasha={parasha}
+                  user={newUser}
+                />
+              }
+            />
+            <Route path="map" element={<Map parasha={parasha} />} />
           </Routes>
 
           {/* <header className="flex bg-red-800 App-header">

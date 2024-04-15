@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import User from "../types/user";
 import chair from "../assets/chair.svg";
 import man from "../assets/man.svg";
@@ -6,11 +6,12 @@ import { collection } from "firebase/firestore";
 import { db } from "..";
 import { onSnapshot } from "firebase/firestore";
 import { Button } from "@mui/material";
-
-function Map() {
+import { toPng } from "html-to-image";
+function Map(props: Props) {
   const seat = [8, 18];
   const allSeats: any = [];
   const [seats, setSeats] = useState<any>();
+  const elementRef = useRef(null);
   useEffect(() => {
     async function fetchData() {
       // await getUsers();
@@ -66,15 +67,30 @@ function Map() {
       console.log(err);
     }
   };
+  const htmlToImageConvert = () => {
+    if (elementRef.current) {
+      toPng(elementRef.current, { cacheBust: false })
+        .then((dataUrl) => {
+          const link = document.createElement("a");
+          link.download = ` ${props.parasha} - סידורי ישיבה.png`;
+          link.href = dataUrl;
+          link.click();
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  };
   return (
     <div
       dir="ltr"
-      className="bg-amber-700  flex flex-col items-center  justify-center text-white"
+      className="bg-[#f2d4b0]  flex flex-col items-center overflow-x-auto justify-center text-black"
     >
+      <button onClick={htmlToImageConvert}> הורדת תמונה</button>
       <Button onClick={getUsers} color="inherit">
         הצג מפה
       </Button>
-      <table>
+      <table ref={elementRef}>
         <tbody>
           {seats?.length > 1 &&
             seats?.map((row: any, rowIndex: number) => (
@@ -99,13 +115,13 @@ function Map() {
                     >
                       <img
                         src={chair}
-                        className="w-12 h-12 shadow-xl"
+                        className="w-12 h-12 shadow-xl rounded-lg"
                         alt="logo"
                       />
                       {typeof seatData === "object" && seatData.present && (
                         <img
                           src={man}
-                          className="w-4 h-4 absolute bottom-[30px]"
+                          className="w-4 h-4 absolute bottom-[20px]"
                           alt="man"
                         />
                       )}
@@ -118,9 +134,9 @@ function Map() {
                               : "12px",
                         }}
                       >
-                        {typeof seatData === "object"
+                        {/* {typeof seatData === "object"
                           ? seatData.name
-                          : seatData}
+                          : seatData} */}
                         {/* {currentSeatNumber} */}
                       </span>
                     </td>
@@ -161,3 +177,11 @@ function Map() {
 }
 
 export default Map;
+
+Map.defaultProps = {
+  parasha: "",
+};
+
+interface Props {
+  parasha: string;
+}

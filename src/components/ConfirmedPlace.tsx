@@ -13,9 +13,6 @@ import Img1 from "../assets/img1.jpg";
 import { Alert, Snackbar } from "@mui/material";
 
 function ConfirmedPlace(props: Props) {
-  const [parasha, setParasha] = useState("");
-  const [candles, setCandles] = useState("");
-  const [havdalah, setHavdalah] = useState("");
   const [user, setUser] = useState<User>();
   const [checked, setChecked] = useState(!!props.user.present);
   const [users, setUsers] = useState<User[]>();
@@ -25,15 +22,6 @@ function ConfirmedPlace(props: Props) {
     label: checked ? "נמצא" : "לא נמצא",
   };
   useEffect(() => {
-    async function fetchData() {
-      await getParasha();
-      // const existUser = JSON.parse(localStorage.getItem("user") ?? "");
-      // if (existUser.name) {
-      //   setUser(existUser);
-      // }
-    }
-    fetchData();
-
     console.log("props.user.name", props.user);
     if (props.user.name) {
       // let userToSet = JSON.parse(user);
@@ -41,43 +29,6 @@ function ConfirmedPlace(props: Props) {
       setChecked(props.user.present);
     }
   }, [props.user]);
-  const getParasha = async () => {
-    console.log("getParasha");
-    let currentData;
-
-    fetch(
-      "https://www.hebcal.com/shabbat?cfg=json&geonameid=293619&ue=off&b=18&M=on&lg=he&lg=s&tgt=_top"
-    )
-      .then((response) => response.text())
-      .then((data) => {
-        currentData = JSON.parse(data);
-        // console.log("currentData from fetch", currentData.items[2].hebrew);
-        // console.log("currentData ", currentData);
-        const currentParasha = currentData.items.find(
-          (item: any) => item.category === "parashat"
-        );
-        const currentCandles = currentData.items.find(
-          (item: any) => item.category === "candles"
-        );
-        const currentHavdalah = currentData.items.find(
-          (item: any) => item.category === "havdalah"
-        );
-
-        const currentHavdalahDate = `${new Date(
-          currentHavdalah.date
-        ).getHours()}:${new Date(currentHavdalah.date).getMinutes()}`;
-
-        const currentCandlesDate = `${new Date(
-          currentCandles.date
-        ).getHours()}:${new Date(currentCandles.date).getMinutes()}`;
-
-        setHavdalah(currentHavdalahDate);
-        setCandles(currentCandlesDate);
-        setParasha(currentParasha.hebrew);
-      })
-
-      .catch((err) => console.log(err));
-  };
 
   const handleChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     setChecked(event.target.checked);
@@ -145,15 +96,15 @@ function ConfirmedPlace(props: Props) {
 
         <CardContent>
           <Typography gutterBottom variant="h5" component="div">
-            <span>נוכחות לשבת -{parasha}</span>
+            <span>נוכחות לשבת - {props.parasha}</span>
           </Typography>
           <Typography variant="body2" color="text.secondary">
             <div className="text-sm w-36">
               <div className="flex justify-between">
-                הדלקת נרות : <span>{candles}</span>
+                הדלקת נרות : <span>{props.candles}</span>
               </div>
               <div className="flex justify-between">
-                הבדלה : <span>{havdalah}</span>
+                הבדלה : <span>{props.havdalah}</span>
               </div>
             </div>
           </Typography>
@@ -195,8 +146,14 @@ function ConfirmedPlace(props: Props) {
 export default ConfirmedPlace;
 ConfirmedPlace.defaultProps = {
   user: {},
+  havdalah: "",
+  candles: "",
+  parasha: "",
 };
 
 interface Props {
   user: User;
+  havdalah: string;
+  candles: string;
+  parasha: string;
 }
