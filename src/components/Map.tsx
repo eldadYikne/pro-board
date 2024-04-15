@@ -2,17 +2,15 @@ import React, { useEffect, useState } from "react";
 import User from "../types/user";
 import chair from "../assets/chair.svg";
 import man from "../assets/man.svg";
-import { collection, getDocs } from "firebase/firestore";
+import { collection } from "firebase/firestore";
 import { db } from "..";
-import Seat from "../types/user";
-import { doc, onSnapshot } from "firebase/firestore";
+import { onSnapshot } from "firebase/firestore";
 import { Button } from "@mui/material";
 
 function Map() {
   const seat = [8, 18];
   const allSeats: any = [];
   const [seats, setSeats] = useState<any>();
-  const [dbSeats, setDbSeats] = useState<any>();
   useEffect(() => {
     async function fetchData() {
       // await getUsers();
@@ -44,18 +42,7 @@ function Map() {
     //   })
     //   .catch((error) => console.log(error));
   };
-  // const getSeatsFromDb = async () => {
-  //   await getDocs(collection(db, "seats"))
-  //     .then((shot) => {
-  //       const news = shot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
-  //       // setDbSeats(news);
-  //       console.log("SEATS news", news);
-  //       if (news) {
-  //         getSeats(news as Seat[]);
-  //       }
-  //     })
-  //     .catch((error) => console.log(error));
-  // };
+
   const getSeats = (users: User[]) => {
     try {
       console.log("users", users);
@@ -93,10 +80,22 @@ function Map() {
             seats?.map((row: any, rowIndex: number) => (
               <tr className="py-2 flex" key={rowIndex}>
                 {row.map((seatData: any, columnIndex: number) => {
+                  let currentSeatNumber = `${rowIndex}${columnIndex}`;
                   return seatData.name ? (
                     <td
                       className="px-2 w-14 h-14 flex flex-col items-center justify-center relative"
                       key={columnIndex}
+                      style={{
+                        marginLeft:
+                          (currentSeatNumber?.length === 3 &&
+                            currentSeatNumber?.split("")[2] === "4") ||
+                          (currentSeatNumber?.length === 2 &&
+                            currentSeatNumber?.split("")[1] === "4") ||
+                          (currentSeatNumber?.length === 2 &&
+                            currentSeatNumber?.split("")[1] === "9")
+                            ? "25px"
+                            : "",
+                      }}
                     >
                       <img
                         src={chair}
@@ -110,23 +109,53 @@ function Map() {
                           alt="man"
                         />
                       )}
-                      <span className="text-sm">
+                      <span
+                        className="shadow-innerdow"
+                        style={{
+                          fontSize:
+                            seatData.name.split(" ").length === 2
+                              ? "9px"
+                              : "12px",
+                        }}
+                      >
                         {typeof seatData === "object"
                           ? seatData.name
                           : seatData}
+                        {/* {currentSeatNumber} */}
                       </span>
                     </td>
                   ) : (
                     <td
                       className="px-2 w-14 h-14 flex flex-col items-center justify-center relative"
                       key={columnIndex}
-                    ></td>
+                      style={{
+                        marginLeft:
+                          (currentSeatNumber?.length === 3 &&
+                            currentSeatNumber?.split("")[2] === "4") ||
+                          (currentSeatNumber?.length === 2 &&
+                            currentSeatNumber?.split("")[1] === "4") ||
+                          (currentSeatNumber?.length === 2 &&
+                            currentSeatNumber?.split("")[1] === "9")
+                            ? "25px"
+                            : "",
+                      }}
+                    >
+                      {/* {currentSeatNumber} */}
+                      {currentSeatNumber === "48" && (
+                        <div className=" border-2 flex justify-center items-center absolute border-black h-32 w-44 left-[-18px] text-black ">
+                          תיבה
+                        </div>
+                      )}
+                    </td>
                   );
                 })}
               </tr>
             ))}
         </tbody>
       </table>
+      <div className=" border-2 flex justify-center items-center p-2 mb-2  border-black h-32 w-3/4 left-[-18px] text-black ">
+        ארון
+      </div>
     </div>
   );
 }

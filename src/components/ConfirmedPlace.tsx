@@ -10,6 +10,8 @@ import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
 import Img1 from "../assets/img1.jpg";
+import { Alert, Snackbar } from "@mui/material";
+
 function ConfirmedPlace(props: Props) {
   const [parasha, setParasha] = useState("");
   const [candles, setCandles] = useState("");
@@ -17,7 +19,7 @@ function ConfirmedPlace(props: Props) {
   const [user, setUser] = useState<User>();
   const [checked, setChecked] = useState(!!props.user.present);
   const [users, setUsers] = useState<User[]>();
-
+  const [snackbarIsOpen, setSnackbarIsOpen] = useState<boolean>();
   const label = {
     inputProps: { "aria-label": "Switch demo" },
     label: checked ? "נמצא" : "לא נמצא",
@@ -103,6 +105,8 @@ function ConfirmedPlace(props: Props) {
           name: newUser?.name,
           present: !checked,
         });
+        setSnackbarIsOpen(true);
+        setTimeout(() => setSnackbarIsOpen(false), 2000);
       }
     } catch (err) {
       console.log(err);
@@ -118,6 +122,16 @@ function ConfirmedPlace(props: Props) {
     } catch (error) {
       console.error("Error updating user:", error);
     }
+  };
+  const handleClose = (
+    event: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setSnackbarIsOpen(false);
   };
   return (
     <div className="flex justify-center items-center w-full p-2">
@@ -143,7 +157,7 @@ function ConfirmedPlace(props: Props) {
               </div>
             </div>
           </Typography>
-          {props.user && (
+          {props.user.name && (
             <div className="text-black  transition-all flex items-center justify-center">
               {checked ? "נמצא" : "לא נמצא"}
               <Switch
@@ -156,6 +170,24 @@ function ConfirmedPlace(props: Props) {
           )}
         </CardContent>
       </Card>
+      <div>
+        <Snackbar
+          className="flex flex-row-reverse"
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+          open={snackbarIsOpen}
+          dir="rtl"
+          key={"bottom" + "center"}
+        >
+          <Alert
+            onClose={handleClose}
+            severity="success"
+            variant="filled"
+            sx={{ width: "100%" }}
+          >
+            הפעולה בוצעה בהצלחה{" "}
+          </Alert>
+        </Snackbar>
+      </div>
     </div>
   );
 }

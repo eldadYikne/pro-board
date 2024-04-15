@@ -1,3 +1,27 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+body {
+  font-family: "BalsamiqSans";
+  margin: 0;
+}
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.site-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+.content-wrap {
+  flex: 1;
+  background-color: #ffffff;
+  /* background-image: url("/assets/images/background-stars.png"); */
+  /* background-position: left top;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed; */
+}
+.MuiAlert-filledSuccess {
+  display: flex;
+  flex-direction: row-reverse;
+}

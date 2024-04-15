@@ -1,29 +1,35 @@
 import "./App.css";
 import Navbar from "./components/Navbar";
 import ConfirmedPlace from "./components/ConfirmedPlace";
-import { BrowserRouter, Route, Link, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Map from "./components/Map";
 import Seat from "./types/user";
 import {
   addDoc,
   collection,
-  getDoc,
   getDocs,
   writeBatch,
-  getFirestore,
   doc,
   updateDoc,
 } from "firebase/firestore";
 import { useState } from "react";
 import { db } from ".";
-import { initializeApp } from "firebase/app";
-import { dbUsers } from "./utils/const";
 import User from "./types/user";
-
+import Box from "@mui/material/Box";
+import BottomNavigation from "@mui/material/BottomNavigation";
+import BottomNavigationAction from "@mui/material/BottomNavigationAction";
+import RestoreIcon from "@mui/icons-material/Restore";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import CreditScoreIcon from "@mui/icons-material/CreditScore";
+import WhatsAppIcon from "@mui/icons-material/WhatsApp";
+import PayBox from "./assets/paybox.png";
 function App() {
   const [users, setUsers] = useState<any>();
   const [seats, setSeats] = useState<any>();
   const [newUser, setNewUser] = useState<any>();
+  const [value, setValue] = useState(0);
+
   const postCollection = async (
     collectionName: string,
     collectionValues: any[]
@@ -93,24 +99,38 @@ function App() {
   };
 
   return (
-    <div dir="rtl" className="">
-      <BrowserRouter>
-        <Navbar setNewUser={setNewUser} />
-        {/* <button onClick={getUsers}>לחץ כאן להביא משתמשים</button>
+    <div dir="rtl" className="site-container">
+      <div className="content-wrap">
+        <BrowserRouter>
+          <Navbar setNewUser={setNewUser} />
+          {/* <button onClick={getUsers}>לחץ כאן להביא משתמשים</button>
         <button onClick={postDataByNumberSeats}>לחץ כאן להעלות</button>
         <button onClick={getSeats}>לחץ כאן לבדוק</button> */}
 
-        <Routes>
-          <Route path="/" element={<ConfirmedPlace user={newUser} />} />
-          <Route path="map" element={<Map />} />
-        </Routes>
+          <Routes>
+            <Route path="/" element={<ConfirmedPlace user={newUser} />} />
+            <Route path="map" element={<Map />} />
+          </Routes>
 
-        {/* <header className="flex bg-red-800 App-header">
+          {/* <header className="flex bg-red-800 App-header">
         <img src={logo} className="App-logo" alt="logo" />
       </header> 
        
       */}
-      </BrowserRouter>
+        </BrowserRouter>
+      </div>
+      <BottomNavigation
+        showLabels
+        value={value}
+        onChange={(event, newValue) => {
+          setValue(newValue);
+        }}
+      >
+        <BottomNavigationAction label="פייבוקס" icon={<CreditScoreIcon />} />
+        {/* <img src={PayBox  }/> */}
+        <BottomNavigationAction label="ווצאפ קהילתי" icon={<WhatsAppIcon />} />
+        {/* <BottomNavigationAction label="Nearby" icon={<LocationOnIcon />} /> */}
+      </BottomNavigation>
     </div>
   );
 }
