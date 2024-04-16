@@ -69,7 +69,10 @@ function Map(props: Props) {
   };
   const htmlToImageConvert = () => {
     if (elementRef.current) {
-      toPng(elementRef.current, { cacheBust: false })
+      toPng(elementRef.current, {
+        cacheBust: false,
+        backgroundColor: "#f2d4b0",
+      })
         .then((dataUrl) => {
           const link = document.createElement("a");
           link.download = ` ${props.parasha} - סידורי ישיבה.png`;
@@ -86,91 +89,105 @@ function Map(props: Props) {
       dir="ltr"
       className="bg-[#f2d4b0]  flex flex-col items-center overflow-x-auto justify-center text-black"
     >
-      <button onClick={htmlToImageConvert}> הורדת תמונה</button>
-      <Button onClick={getUsers} color="inherit">
-        הצג מפה
-      </Button>
-      <table ref={elementRef}>
-        <tbody>
-          {seats?.length > 1 &&
-            seats?.map((row: any, rowIndex: number) => (
-              <tr className="py-2 flex" key={rowIndex}>
-                {row.map((seatData: any, columnIndex: number) => {
-                  let currentSeatNumber = `${rowIndex}${columnIndex}`;
-                  return seatData.name ? (
-                    <td
-                      className="px-2 w-14 h-14 flex flex-col items-center justify-center relative"
-                      key={columnIndex}
-                      style={{
-                        marginLeft:
-                          (currentSeatNumber?.length === 3 &&
-                            currentSeatNumber?.split("")[2] === "4") ||
-                          (currentSeatNumber?.length === 2 &&
-                            currentSeatNumber?.split("")[1] === "4") ||
-                          (currentSeatNumber?.length === 2 &&
-                            currentSeatNumber?.split("")[1] === "9")
-                            ? "25px"
-                            : "",
-                      }}
-                    >
-                      <img
-                        src={chair}
-                        className="w-12 h-12 shadow-xl rounded-lg"
-                        alt="logo"
-                      />
-                      {typeof seatData === "object" && seatData.present && (
-                        <img
-                          src={man}
-                          className="w-4 h-4 absolute bottom-[20px]"
-                          alt="man"
-                        />
-                      )}
-                      <span
-                        className="shadow-innerdow"
+      {seats?.length > 1 && (
+        <div className="bg-white m-2 ">
+          <Button onClick={htmlToImageConvert} color="primary">
+            הורדת תמונה{" "}
+          </Button>
+        </div>
+      )}
+      {!seats && (
+        <div className="bg-white m-2 ">
+          <Button onClick={getUsers} color="primary">
+            הצג מפה
+          </Button>
+        </div>
+      )}
+      <div className="flex flex-col items-center" ref={elementRef}>
+        <table>
+          <tbody>
+            {seats?.length > 1 &&
+              seats?.map((row: any, rowIndex: number) => (
+                <tr className="py-2 flex" key={rowIndex}>
+                  {row.map((seatData: any, columnIndex: number) => {
+                    let currentSeatNumber = `${rowIndex}${columnIndex}`;
+                    return seatData.name ? (
+                      <td
+                        className="px-2 w-14 h-14 flex flex-col items-center justify-center relative"
+                        key={columnIndex}
                         style={{
-                          fontSize:
-                            seatData.name.split(" ").length === 2
-                              ? "9px"
-                              : "12px",
+                          marginLeft:
+                            (currentSeatNumber?.length === 3 &&
+                              currentSeatNumber?.split("")[2] === "4") ||
+                            (currentSeatNumber?.length === 2 &&
+                              currentSeatNumber?.split("")[1] === "4") ||
+                            (currentSeatNumber?.length === 2 &&
+                              currentSeatNumber?.split("")[1] === "9")
+                              ? "25px"
+                              : "",
                         }}
                       >
-                        {/* {typeof seatData === "object"
+                        <img
+                          src={chair}
+                          className="w-12 h-12 shadow-xl rounded-lg"
+                          alt="logo"
+                        />
+                        {typeof seatData === "object" && seatData.present && (
+                          <img
+                            src={man}
+                            className="w-4 h-4 absolute bottom-[20px]"
+                            alt="man"
+                          />
+                        )}
+                        <span
+                          className="shadow-innerdow"
+                          style={{
+                            fontSize:
+                              seatData.name.split(" ").length === 2
+                                ? "9px"
+                                : "12px",
+                          }}
+                        >
+                          {/* {typeof seatData === "object"
                           ? seatData.name
                           : seatData} */}
+                          {/* {currentSeatNumber} */}
+                        </span>
+                      </td>
+                    ) : (
+                      <td
+                        className="px-2 w-14 h-14 flex flex-col items-center justify-center relative"
+                        key={columnIndex}
+                        style={{
+                          marginLeft:
+                            (currentSeatNumber?.length === 3 &&
+                              currentSeatNumber?.split("")[2] === "4") ||
+                            (currentSeatNumber?.length === 2 &&
+                              currentSeatNumber?.split("")[1] === "4") ||
+                            (currentSeatNumber?.length === 2 &&
+                              currentSeatNumber?.split("")[1] === "9")
+                              ? "25px"
+                              : "",
+                        }}
+                      >
                         {/* {currentSeatNumber} */}
-                      </span>
-                    </td>
-                  ) : (
-                    <td
-                      className="px-2 w-14 h-14 flex flex-col items-center justify-center relative"
-                      key={columnIndex}
-                      style={{
-                        marginLeft:
-                          (currentSeatNumber?.length === 3 &&
-                            currentSeatNumber?.split("")[2] === "4") ||
-                          (currentSeatNumber?.length === 2 &&
-                            currentSeatNumber?.split("")[1] === "4") ||
-                          (currentSeatNumber?.length === 2 &&
-                            currentSeatNumber?.split("")[1] === "9")
-                            ? "25px"
-                            : "",
-                      }}
-                    >
-                      {/* {currentSeatNumber} */}
-                      {currentSeatNumber === "48" && (
-                        <div className=" border-2 flex justify-center items-center absolute border-black h-32 w-44 left-[-18px] text-black ">
-                          תיבה
-                        </div>
-                      )}
-                    </td>
-                  );
-                })}
-              </tr>
-            ))}
-        </tbody>
-      </table>
-      <div className=" border-2 flex justify-center items-center p-2 mb-2  border-black h-32 w-3/4 left-[-18px] text-black ">
-        ארון
+                        {currentSeatNumber === "48" && (
+                          <div className=" border-2 flex justify-center items-center absolute border-black h-32 w-44 left-[-18px] text-black ">
+                            תיבה
+                          </div>
+                        )}
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+          </tbody>
+        </table>
+        {seats?.length > 1 && (
+          <div className=" border-2 flex justify-center items-center p-2 mb-2  border-black h-32 w-3/4 left-[-18px] text-black ">
+            ארון
+          </div>
+        )}
       </div>
     </div>
   );

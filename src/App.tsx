@@ -184,9 +184,7 @@ function App() {
         }}
       >
         <BottomNavigationAction label="פייבוקס" icon={<CreditScoreIcon />} />
-        {/* <img src={PayBox  }/> */}
         <BottomNavigationAction label="ווצאפ קהילתי" icon={<WhatsAppIcon />} />
-        {/* <BottomNavigationAction label="Nearby" icon={<LocationOnIcon />} /> */}
       </BottomNavigation>
     </div>
   );
