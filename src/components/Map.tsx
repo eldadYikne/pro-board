@@ -113,7 +113,7 @@ function Map(props: Props) {
                     let currentSeatNumber = `${rowIndex}${columnIndex}`;
                     return seatData.name ? (
                       <td
-                        className="px-2 w-14 h-14 flex flex-col items-center justify-center relative"
+                        className="px-2 w-14 h-14 flex flex-col items-center justify-center relative td-table-seat"
                         key={columnIndex}
                         style={{
                           marginLeft:
@@ -129,7 +129,11 @@ function Map(props: Props) {
                       >
                         <img
                           src={chair}
-                          className="w-12 h-12 shadow-xl rounded-lg"
+                          className={`${
+                            typeof seatData === "object" && seatData.present
+                              ? ""
+                              : "not-present"
+                          } w-12 h-12 shadow-xl rounded-lg`}
                           alt="logo"
                         />
                         {typeof seatData === "object" && seatData.present && (
