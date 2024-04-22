@@ -1,3 +1,5 @@
+import { TranslationsZmanimKeys } from "../types/zmanim";
+
 export const dbUsers = [
   {
     name: "יקנה",
@@ -258,3 +260,45 @@ export const dbUsers = [
     present: true,
   },
 ];
+export function getCurrentDate() {
+  const currentDate = new Date();
+  const year = currentDate.getFullYear();
+  const month = String(currentDate.getMonth() + 1).padStart(2, "0"); // Months are zero-based
+  const day = String(currentDate.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+export function getHoursAndMinutes(dateTimeString: string) {
+  const dateObj = new Date(dateTimeString);
+  const hours = String(dateObj.getHours()).padStart(2, "0");
+  const minutes = String(dateObj.getMinutes()).padStart(2, "0");
+  return `${hours}:${minutes}`;
+}
+// Example usage:
+// console.log(getCurrentDate()); // Output: e.g., 2024-04-16
+
+export const translationsZmanimKeys: TranslationsZmanimKeys = {
+  chatzotNight: "חצות הלילה",
+  alotHaShachar: "עלות השחר",
+  misheyakir: "משיכיר",
+  misheyakirMachmir: "משיכיר מחמיר",
+  dawn: "שחר",
+  sunrise: "זריחה",
+  sofZmanShmaMGA16Point1: 'סוף זמן שמע מג"א 16.1',
+  sofZmanShmaMGA: 'סוף זמן שמע מג"א',
+  sofZmanShma: "סוף זמן שמע",
+  sofZmanTfillaMGA16Point1: 'סוף זמן תפילה מג"א 16.1',
+  sofZmanTfillaMGA: 'סוף זמן תפילה מג"א',
+  sofZmanTfilla: "סוף זמן תפילה",
+  chatzot: "חצות",
+  minchaGedola: "מנחה גדולה",
+  minchaKetana: "מנחה קטנה",
+  plagHaMincha: "פלג המנחה",
+  sunset: "שקיעה",
+  beinHaShmashos: "בין השמשות",
+  dusk: "נטיפות",
+  tzeit7083deg: "צאת הכוכבים",
+  tzeit85deg: "צאת כוכבים (8.5 מעלות)",
+  tzeit42min: "צאת כוכבים (42 דקות)",
+  tzeit50min: "צאת כוכבים (50 דקות)",
+  tzeit72min: "צאת כוכבים (72 דקות)",
+};

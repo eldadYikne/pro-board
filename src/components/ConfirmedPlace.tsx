@@ -5,12 +5,15 @@ import "firebase/compat/firestore";
 import { collection, doc, getDocs, updateDoc } from "firebase/firestore";
 import { db } from "..";
 import * as React from "react";
+import Board from "./Board";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
 import Img1 from "../assets/img1.jpg";
-import { Alert, Snackbar } from "@mui/material";
+import { Alert, Checkbox, FormControlLabel, Snackbar } from "@mui/material";
+import { Zman } from "../types/zmanim";
+import EditBoard from "./EditBoard";
 
 function ConfirmedPlace(props: Props) {
   const [user, setUser] = useState<User>();
@@ -30,8 +33,8 @@ function ConfirmedPlace(props: Props) {
     }
   }, [props.user]);
 
-  const handleChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    setChecked(event.target.checked);
+  const handleChange = async (isPresent: boolean) => {
+    setChecked(isPresent);
     const newUserToUse: any = props.user;
     console.log("newUserToUse", newUserToUse);
     if (!user?.id) {
@@ -62,7 +65,7 @@ function ConfirmedPlace(props: Props) {
     } catch (err) {
       console.log(err);
     }
-    console.log(event.target.checked);
+    console.log(isPresent);
   };
   const updateUser = async (userId: string, userData: any) => {
     const userRef = doc(collection(db, "users"), userId); // Get reference to the user document
@@ -85,7 +88,7 @@ function ConfirmedPlace(props: Props) {
     setSnackbarIsOpen(false);
   };
   return (
-    <div className="flex justify-center items-center w-full p-2">
+    <div className="flex flex-col justify-center items-center w-full p-2">
       <Card sx={{ maxWidth: 345 }}>
         <CardMedia
           component="img"
@@ -96,7 +99,7 @@ function ConfirmedPlace(props: Props) {
 
         <CardContent>
           <Typography gutterBottom variant="h5" component="div">
-            <span>נוכחות לשבת - {props.parasha}</span>
+            <span>נוכחות - {props.parasha}</span>
           </Typography>
           <Typography variant="body2" color="text.secondary">
             <div className="text-sm w-36">
@@ -110,17 +113,42 @@ function ConfirmedPlace(props: Props) {
           </Typography>
           {props.user.name && (
             <div className="text-black  transition-all flex items-center justify-center">
-              {checked ? "נמצא" : "לא נמצא"}
-              <Switch
+              {/* {checked ? "נמצא" : "לא נמצא"} */}
+              {/* <Switch
                 {...label}
                 defaultChecked
                 checked={checked}
                 onChange={handleChange}
+              /> */}
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    onChange={() => handleChange(true)}
+                    defaultChecked
+                    checked={checked}
+                  />
+                }
+                label="נמצא"
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    onChange={() => handleChange(false)}
+                    defaultChecked
+                    checked={!checked}
+                  />
+                }
+                label="לא נמצא"
               />
             </div>
           )}
         </CardContent>
       </Card>
+
+      {/* <div className="w-full h-full ">
+        <Board zmanim={props.zmanim} />
+      </div> */}
+      {/* {<EditBoard />} */}
       <div>
         <Snackbar
           className="flex flex-row-reverse"
@@ -149,6 +177,7 @@ ConfirmedPlace.defaultProps = {
   havdalah: "",
   candles: "",
   parasha: "",
+  zmanim: null,
 };
 
 interface Props {
@@ -156,4 +185,5 @@ interface Props {
   havdalah: string;
   candles: string;
   parasha: string;
+  zmanim: Zman[] | null;
 }

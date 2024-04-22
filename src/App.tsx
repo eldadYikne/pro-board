@@ -24,6 +24,14 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 import CreditScoreIcon from "@mui/icons-material/CreditScore";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import PayBox from "./assets/paybox.png";
+import {
+  getCurrentDate,
+  getHoursAndMinutes,
+  translationsZmanimKeys,
+} from "./utils/const";
+import { TranslationsZmanimKeys, Zman } from "./types/zmanim";
+import Edit from "./components/EditBoard";
+import Board from "./components/Board";
 function App() {
   const [users, setUsers] = useState<any>();
   const [seats, setSeats] = useState<any>();
@@ -32,6 +40,7 @@ function App() {
   const [parasha, setParasha] = useState("");
   const [candles, setCandles] = useState("");
   const [havdalah, setHavdalah] = useState("");
+  const [zmanim, setZmanim] = useState<Zman[]>();
 
   useEffect(() => {
     async function fetchData() {
@@ -41,26 +50,51 @@ function App() {
   }, []);
   const getParasha = async () => {
     console.log("getParasha");
-    let currentData;
+    let shabatData;
+    let zmanimData: Zman[] = [];
+    let currentDate = getCurrentDate();
+    fetch(
+      `https://www.hebcal.com/zmanim?cfg=json&geonameid=293619&date=${currentDate}`
+    )
+      .then((res) => res.text())
+      .then((data) => {
+        let newData = JSON.parse(data);
+        console.log("zmanimData ", newData);
 
+        for (const property in newData.times) {
+          zmanimData.push({
+            name: String(
+              translationsZmanimKeys[property as keyof TranslationsZmanimKeys]
+            ),
+            time: getHoursAndMinutes(newData.times[property]),
+          });
+        }
+        console.log("zmanimDatazmanimData ", zmanimData);
+        setZmanim(zmanimData);
+      });
     fetch(
       "https://www.hebcal.com/shabbat?cfg=json&geonameid=293619&ue=off&b=18&M=on&lg=he&lg=s&tgt=_top"
     )
       .then((response) => response.text())
       .then((data) => {
-        currentData = JSON.parse(data);
+        shabatData = JSON.parse(data);
         // console.log("currentData from fetch", currentData.items[2].hebrew);
-        // console.log("currentData ", currentData);
-        const currentParasha = currentData.items.find(
+        console.log("shabatData ", shabatData);
+        let currentParasha = shabatData.items.find(
           (item: any) => item.category === "parashat"
         );
-        const currentCandles = currentData.items.find(
+        const currentCandles = shabatData.items.find(
           (item: any) => item.category === "candles"
         );
-        const currentHavdalah = currentData.items.find(
+        const currentHavdalah = shabatData.items.find(
           (item: any) => item.category === "havdalah"
         );
-
+        if (!currentParasha) {
+          currentParasha = shabatData.items.find(
+            (item: any) =>
+              item.category === "holiday" && item.subcat === "major"
+          );
+        }
         const currentHavdalahDate = `${new Date(
           currentHavdalah.date
         ).getHours()}:${new Date(currentHavdalah.date).getMinutes()}`;
@@ -163,10 +197,16 @@ function App() {
                   candles={candles}
                   parasha={parasha}
                   user={newUser}
+                  zmanim={zmanim}
                 />
               }
             />
             <Route path="map" element={<Map parasha={parasha} />} />
+            <Route path="edit" element={<Edit parasha={parasha} />} />
+            <Route
+              path="board"
+              element={<Board zmanim={zmanim} parasha={parasha} />}
+            />
           </Routes>
 
           {/* <header className="flex bg-red-800 App-header">
