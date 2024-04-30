@@ -1,0 +1,18 @@
+@font-face {
+  font-family: "Alef";
+  src: url("./Alef-Regular.ttf") format("truetype");
+  /* Add other font formats if available */
+}
+
+@font-face {
+  font-family: "Damka";
+  src: url("./damka-regular-fm.otf") format("opentype");
+}
+@font-face {
+  font-family: "BonaNova";
+  src: url("./BonaNova-Regular.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Yiddish";
+  src: url("./YiddishkeitAlefAlefAlef-Bold.otf") format("opentype");
+}

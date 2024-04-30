@@ -283,10 +283,10 @@ export const translationsZmanimKeys: TranslationsZmanimKeys = {
   misheyakirMachmir: "משיכיר מחמיר",
   dawn: "שחר",
   sunrise: "זריחה",
-  sofZmanShmaMGA16Point1: 'סוף זמן שמע מג"א 16.1',
+  sofZmanShmaMGA16Point1: 'סוף זמן שמע מג"א',
   sofZmanShmaMGA: 'סוף זמן שמע מג"א',
   sofZmanShma: "סוף זמן שמע",
-  sofZmanTfillaMGA16Point1: 'סוף זמן תפילה מג"א 16.1',
+  sofZmanTfillaMGA16Point1: 'סוף זמן תפילה מג"א',
   sofZmanTfillaMGA: 'סוף זמן תפילה מג"א',
   sofZmanTfilla: "סוף זמן תפילה",
   chatzot: "חצות",
@@ -302,3 +302,25 @@ export const translationsZmanimKeys: TranslationsZmanimKeys = {
   tzeit50min: "צאת כוכבים (50 דקות)",
   tzeit72min: "צאת כוכבים (72 דקות)",
 };
+export const beautyColorsHex: string[] = [
+  "#DC143C", // Crimson
+  "#E6E6FA", // Lavender
+  "#008000", // Emerald
+  "#0F52BA", // Sapphire
+  "#DAA520", // Goldenrod
+  "#FF7F50", // Coral
+  "#9966CC", // Amethyst
+  "#40E0D0", // Turquoise
+  "#E0115F", // Ruby
+  "#EAE0C8", // Pearl
+  "#4B0082", // Indigo
+  "#FF00FF", // Magenta
+  "#FFD700", // Topaz
+  "#007FFF", // Azure
+  "#E6E200", // Peridot
+  "#8A2BE2", // Violet
+  "#FF007F", // Rose
+  "#007BA7", // Cerulean
+  "#FF2400", // Scarlet
+  "#00FFFF", // Aqua
+];

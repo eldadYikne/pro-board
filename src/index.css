@@ -1,3 +1,6 @@
+@import "./fonts/fonts.css";
+@import "./assets/css/Kboard.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

@@ -1,7 +1,14 @@
 import "./App.css";
 import Navbar from "./components/Navbar";
 import ConfirmedPlace from "./components/ConfirmedPlace";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import {
+  BrowserRouter,
+  Route,
+  Routes,
+  useLocation,
+  useParams,
+  useRoutes,
+} from "react-router-dom";
 import Map from "./components/Map";
 import Seat from "./types/user";
 import {
@@ -11,37 +18,35 @@ import {
   writeBatch,
   doc,
   updateDoc,
+  getDoc,
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { db } from ".";
 import User from "./types/user";
-import Box from "@mui/material/Box";
 import BottomNavigation from "@mui/material/BottomNavigation";
 import BottomNavigationAction from "@mui/material/BottomNavigationAction";
-import RestoreIcon from "@mui/icons-material/Restore";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
 import CreditScoreIcon from "@mui/icons-material/CreditScore";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
-import PayBox from "./assets/paybox.png";
 import {
   getCurrentDate,
   getHoursAndMinutes,
   translationsZmanimKeys,
 } from "./utils/const";
 import { TranslationsZmanimKeys, Zman } from "./types/zmanim";
-import Edit from "./components/EditBoard";
-import Board from "./components/Board";
+import EditBoard from "./components/EditBoard";
+import Kboard from "./components/Kboard";
 function App() {
   const [users, setUsers] = useState<any>();
-  const [seats, setSeats] = useState<any>();
+  const [board, setBoard] = useState<any>();
   const [newUser, setNewUser] = useState<any>();
   const [value, setValue] = useState(0);
   const [parasha, setParasha] = useState("");
   const [candles, setCandles] = useState("");
   const [havdalah, setHavdalah] = useState("");
   const [zmanim, setZmanim] = useState<Zman[]>();
-
+  const location = useLocation();
+  const { hash, pathname, search } = location;
+  console.log("location.pathname ", pathname);
   useEffect(() => {
     async function fetchData() {
       await getParasha();
@@ -92,7 +97,9 @@ function App() {
         if (!currentParasha) {
           currentParasha = shabatData.items.find(
             (item: any) =>
-              item.category === "holiday" && item.subcat === "major"
+              item.category === "holiday" &&
+              item.subcat === "major" &&
+              item.date === currentDate
           );
         }
         const currentHavdalahDate = `${new Date(
@@ -154,6 +161,15 @@ function App() {
       console.error("Error updating user:", error);
     }
   };
+  const updateBoard = async (boardId: string, boardData: any) => {
+    const boardRef = doc(collection(db, "boards"), boardId); // Get reference to the user document
+    try {
+      await updateDoc(boardRef, boardData); // Update the user document with new data
+      console.log("User updated successfully!");
+    } catch (error) {
+      console.error("Error updating user:", error);
+    }
+  };
   const postUser = async () => {
     const docRef = await addDoc(collection(db, "users"), {
       user: { name: "יעקב כהן", seats: ["1"], present: false },
@@ -169,12 +185,31 @@ function App() {
       })
       .catch((error) => console.log(error));
   };
-  const getSeats = async () => {
-    await getDocs(collection(db, "seats"))
+  const getBoardById = async (boardId: string) => {
+    try {
+      const boardDoc = await getDoc(doc(db, "boards", boardId));
+      if (boardDoc.exists()) {
+        // Document exists, return its data along with the ID
+        const dbBoard = { ...boardDoc.data(), id: boardDoc.id };
+        setBoard(dbBoard);
+        console.log(dbBoard);
+      } else {
+        // Document does not exist
+        console.log("User not found");
+        return null;
+      }
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      throw error; // Rethrow the error to handle it where the function is called
+    }
+  };
+
+  const getBoards = async () => {
+    await getDocs(collection(db, "boards"))
       .then((shot) => {
         const news = shot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
-        setSeats(news);
-        console.log("SEATS", news);
+        // setBoard(news);
+        console.log("boards", news);
       })
       .catch((error) => console.log(error));
   };
@@ -182,50 +217,39 @@ function App() {
   return (
     <div dir="rtl" className="site-container">
       <div className="content-wrap">
-        <BrowserRouter>
-          <Navbar setNewUser={setNewUser} />
-          {/* <button onClick={getUsers}>לחץ כאן להביא משתמשים</button>
-        <button onClick={postDataByNumberSeats}>לחץ כאן להעלות</button>
-        <button onClick={getSeats}>לחץ כאן לבדוק</button> */}
+        {!pathname.includes("board") && <Navbar setNewUser={setNewUser} />}
+        {/* <button onClick={getUsers}>לחץ כאן להביא משתמשים</button> */}
+        {/* <button onClick={() => postCollection("boards", [board])}>
+            לחץ כאן להעלות
+          </button> */}
+        {/* <button onClick={() => getBoardById("LnyqSBc5RtBE0E3dwCy2")}>
+            לחץ כאן לבדוק
+          </button> */}
 
-          <Routes>
-            <Route
-              path="/"
-              element={
-                <ConfirmedPlace
-                  havdalah={havdalah}
-                  candles={candles}
-                  parasha={parasha}
-                  user={newUser}
-                  zmanim={zmanim}
-                />
-              }
-            />
-            <Route path="map" element={<Map parasha={parasha} />} />
-            <Route path="edit" element={<Edit parasha={parasha} />} />
-            <Route
-              path="board"
-              element={<Board zmanim={zmanim} parasha={parasha} />}
-            />
-          </Routes>
-
-          {/* <header className="flex bg-red-800 App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-      </header> 
-       
-      */}
-        </BrowserRouter>
+        <Routes>
+          <Route
+            path="/confirm/:id"
+            element={
+              <ConfirmedPlace
+                havdalah={havdalah}
+                candles={candles}
+                parasha={parasha}
+                user={newUser}
+                zmanim={zmanim}
+              />
+            }
+          />
+          <Route path="map" element={<Map parasha={parasha} />} />
+          <Route
+            path="edit/:id"
+            element={<EditBoard zmanim={zmanim} parasha={parasha} />}
+          />
+          <Route
+            path="board/:id"
+            element={<Kboard zmanim={zmanim} parasha={parasha} />}
+          />
+        </Routes>
       </div>
-      <BottomNavigation
-        showLabels
-        value={value}
-        onChange={(event, newValue) => {
-          setValue(newValue);
-        }}
-      >
-        <BottomNavigationAction label="פייבוקס" icon={<CreditScoreIcon />} />
-        <BottomNavigationAction label="ווצאפ קהילתי" icon={<WhatsAppIcon />} />
-      </BottomNavigation>
     </div>
   );
 }

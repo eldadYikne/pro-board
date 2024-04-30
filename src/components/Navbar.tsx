@@ -8,17 +8,27 @@ import MenuIcon from "@mui/icons-material/Menu";
 import Kmodal from "./Kmodal";
 import { useState, useEffect } from "react";
 import User from "../types/user";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 import { db } from "..";
+import { useParams } from "react-router-dom";
+import { Board } from "../types/board";
 
 export default function Navbar(props: Props) {
   const [user, setUser] = useState<any>();
   const [users, setUsers] = useState<any[]>();
+  const [dbBoard, setDbBoard] = useState<Board>();
 
+  const { id } = useParams();
   useEffect(() => {
     async function fetchData() {
+      console.log("id from navbar", id);
+      if (id) {
+        console.log("id from navbar", id);
+        await getBoardById(id);
+      }
       await getUsers();
     }
+
     fetchData();
     const user = localStorage.getItem("user");
 
@@ -27,8 +37,27 @@ export default function Navbar(props: Props) {
       props.setNewUser(userToSet);
       setUser(userToSet);
     }
-  }, []);
-
+  }, [id]);
+  const getBoardById = async (boardId: string) => {
+    try {
+      const boardDoc = await getDoc(doc(db, "boards", boardId));
+      if (boardDoc.exists()) {
+        // Document exists, return its data along with the ID
+        const newBoard = { ...boardDoc.data(), id: boardDoc.id };
+        if (newBoard) {
+          setDbBoard(newBoard as Board);
+        }
+        console.log(newBoard);
+      } else {
+        // Document does not exist
+        console.log("User not found");
+        return null;
+      }
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      throw error; // Rethrow the error to handle it where the function is called
+    }
+  };
   const onPickUsername = (user: User) => {
     if (user) {
       console.log(user);
@@ -76,7 +105,7 @@ export default function Navbar(props: Props) {
             component="div"
             sx={{ flexGrow: 1 }}
           >
-            בית כנסת כלניות
+            {dbBoard && dbBoard.boardName}
           </Typography>
 
           {users && (

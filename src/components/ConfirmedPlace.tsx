@@ -2,10 +2,16 @@ import { useState, useEffect } from "react";
 import User from "../types/user";
 import Switch from "@mui/material/Switch";
 import "firebase/compat/firestore";
-import { collection, doc, getDocs, updateDoc } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  updateDoc,
+} from "firebase/firestore";
 import { db } from "..";
 import * as React from "react";
-import Board from "./Board";
+import Kboard from "./Kboard";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
@@ -14,6 +20,8 @@ import Img1 from "../assets/img1.jpg";
 import { Alert, Checkbox, FormControlLabel, Snackbar } from "@mui/material";
 import { Zman } from "../types/zmanim";
 import EditBoard from "./EditBoard";
+import { useParams } from "react-router-dom";
+import { Board } from "../types/board";
 
 function ConfirmedPlace(props: Props) {
   const [user, setUser] = useState<User>();
@@ -24,15 +32,44 @@ function ConfirmedPlace(props: Props) {
     inputProps: { "aria-label": "Switch demo" },
     label: checked ? "נמצא" : "לא נמצא",
   };
+  const { id } = useParams();
+  const [dbBoard, setDbBoard] = useState<Board>();
+
   useEffect(() => {
-    console.log("props.user.name", props.user);
+    console.log("board id", id);
     if (props.user.name) {
       // let userToSet = JSON.parse(user);
       setUser(props.user);
       setChecked(props.user.present);
     }
+    async function fetchData() {
+      if (id) {
+        console.log("id", id);
+        await getBoardById(id);
+      }
+    }
+    fetchData();
   }, [props.user]);
-
+  const getBoardById = async (boardId: string) => {
+    try {
+      const boardDoc = await getDoc(doc(db, "boards", boardId));
+      if (boardDoc.exists()) {
+        // Document exists, return its data along with the ID
+        const newBoard = { ...boardDoc.data(), id: boardDoc.id };
+        if (newBoard) {
+          setDbBoard(newBoard as Board);
+        }
+        console.log(newBoard);
+      } else {
+        // Document does not exist
+        console.log("User not found");
+        return null;
+      }
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      throw error; // Rethrow the error to handle it where the function is called
+    }
+  };
   const handleChange = async (isPresent: boolean) => {
     setChecked(isPresent);
     const newUserToUse: any = props.user;

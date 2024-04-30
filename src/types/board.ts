@@ -1,27 +1,28 @@
 import { TranslationsZmanimKeys } from "./zmanim";
 
 export interface Board {
-  city: string;
+  id?: string;
+  boardName: string;
   geoId: string;
   timeScreenPass: string;
   tfilaTimes: Tfila[];
-  forUplifting: string[];
-  forMedicine: string[];
+  forUplifting: Message[];
+  forMedicine: Message[];
   messages: Message[];
-  boardBackgroundImage: BoardBackgroundImage;
+  boardBackgroundImage: string;
+  boardTextColor: string;
   mapBackgroundImage: string;
-  timesToShow: TranslationsZmanimKeys[];
-  users: string[];
+  timesToShow: Array<keyof TranslationsZmanimKeys>;
+  users?: string[];
   theme: Theme;
 }
 
-interface Tfila {
+export interface Tfila {
   time: string;
-  name: TfilaName;
+  name: string;
   isSaturdayTfila: boolean;
 }
-interface Message {
-  title: string;
+export interface Message {
   content: string;
   date: Date;
 }
@@ -43,4 +44,4 @@ type TfilaName =
   | "(אשרי) מנחה של שבת"
   | "ערבית צאת שבת";
 
-type Theme = "regular" | "primary" | "gold";
+export type Theme = "regular" | "nature" | "gold";
