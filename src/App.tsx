@@ -232,6 +232,7 @@ function App() {
               />
             }
           />
+          <Route path="/" element={<div>עמוד לא נמצא</div>} />
           <Route path="/map" element={<Map parasha={parasha} />} />
           <Route
             path="/edit/:id"
