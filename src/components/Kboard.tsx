@@ -169,26 +169,37 @@ function Kboard(props: Props) {
           <div className="flex flex-col gap-4 h-full w-full items-center justify-center">
             <div
               className="sm:text-8xl py-4 font-bold font-['Yiddish'] "
-              style={{ color: colors[2] }}
+              style={{
+                color: dbBoard.boardTextColor === "auto" ? colors[2] : "black",
+              }}
             >
               {dbBoard.boardName}
             </div>
             <div className="flex gap-6 w-[80%] min-h-3/4">
               <div className="flex flex-col justify-between gap-3 sm:min-w-96 w-full ">
                 <div
-                  style={{ color: colors[1] }}
+                  style={{
+                    color:
+                      dbBoard.boardTextColor === "auto" ? colors[1] : "black",
+                  }}
                   className="backdrop-opacity-10 rounded-md backdrop-invert bg-white/50 px-3 py-4 h-full w-full   flex items-center justify-center shadow-sm font-['Yiddish'] sm:text-6xl text-amber-600-600/75"
                 >
                   {hebrewDate}
                 </div>
                 <div
-                  style={{ color: colors[2] }}
+                  style={{
+                    color:
+                      dbBoard.boardTextColor === "auto" ? colors[2] : "black",
+                  }}
                   className="backdrop-opacity-10 rounded-md backdrop-invert bg-white/50 px-3 py-4 h-full w-full   flex items-center justify-center shadow-sm font-['Yiddish'] sm:text-7xl  text-amber-600-600/75"
                 >
                   {hours}:{formattedMinutes}
                 </div>
                 <div
-                  style={{ color: colors[1] }}
+                  style={{
+                    color:
+                      dbBoard.boardTextColor === "auto" ? colors[1] : "black",
+                  }}
                   className="backdrop-opacity-10 rounded-md backdrop-invert bg-white/50 px-3 py-4 h-full w-full   flex items-center justify-center shadow-sm font-['Yiddish'] sm:text-6xl text-amber-600-600/75"
                 >
                   {props.parasha}
@@ -201,7 +212,10 @@ function Kboard(props: Props) {
               <div className="backdrop-opacity-10 rounded-md backdrop-invert bg-white/50 h-full sm:min-w-96 w-full  flex flex-col p-6 ">
                 <div
                   className=" py-2 font-['Yiddish'] sm:text-5xl text-amber-600-600/75"
-                  style={{ color: colors[1] }}
+                  style={{
+                    color:
+                      dbBoard.boardTextColor === "auto" ? colors[1] : "black",
+                  }}
                 >
                   {step === 0
                     ? " זמני היום"
@@ -216,7 +230,12 @@ function Kboard(props: Props) {
                         <div className="flex flex-col">
                           <span
                             className="font-['Alef'] font-light text-2xl"
-                            style={{ color: colors[2] }}
+                            style={{
+                              color:
+                                dbBoard.boardTextColor === "auto"
+                                  ? colors[2]
+                                  : "black",
+                            }}
                           >
                             {time.includes("tzeit")
                               ? "צאת הכוכבים"
@@ -225,7 +244,12 @@ function Kboard(props: Props) {
                                 ]}
                           </span>
                           <span
-                            style={{ color: colors[2] }}
+                            style={{
+                              color:
+                                dbBoard.boardTextColor === "auto"
+                                  ? colors[2]
+                                  : "black",
+                            }}
                             className="font-['Damka'] text-3xl [text-shadow:_0_1px_0_rgb(0_0_0_/_30%)]"
                           >
                             {props.zmanim?.find(
@@ -248,7 +272,12 @@ function Kboard(props: Props) {
                         ) && (
                           <div
                             className=" py-2 font-['Alef'] sm:text-3xl text-amber-600-600/75"
-                            style={{ color: colors[1] }}
+                            style={{
+                              color:
+                                dbBoard.boardTextColor === "auto"
+                                  ? colors[1]
+                                  : "black",
+                            }}
                           >
                             יום חול
                           </div>
@@ -258,13 +287,23 @@ function Kboard(props: Props) {
                             return !tfila.isSaturdayTfila ? (
                               <div>
                                 <div
-                                  style={{ color: colors[2] }}
+                                  style={{
+                                    color:
+                                      dbBoard.boardTextColor === "auto"
+                                        ? colors[2]
+                                        : "black",
+                                  }}
                                   className="font-['Alef'] font-light sm:text-2xl"
                                 >
                                   {tfila.name}{" "}
                                 </div>
                                 <div
-                                  style={{ color: colors[2] }}
+                                  style={{
+                                    color:
+                                      dbBoard.boardTextColor === "auto"
+                                        ? colors[2]
+                                        : "black",
+                                  }}
                                   className="font-['Damka'] sm:text-3xl [text-shadow:_0_1px_0_rgb(0_0_0_/_30%)]"
                                 >
                                   {tfila.time}
@@ -282,7 +321,12 @@ function Kboard(props: Props) {
                         ) && (
                           <div
                             className=" py-2 font-['Alef'] sm:text-3xl text-amber-600-600/75"
-                            style={{ color: colors[1] }}
+                            style={{
+                              color:
+                                dbBoard.boardTextColor === "auto"
+                                  ? colors[1]
+                                  : "black",
+                            }}
                           >
                             שבת
                           </div>
@@ -292,13 +336,23 @@ function Kboard(props: Props) {
                             return tfila.isSaturdayTfila ? (
                               <div>
                                 <div
-                                  style={{ color: colors[2] }}
+                                  style={{
+                                    color:
+                                      dbBoard.boardTextColor === "auto"
+                                        ? colors[2]
+                                        : "black",
+                                  }}
                                   className="font-['Alef'] font-light sm:text-2xl"
                                 >
                                   {tfila.name}{" "}
                                 </div>
                                 <div
-                                  style={{ color: colors[2] }}
+                                  style={{
+                                    color:
+                                      dbBoard.boardTextColor === "auto"
+                                        ? colors[2]
+                                        : "black",
+                                  }}
                                   className="font-['Damka'] sm:text-3xl [text-shadow:_0_1px_0_rgb(0_0_0_/_30%)]"
                                 >
                                   {tfila.time}
@@ -318,7 +372,12 @@ function Kboard(props: Props) {
                         dbBoard.messages.map((message) => {
                           return (
                             <li
-                              style={{ color: colors[2] }}
+                              style={{
+                                color:
+                                  dbBoard.boardTextColor === "auto"
+                                    ? colors[2]
+                                    : "black",
+                              }}
                               className="font-['Alef'] font-light sm:text-2xl "
                             >
                               - {message.content}

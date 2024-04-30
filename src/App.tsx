@@ -218,13 +218,6 @@ function App() {
     <div dir="rtl" className="site-container">
       <div className="content-wrap">
         {!pathname.includes("board") && <Navbar setNewUser={setNewUser} />}
-        {/* <button onClick={getUsers}>לחץ כאן להביא משתמשים</button> */}
-        {/* <button onClick={() => postCollection("boards", [board])}>
-            לחץ כאן להעלות
-          </button> */}
-        {/* <button onClick={() => getBoardById("LnyqSBc5RtBE0E3dwCy2")}>
-            לחץ כאן לבדוק
-          </button> */}
 
         <Routes>
           <Route
@@ -239,13 +232,13 @@ function App() {
               />
             }
           />
-          <Route path="map" element={<Map parasha={parasha} />} />
+          <Route path="/map" element={<Map parasha={parasha} />} />
           <Route
-            path="edit/:id"
+            path="/edit/:id"
             element={<EditBoard zmanim={zmanim} parasha={parasha} />}
           />
           <Route
-            path="board/:id"
+            path="/board/:id"
             element={<Kboard zmanim={zmanim} parasha={parasha} />}
           />
         </Routes>

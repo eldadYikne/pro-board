@@ -13,12 +13,10 @@ import { useNavigate, useParams } from "react-router-dom";
 import { collection, doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "..";
 import { Delete } from "@mui/icons-material";
-import Bg1 from "../assets/backgrounds/1.jpeg";
-import Bg2 from "../assets/backgrounds/2.jpeg";
-import Bg3 from "../assets/backgrounds/3.jpeg";
+
 import { beautyColorsHex, translationsZmanimKeys } from "../utils/const";
 import { TranslationsZmanimKeys, Zman } from "../types/zmanim";
-import Kboard from "./Kboard";
+
 function EditBoard(props: Props) {
   const [dbBoard, setDbBoard] = useState<Board>();
   const [snackbarIsOpen, setSnackbarIsOpen] = useState<boolean>();
