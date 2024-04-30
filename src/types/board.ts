@@ -5,6 +5,7 @@ export interface Board {
   boardName: string;
   geoId: string;
   timeScreenPass: string;
+  dateTypes: string[];
   tfilaTimes: Tfila[];
   forUplifting: Message[];
   forMedicine: Message[];

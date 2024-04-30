@@ -276,6 +276,10 @@ export function getHoursAndMinutes(dateTimeString: string) {
 // Example usage:
 // console.log(getCurrentDate()); // Output: e.g., 2024-04-16
 
+export const dateToShow: DateToShow = {
+  hebrew: "עברי",
+  number: "לועזי",
+};
 export const translationsZmanimKeys: TranslationsZmanimKeys = {
   chatzotNight: "חצות הלילה",
   alotHaShachar: "עלות השחר",
@@ -324,3 +328,7 @@ export const beautyColorsHex: string[] = [
   "#FF2400", // Scarlet
   "#00FFFF", // Aqua
 ];
+export interface DateToShow {
+  hebrew: "עברי";
+  number: "לועזי";
+}

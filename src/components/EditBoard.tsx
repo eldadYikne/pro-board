@@ -14,7 +14,12 @@ import { collection, doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "..";
 import { Delete } from "@mui/icons-material";
 
-import { beautyColorsHex, translationsZmanimKeys } from "../utils/const";
+import {
+  DateToShow,
+  beautyColorsHex,
+  dateToShow,
+  translationsZmanimKeys,
+} from "../utils/const";
 import { TranslationsZmanimKeys, Zman } from "../types/zmanim";
 
 function EditBoard(props: Props) {
@@ -92,6 +97,7 @@ function EditBoard(props: Props) {
     { name: "timeScreenPass", placeholder: "זמן מעבר בין מסכים" },
     { name: "tfilaTimes", placeholder: "זמני תפילה" },
     { name: "forUplifting", placeholder: "לעילוי נשמת" },
+    { name: "dateTypes", placeholder: "סוג תאריך" },
     { name: "forMedicine", placeholder: "לרפואה" },
     { name: "messages", placeholder: "הודעות לציבור " },
     { name: "boardTextColor", placeholder: "צבע טקסט" },
@@ -225,6 +231,7 @@ function EditBoard(props: Props) {
       navigate(`/board/${id}`);
     }
   };
+
   return (
     <div
       style={{
@@ -243,6 +250,7 @@ function EditBoard(props: Props) {
                   name !== "boardBackgroundImage" &&
                   name !== "mapBackgroundImage" &&
                   name !== "boardTextColor" &&
+                  name !== "dateTypes" &&
                   name !== "theme" && (
                     <TextField
                       dir="rtl"
@@ -348,42 +356,32 @@ function EditBoard(props: Props) {
                 )}
                 {name === "boardBackgroundImage" && (
                   <div className="flex gap-1 w-full overflow-x-auto">
-                    {[
-                      "1",
-                      "2",
-                      "3",
-                      "4",
-                      "5",
-                      "6",
-                      "7",
-                      "8",
-                      "9",
-                      "10",
-                      "11",
-                    ].map((item, index) => (
-                      <div
-                        onClick={() =>
-                          setDbBoard({
-                            ...dbBoard,
-                            boardBackgroundImage: item,
-                          })
-                        }
-                        key={index}
-                        className="min-w-20 min-h-16"
-                      >
-                        <img
-                          src={require("../assets/backgrounds/" +
-                            item +
-                            ".jpg")}
-                          className={`min-w-20 min-h-16 rounded-md ${
-                            item === dbBoard.boardBackgroundImage
-                              ? "border-2 border-sky-500 border-spacing-1"
-                              : ""
-                          }`}
-                          alt={item}
-                        />
-                      </div>
-                    ))}
+                    {["1", "2", "3", "4", "5", "6", "7", "8", "9"].map(
+                      (item, index) => (
+                        <div
+                          onClick={() =>
+                            setDbBoard({
+                              ...dbBoard,
+                              boardBackgroundImage: item,
+                            })
+                          }
+                          key={index}
+                          className="min-w-20 min-h-16"
+                        >
+                          <img
+                            src={require("../assets/backgrounds/" +
+                              item +
+                              ".jpg")}
+                            className={`min-w-20 min-h-16 rounded-md ${
+                              item === dbBoard.boardBackgroundImage
+                                ? "border-2 border-sky-500 border-spacing-1"
+                                : ""
+                            }`}
+                            alt={item}
+                          />
+                        </div>
+                      )
+                    )}
                   </div>
                 )}
                 {name === "mapBackgroundImage" && (
@@ -426,6 +424,49 @@ function EditBoard(props: Props) {
                                   key as keyof TranslationsZmanimKeys
                                 ]
                               }{" "}
+                            </div>
+                          }
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+                {name === "dateTypes" && (
+                  <div className="flex ">
+                    {Object.keys(dateToShow).map((key: string) => {
+                      return (
+                        <div>
+                          {
+                            <div>
+                              <Checkbox
+                                onClick={(e) => {
+                                  if (
+                                    dbBoard?.dateTypes.includes(
+                                      key as keyof DateToShow
+                                    )
+                                  ) {
+                                    let arr = dbBoard?.dateTypes.filter(
+                                      (date) => date !== key
+                                    );
+                                    setDbBoard({
+                                      ...dbBoard,
+                                      dateTypes: arr,
+                                    });
+                                  } else {
+                                    let arr = [...dbBoard?.dateTypes, key];
+
+                                    setDbBoard({
+                                      ...dbBoard,
+                                      dateTypes: arr,
+                                    });
+                                  }
+                                }}
+                                name={"isSaturdayTfila"}
+                                checked={dbBoard.dateTypes.includes(
+                                  key as keyof DateToShow
+                                )}
+                              />
+                              {dateToShow[key as keyof DateToShow]}
                             </div>
                           }
                         </div>
