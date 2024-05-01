@@ -1,16 +1,8 @@
 import "./App.css";
 import Navbar from "./components/Navbar";
 import ConfirmedPlace from "./components/ConfirmedPlace";
-import {
-  BrowserRouter,
-  Route,
-  Routes,
-  useLocation,
-  useParams,
-  useRoutes,
-} from "react-router-dom";
+import { Route, Routes, useLocation, useParams } from "react-router-dom";
 import Map from "./components/Map";
-import Seat from "./types/user";
 import {
   addDoc,
   collection,
@@ -36,7 +28,6 @@ function App() {
   const [users, setUsers] = useState<any>();
   const [board, setBoard] = useState<any>();
   const [newUser, setNewUser] = useState<any>();
-  const [value, setValue] = useState(0);
   const [parasha, setParasha] = useState("");
   const [candles, setCandles] = useState("");
   const [havdalah, setHavdalah] = useState("");
@@ -288,7 +279,8 @@ function App() {
           />
           <Route path="/" element={<div>עמוד לא נמצא</div>} />
           <Route path="*" element={<div>404 עמוד לא נמצא</div>} />
-          <Route path="/map" element={<Map parasha={parasha} />} />
+          <Route path="/map" element={<Map />} />
+          <Route path="/check" element={<div>check עמוד לא נמצא</div>} />
           <Route
             path="/edit/:id"
             element={<EditBoard zmanim={zmanim} parasha={parasha} />}

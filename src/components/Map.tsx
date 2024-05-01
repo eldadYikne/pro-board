@@ -75,7 +75,7 @@ function Map(props: Props) {
       })
         .then((dataUrl) => {
           const link = document.createElement("a");
-          link.download = ` ${props.parasha} - סידורי ישיבה.png`;
+          link.download = ` ${props?.parasha} - סידורי ישיבה.png`;
           link.href = dataUrl;
           link.click();
         })
@@ -204,5 +204,5 @@ Map.defaultProps = {
 };
 
 interface Props {
-  parasha: string;
+  parasha?: string;
 }
