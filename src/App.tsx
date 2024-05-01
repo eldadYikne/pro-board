@@ -44,6 +44,7 @@ function App() {
   const [candles, setCandles] = useState("");
   const [havdalah, setHavdalah] = useState("");
   const [zmanim, setZmanim] = useState<Zman[]>();
+  const [isMoridHatal, SetIsMoridHatal] = useState<boolean>();
   const location = useLocation();
   const { hash, pathname, search } = location;
   console.log("location.pathname ", pathname);
@@ -77,6 +78,30 @@ function App() {
         console.log("zmanimDatazmanimData ", zmanimData);
         setZmanim(zmanimData);
       });
+    fetch(
+      `https://www.hebcal.com/converter?cfg=json&gy=now&gm=now&gd=now&g2h=1&date=${currentDate}`
+    )
+      .then((res) => res.text())
+      .then((data) => {
+        let newData = JSON.parse(data);
+        console.log("moridHatalData ", newData);
+        const hebrewMonth = newData.hm; //
+        let isRainySeason = [
+          "Cheshvan",
+          "Kislev",
+          "Tevet",
+          "Shevat",
+          "Adar",
+          "Nisan",
+        ].includes(hebrewMonth);
+        if (newData.hm === "Nisan" && newData.hd > 14) {
+          isRainySeason = false;
+        } else if (newData.hm === "Cheshvan" && newData.hd > 7) {
+          isRainySeason = true;
+        }
+        SetIsMoridHatal(!isRainySeason);
+      });
+
     fetch(
       "https://www.hebcal.com/shabbat?cfg=json&geonameid=293619&ue=off&b=18&M=on&lg=he&lg=s&tgt=_top"
     )
@@ -133,6 +158,20 @@ function App() {
       // Set the data for the document
       batch.set(newDocRef, value);
     });
+
+    // Commit the batch write
+    await batch.commit();
+  };
+  const postCollectionCoustumId = async (
+    collectionName: string,
+    collectionValues: any[],
+    idNameCollection: string
+  ) => {
+    const batch = writeBatch(db);
+    const boardRef = doc(collection(db, collectionName), idNameCollection); // Using 'calaniot' as the board ID
+
+    // Set the data for the board document
+    batch.set(boardRef, collectionValues);
 
     // Commit the batch write
     await batch.commit();
@@ -218,7 +257,23 @@ function App() {
     <div dir="rtl" className="site-container">
       <div className="content-wrap">
         {!pathname.includes("board") && <Navbar setNewUser={setNewUser} />}
-
+        {/* <button onClick={getUsers}>לחץ כאן להביא משתמשים</button> */}
+        {/* <button onClick={() => postCollectionCoustumId("boards", [dbBoard],'calaniot')}>
+          לחץ כאן להעלות
+        </button> 
+          
+          <button
+            onClick={() =>
+              postCollectionCoustumId("boards", dbBoard, "calaniot")
+            }
+          >
+            לחץ כאן להעלות
+          </button>
+     
+        */}
+        {/* <button onClick={() => getBoardById("LnyqSBc5RtBE0E3dwCy2")}>
+            לחץ כאן לבדוק
+          </button> */}
         <Routes>
           <Route
             path="/confirm/:id"
@@ -240,7 +295,13 @@ function App() {
           />
           <Route
             path="/board/:id"
-            element={<Kboard zmanim={zmanim} parasha={parasha} />}
+            element={
+              <Kboard
+                isMoridHatal={isMoridHatal}
+                zmanim={zmanim}
+                parasha={parasha}
+              />
+            }
           />
         </Routes>
       </div>

@@ -16,6 +16,7 @@ export interface Board {
   timesToShow: Array<keyof TranslationsZmanimKeys>;
   users?: string[];
   theme: Theme;
+  isMinchaSunset: boolean;
 }
 
 export interface Tfila {
@@ -45,4 +46,4 @@ type TfilaName =
   | "(אשרי) מנחה של שבת"
   | "ערבית צאת שבת";
 
-export type Theme = "regular" | "nature" | "gold";
+export type Theme = "modern" | "column" | "gold";

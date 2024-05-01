@@ -4,8 +4,14 @@ import { useParams } from "react-router-dom";
 import { doc, getDoc, onSnapshot } from "firebase/firestore";
 import { db } from "..";
 import { Board, Tfila } from "../types/board";
-import { translationsZmanimKeys } from "../utils/const";
+import {
+  getCurrentDate,
+  getCurrentDateDayFirst,
+  getCurrentDateNoYear,
+  translationsZmanimKeys,
+} from "../utils/const";
 import Color, { Palette } from "color-thief-react";
+import KboardTimes from "./KboardTimes";
 
 function Kboard(props: Props) {
   const [dbBoard, setDbBoard] = useState<Board>();
@@ -66,6 +72,7 @@ function Kboard(props: Props) {
     const updateHebrewDate = () => {
       const currentDate = new Date();
       const options = {
+        weekday: "long" as const, // Specify "long" for full weekday name
         year: "numeric" as const,
         month: "long" as const,
         day: "2-digit" as const,
@@ -73,12 +80,11 @@ function Kboard(props: Props) {
       };
 
       const formatter = new Intl.DateTimeFormat("he-IL", options);
-      const [day, b, month] = formatter.formatToParts(currentDate); // Extract month and day
-      console.log("dayday", day, month, b);
+      const [weekday, a, day, c, month] = formatter.formatToParts(currentDate); // Extract month and day
+      console.log("dayday", weekday, day, a, c, month);
       console.log("month", month);
-      console.log("b", b);
       const hebrewDay = String(getHebrewDay(Number(parseInt(day.value, 10)))); // Convert numeric day to Hebrew letters
-      const formattedHebrewDate = `${hebrewDay}' ${month.value}`;
+      const formattedHebrewDate = `${weekday.value} ${hebrewDay}' ${month.value}`;
       setHebrewDate(formattedHebrewDate);
     };
 
@@ -104,7 +110,7 @@ function Kboard(props: Props) {
   const minutes = currentTime.getMinutes();
 
   // Ensure minutes are displayed with leading zero if less than 10
-  const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+  const formattedMinutes = minutes < 10 ? `0${minutes}` : `${minutes}`;
 
   const getBoardById = async (boardId: string) => {
     try {
@@ -163,277 +169,455 @@ function Kboard(props: Props) {
               dbBoard.boardBackgroundImage +
               ".jpg")}) no-repeat`,
             backgroundSize: "cover !importent",
+            rotate: step === 0 ? "180deg" : "0deg",
           }}
           className=" !bg-cover flex h-screen flex-col items-center justify-center p-3 w-full rounded-sm"
         >
-          <div className="flex flex-col gap-4 h-full w-full items-center justify-center">
+          <div
+            style={{ rotate: step === 0 ? "180deg" : "0deg" }}
+            className="flex flex-col gap-4 h-full w-full items-center justify-center"
+          >
             <div
-              className="sm:text-8xl py-4 font-bold font-['Yiddish'] "
-              style={{
-                color: dbBoard.boardTextColor === "auto" ? colors[2] : "black",
-              }}
+              // style={{ rotate: step === 0 ? "180deg" : "0deg" }}
+              className="flex flex-col gap-4 h-full w-full items-center justify-center"
             >
-              {dbBoard.boardName}
-            </div>
-            <div className="flex gap-6 w-[80%] min-h-3/4">
-              <div className="flex flex-col justify-between gap-3 sm:min-w-96 w-full ">
-                <div
-                  style={{
-                    color:
-                      dbBoard.boardTextColor === "auto" ? colors[1] : "black",
-                  }}
-                  className="backdrop-opacity-10 rounded-md backdrop-invert bg-white/50 px-3 py-4 h-full w-full   flex items-center justify-center shadow-sm font-['Yiddish'] sm:text-7xl  text-amber-600-600/75"
-                >
-                  {hours}:{formattedMinutes}
-                </div>
-                <div
-                  style={{
-                    color:
-                      dbBoard.boardTextColor === "auto" ? colors[2] : "black",
-                  }}
-                  className="backdrop-opacity-10 rounded-md backdrop-invert bg-white/50 px-3 py-4 h-full w-full   flex items-center justify-center shadow-sm font-['Yiddish'] sm:text-6xl text-amber-600-600/75"
-                >
-                  {hebrewDate}
-                </div>
-
-                <div
-                  style={{
-                    color:
-                      dbBoard.boardTextColor === "auto" ? colors[1] : "black",
-                  }}
-                  className="backdrop-opacity-10 rounded-md backdrop-invert bg-white/50 px-3 py-4 h-full w-full   flex items-center justify-center shadow-sm font-['Yiddish'] sm:text-6xl text-amber-600-600/75"
-                >
-                  {props.parasha}
-                  {/* {props.parasha
-                    .split(" ")
-                    .filter((word) => word !== "פרשת")
-                    .join(" ")} */}
-                </div>
+              <div
+                className="sm:text-8xl py-4 font-bold font-['Yiddish'] text-shadow-headline"
+                style={{
+                  color:
+                    dbBoard.boardTextColor === "auto" ? colors[2] : "black",
+                }}
+              >
+                {dbBoard.boardName}
               </div>
-              <div className="backdrop-opacity-10 rounded-md backdrop-invert bg-white/50 h-full sm:min-w-96 w-full  flex flex-col p-6 ">
-                <div
-                  className=" py-2 font-['Yiddish'] sm:text-5xl text-amber-600-600/75"
-                  style={{
-                    color:
-                      dbBoard.boardTextColor === "auto" ? colors[1] : "black",
-                  }}
-                >
-                  {step === 0
-                    ? " זמני היום"
-                    : step === 1
-                    ? "זמני תפילות"
-                    : "הודעות לציבור"}
-                </div>
-                <div className="flex flex-col ">
-                  {step === 0 && (
-                    <div className="grid gap-2 xl:grid-cols-3 sm:grid-cols-2 ">
-                      {dbBoard.timesToShow.map((time: string) => (
-                        <div className="flex flex-col">
-                          <span
-                            className="font-['Alef'] font-light text-2xl"
-                            style={{
-                              color:
-                                dbBoard.boardTextColor === "auto"
-                                  ? colors[2]
-                                  : "black",
-                            }}
-                          >
-                            {time.includes("tzeit")
-                              ? "צאת הכוכבים"
-                              : translationsZmanimKeys[
-                                  time as keyof TranslationsZmanimKeys
-                                ]}
-                          </span>
-                          <span
-                            style={{
-                              color:
-                                dbBoard.boardTextColor === "auto"
-                                  ? colors[2]
-                                  : "black",
-                            }}
-                            className="font-['Damka'] text-3xl [text-shadow:_0_1px_0_rgb(0_0_0_/_30%)]"
-                          >
-                            {props.zmanim?.find(
-                              (zman) =>
-                                zman.name ===
-                                translationsZmanimKeys[
-                                  time as keyof TranslationsZmanimKeys
-                                ]
-                            )?.time ?? ""}
-                          </span>
-                        </div>
-                      ))}
+              {dbBoard.theme === "modern" && (
+                <div className="flex gap-6 w-[80%] min-h-[65%]">
+                  <KboardTimes
+                    board={dbBoard}
+                    formattedMinutes={formattedMinutes}
+                    hours={hours}
+                    colors={colors}
+                    hebrewDate={hebrewDate}
+                    isMoridHatal={props.isMoridHatal}
+                    parasha={props.parasha}
+                    zmanim={props.zmanim}
+                  />
+                  <div className="backdrop-opacity-10 rounded-md backdrop-invert bg-white/50 h-full sm:min-w-96 w-full  flex flex-col p-6 ">
+                    <div
+                      className=" py-2 font-['Yiddish']  sm:text-5xl text-amber-600-600/75"
+                      style={{
+                        color:
+                          dbBoard.boardTextColor === "auto"
+                            ? colors[1]
+                            : "black",
+                      }}
+                    >
+                      {step === 0
+                        ? " זמני היום"
+                        : step === 1
+                        ? "זמני תפילות"
+                        : "הודעות לציבור"}
                     </div>
-                  )}
-                  {step === 1 && (
-                    <div className="flex flex-col gap-2">
-                      <div className="flex flex-col">
-                        {dbBoard.tfilaTimes.filter(
-                          (tfila) => !tfila.isSaturdayTfila
-                        ) && (
-                          <div
-                            className=" py-2 font-['Alef'] sm:text-3xl text-amber-600-600/75"
-                            style={{
-                              color:
-                                dbBoard.boardTextColor === "auto"
-                                  ? colors[1]
-                                  : "black",
-                            }}
-                          >
-                            יום חול
-                          </div>
-                        )}
+                    <div className="flex flex-col ">
+                      {step === 0 && (
                         <div className="grid gap-2 xl:grid-cols-3 sm:grid-cols-2 ">
-                          {dbBoard.tfilaTimes.map((tfila: Tfila) => {
-                            return !tfila.isSaturdayTfila ? (
-                              <div>
-                                <div
-                                  style={{
-                                    color:
-                                      dbBoard.boardTextColor === "auto"
-                                        ? colors[2]
-                                        : "black",
-                                  }}
-                                  className="font-['Alef'] font-light sm:text-2xl"
-                                >
-                                  {tfila.name}{" "}
-                                </div>
-                                <div
-                                  style={{
-                                    color:
-                                      dbBoard.boardTextColor === "auto"
-                                        ? colors[2]
-                                        : "black",
-                                  }}
-                                  className="font-['Damka'] sm:text-3xl [text-shadow:_0_1px_0_rgb(0_0_0_/_30%)]"
-                                >
-                                  {tfila.time}
-                                </div>
-                              </div>
-                            ) : (
-                              <span className="hidden"></span>
-                            );
-                          })}
+                          {dbBoard.timesToShow.map((time: string) => (
+                            <div className="flex flex-col">
+                              <span
+                                className="font-['Alef'] font-light text-2xl"
+                                style={{
+                                  color:
+                                    dbBoard.boardTextColor === "auto"
+                                      ? colors[2]
+                                      : "black",
+                                }}
+                              >
+                                {time.includes("tzeit")
+                                  ? "צאת הכוכבים"
+                                  : translationsZmanimKeys[
+                                      time as keyof TranslationsZmanimKeys
+                                    ]}
+                              </span>
+                              <span
+                                style={{
+                                  color:
+                                    dbBoard.boardTextColor === "auto"
+                                      ? colors[2]
+                                      : "black",
+                                }}
+                                className="font-['Damka'] text-3xl [text-shadow:_0_1px_0_rgb(0_0_0_/_30%)]"
+                              >
+                                {props.zmanim?.find(
+                                  (zman) =>
+                                    zman.name ===
+                                    translationsZmanimKeys[
+                                      time as keyof TranslationsZmanimKeys
+                                    ]
+                                )?.time ?? ""}
+                              </span>
+                            </div>
+                          ))}
                         </div>
-                      </div>
-                      <div className="flex flex-col">
-                        {dbBoard.tfilaTimes.filter(
-                          (tfila) => tfila.isSaturdayTfila
-                        ) && (
-                          <div
-                            className=" py-2 font-['Alef'] sm:text-3xl text-amber-600-600/75"
-                            style={{
-                              color:
-                                dbBoard.boardTextColor === "auto"
-                                  ? colors[1]
-                                  : "black",
-                            }}
-                          >
-                            שבת
-                          </div>
-                        )}
-                        <div className="grid gap-2 xl:grid-cols-3 sm:grid-cols-2 ">
-                          {dbBoard.tfilaTimes.map((tfila: Tfila) => {
-                            return tfila.isSaturdayTfila ? (
-                              <div>
-                                <div
-                                  style={{
-                                    color:
-                                      dbBoard.boardTextColor === "auto"
-                                        ? colors[2]
-                                        : "black",
-                                  }}
-                                  className="font-['Alef'] font-light sm:text-2xl"
-                                >
-                                  {tfila.name}{" "}
-                                </div>
-                                <div
-                                  style={{
-                                    color:
-                                      dbBoard.boardTextColor === "auto"
-                                        ? colors[2]
-                                        : "black",
-                                  }}
-                                  className="font-['Damka'] sm:text-3xl [text-shadow:_0_1px_0_rgb(0_0_0_/_30%)]"
-                                >
-                                  {tfila.time}
-                                </div>
+                      )}
+                      {step === 1 && (
+                        <div className="flex flex-col gap-2">
+                          <div className="flex flex-col">
+                            {dbBoard.tfilaTimes.filter(
+                              (tfila) => !tfila.isSaturdayTfila
+                            ) && (
+                              <div
+                                className=" py-2 font-['Alef'] sm:text-3xl text-amber-600-600/75"
+                                style={{
+                                  color:
+                                    dbBoard.boardTextColor === "auto"
+                                      ? colors[1]
+                                      : "black",
+                                }}
+                              >
+                                יום חול
                               </div>
-                            ) : (
-                              <span className="hidden"></span>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  {step === 2 && (
-                    <ul className="flex flex-col gap-2">
-                      {dbBoard.messages.length > 0 &&
-                        dbBoard.messages.map((message) => {
-                          return (
-                            <li
-                              style={{
-                                color:
-                                  dbBoard.boardTextColor === "auto"
-                                    ? colors[2]
-                                    : "black",
-                              }}
-                              className="font-['Alef'] font-light sm:text-2xl "
-                            >
-                              - {message.content}
-                            </li>
-                          );
-                        })}
-                    </ul>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-          {dbBoard.forUplifting.length > 0 && (
-            <div id="scroll-container">
-              {dbBoard.forUplifting.length > 5 ? (
-                <div className="flex flex-col justify-center items-center font-['Alef']  w-full font-light sm:text-2xl  gap-1">
-                  <span>לעילוי נשמת </span>
-                  <div id="scroll-text" className="">
-                    <div className="flex">
-                      {dbBoard.forUplifting.map((forUplift, index) => {
-                        return (
-                          <div className="">
-                            {" "}
-                            {forUplift.content}{" "}
-                            {dbBoard.forUplifting.length > 1
-                              ? index === dbBoard.forUplifting.length - 1
-                                ? "."
-                                : ","
-                              : ""}{" "}
+                            )}
+                            <div className="grid gap-2 xl:grid-cols-3 sm:grid-cols-2 ">
+                              {dbBoard.tfilaTimes.map((tfila: Tfila) => {
+                                return !tfila.isSaturdayTfila ? (
+                                  <div>
+                                    <div
+                                      style={{
+                                        color:
+                                          dbBoard.boardTextColor === "auto"
+                                            ? colors[2]
+                                            : "black",
+                                      }}
+                                      className="font-['Alef'] font-light sm:text-2xl"
+                                    >
+                                      {tfila.name}{" "}
+                                    </div>
+                                    <div
+                                      style={{
+                                        color:
+                                          dbBoard.boardTextColor === "auto"
+                                            ? colors[2]
+                                            : "black",
+                                      }}
+                                      className="font-['Damka'] sm:text-3xl [text-shadow:_0_1px_0_rgb(0_0_0_/_30%)]"
+                                    >
+                                      {tfila.time}
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <span className="hidden"></span>
+                                );
+                              })}
+                            </div>
                           </div>
-                        );
-                      })}
+                          <div className="flex flex-col">
+                            {dbBoard.tfilaTimes.filter(
+                              (tfila) => tfila.isSaturdayTfila
+                            ) && (
+                              <div
+                                className=" py-2 font-['Alef'] sm:text-3xl text-amber-600-600/75"
+                                style={{
+                                  color:
+                                    dbBoard.boardTextColor === "auto"
+                                      ? colors[1]
+                                      : "black",
+                                }}
+                              >
+                                שבת
+                              </div>
+                            )}
+                            <div className="grid gap-2 xl:grid-cols-3 sm:grid-cols-2 ">
+                              {dbBoard.tfilaTimes.map((tfila: Tfila) => {
+                                return tfila.isSaturdayTfila ? (
+                                  <div>
+                                    <div
+                                      style={{
+                                        color:
+                                          dbBoard.boardTextColor === "auto"
+                                            ? colors[2]
+                                            : "black",
+                                      }}
+                                      className="font-['Alef'] font-light sm:text-2xl"
+                                    >
+                                      {tfila.name}{" "}
+                                    </div>
+                                    <div
+                                      style={{
+                                        color:
+                                          dbBoard.boardTextColor === "auto"
+                                            ? colors[2]
+                                            : "black",
+                                      }}
+                                      className="font-['Damka'] sm:text-3xl [text-shadow:_0_1px_0_rgb(0_0_0_/_30%)]"
+                                    >
+                                      {tfila.time}
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <span className="hidden"></span>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      {step === 2 && (
+                        <ul className="flex flex-col gap-2">
+                          {dbBoard.messages.length > 0 &&
+                            dbBoard.messages.map((message) => {
+                              return (
+                                <li
+                                  style={{
+                                    color:
+                                      dbBoard.boardTextColor === "auto"
+                                        ? colors[2]
+                                        : "black",
+                                  }}
+                                  className="font-['Alef'] font-light sm:text-2xl "
+                                >
+                                  - {message.content}
+                                </li>
+                              );
+                            })}
+                        </ul>
+                      )}
                     </div>
                   </div>
                 </div>
-              ) : (
-                <div className="font-['Alef'] justify-center items-center w-full font-light sm:text-2xl flex gap-1">
-                  לע״נ
-                  {dbBoard.forUplifting.map((forUplift, index) => {
-                    return (
-                      <div>
-                        {" "}
-                        {forUplift.content}{" "}
-                        {dbBoard.forUplifting.length > 1
-                          ? index === dbBoard.forUplifting.length - 1
-                            ? "."
-                            : ","
-                          : ""}{" "}
+              )}
+              {dbBoard.theme === "column" && (
+                <div className="flex gap-6 w-[90%] min-h-[80%]">
+                  {step === 0 && (
+                    <div className="backdrop-opacity-10 rounded-md backdrop-invert bg-white/50 h-full sm:min-w-96 w-full  flex flex-col p-6 ">
+                      <div
+                        className=" py-2 font-['Yiddish'] w-full flex justify-center sm:text-6xl text-amber-600-600/75"
+                        style={{
+                          color:
+                            dbBoard.boardTextColor === "auto"
+                              ? colors[1]
+                              : "black",
+                        }}
+                      >
+                        זמני תפילות יום חול
                       </div>
-                    );
-                  })}
+                      <div className="flex flex-col py-6 ">
+                        {step === 0 && (
+                          <div
+                            className="grid gap-2  "
+                            style={{
+                              gridTemplateColumns: "repeat(2, minmax(0, 1fr)) ",
+                            }}
+                          >
+                            {dbBoard.tfilaTimes.map((tfila: Tfila) => {
+                              return !tfila.isSaturdayTfila ? (
+                                <div>
+                                  <div
+                                    style={{
+                                      color:
+                                        dbBoard.boardTextColor === "auto"
+                                          ? colors[2]
+                                          : "black",
+                                    }}
+                                    className="font-['Alef'] font-light sm:text-4xl"
+                                  >
+                                    {tfila.name}{" "}
+                                  </div>
+                                  <div
+                                    style={{
+                                      color:
+                                        dbBoard.boardTextColor === "auto"
+                                          ? colors[2]
+                                          : "black",
+                                    }}
+                                    className="font-['Damka'] sm:text-5xl [text-shadow:_0_1px_0_rgb(0_0_0_/_30%)]"
+                                  >
+                                    {tfila.time}
+                                  </div>
+                                </div>
+                              ) : (
+                                <span className="hidden"></span>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  <KboardTimes
+                    board={dbBoard}
+                    formattedMinutes={formattedMinutes}
+                    hours={hours}
+                    colors={colors}
+                    hebrewDate={hebrewDate}
+                    isMoridHatal={props.isMoridHatal}
+                    parasha={props.parasha}
+                    zmanim={props.zmanim}
+                  />
+
+                  <div className="backdrop-opacity-10 rounded-md backdrop-invert bg-white/50 h-full sm:min-w-96 w-full  flex flex-col p-6 ">
+                    <div
+                      className={`py-2 font-['Yiddish'] sm:text-6xl text-amber-600-600/75 ${
+                        step === 0 ? "w-full flex justify-center" : ""
+                      }`}
+                      style={{
+                        color:
+                          dbBoard.boardTextColor === "auto"
+                            ? colors[1]
+                            : "black",
+                      }}
+                    >
+                      {step === 0
+                        ? "זמני תפילות שבת"
+                        : step === 1
+                        ? " זמני היום"
+                        : "הודעות לציבור"}
+                    </div>
+                    <div className="flex flex-col ">
+                      {step === 1 && (
+                        <div className="grid gap-2 xl:grid-cols-3 sm:grid-cols-2 ">
+                          {dbBoard.timesToShow.map((time: string) => (
+                            <div className="flex flex-col">
+                              <span
+                                className="font-['Alef'] font-light text-4xl"
+                                style={{
+                                  color:
+                                    dbBoard.boardTextColor === "auto"
+                                      ? colors[2]
+                                      : "black",
+                                }}
+                              >
+                                {time.includes("tzeit")
+                                  ? "צאת הכוכבים"
+                                  : translationsZmanimKeys[
+                                      time as keyof TranslationsZmanimKeys
+                                    ]}
+                              </span>
+                              <span
+                                style={{
+                                  color:
+                                    dbBoard.boardTextColor === "auto"
+                                      ? colors[2]
+                                      : "black",
+                                }}
+                                className="font-['Damka'] text-5xl [text-shadow:_0_1px_0_rgb(0_0_0_/_30%)]"
+                              >
+                                {props.zmanim?.find(
+                                  (zman) =>
+                                    zman.name ===
+                                    translationsZmanimKeys[
+                                      time as keyof TranslationsZmanimKeys
+                                    ]
+                                )?.time ?? ""}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {step === 0 && (
+                        <div className="flex ">
+                          <div className="grid gap-4  py-5 xl:grid-cols-2 sm:grid-cols-2 ">
+                            {dbBoard.tfilaTimes.map((tfila: Tfila) => {
+                              return tfila.isSaturdayTfila ? (
+                                <div>
+                                  <div
+                                    style={{
+                                      color:
+                                        dbBoard.boardTextColor === "auto"
+                                          ? colors[2]
+                                          : "black",
+                                    }}
+                                    className="font-['Alef'] font-light sm:text-4xl"
+                                  >
+                                    {tfila.name}
+                                  </div>
+                                  <div
+                                    style={{
+                                      color:
+                                        dbBoard.boardTextColor === "auto"
+                                          ? colors[2]
+                                          : "black",
+                                    }}
+                                    className="font-['Damka'] sm:text-5xl [text-shadow:_0_1px_0_rgb(0_0_0_/_30%)]"
+                                  >
+                                    {tfila.time}
+                                  </div>
+                                </div>
+                              ) : (
+                                <span className="hidden"></span>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+                      {step === 2 && (
+                        <ul className="flex flex-col gap-2">
+                          {dbBoard.messages.length > 0 &&
+                            dbBoard.messages.map((message) => {
+                              return (
+                                <li
+                                  style={{
+                                    color:
+                                      dbBoard.boardTextColor === "auto"
+                                        ? colors[2]
+                                        : "black",
+                                  }}
+                                  className="font-['Alef'] font-light sm:text-2xl "
+                                >
+                                  - {message.content}
+                                </li>
+                              );
+                            })}
+                        </ul>
+                      )}
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
-          )}
+            {dbBoard.forUplifting.length > 0 && (
+              <div id="scroll-container">
+                {dbBoard.forUplifting.length > 5 ? (
+                  <div className="flex flex-col justify-center items-center font-['Alef']  w-full font-light sm:text-2xl  gap-1">
+                    <span>לעילוי נשמת </span>
+                    <div id="scroll-text" className="">
+                      <div className="flex">
+                        {dbBoard.forUplifting.map((forUplift, index) => {
+                          return (
+                            <div className="">
+                              {" "}
+                              {forUplift.content}{" "}
+                              {dbBoard.forUplifting.length > 1
+                                ? index === dbBoard.forUplifting.length - 1
+                                  ? "."
+                                  : ","
+                                : ""}{" "}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="font-['Alef'] justify-center items-center w-full font-light sm:text-2xl flex gap-1">
+                    לע״נ
+                    {dbBoard.forUplifting.map((forUplift, index) => {
+                      return (
+                        <div>
+                          {" "}
+                          {forUplift.content}{" "}
+                          {dbBoard.forUplifting.length > 1
+                            ? index === dbBoard.forUplifting.length - 1
+                              ? "."
+                              : ","
+                            : ""}{" "}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       )}
       {dbBoard && (
@@ -472,10 +656,12 @@ export default Kboard;
 Kboard.defaultProps = {
   parasha: "",
   zmanim: undefined,
+  isMoridHatal: false,
 };
 
 interface Props {
   parasha: string;
   zmanim: Zman[] | undefined;
   board?: Board;
+  isMoridHatal: boolean;
 }

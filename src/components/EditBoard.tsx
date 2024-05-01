@@ -10,7 +10,13 @@ import {
   Typography,
 } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
-import { collection, doc, getDoc, updateDoc } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDoc,
+  updateDoc,
+  writeBatch,
+} from "firebase/firestore";
 import { db } from "..";
 import { Delete } from "@mui/icons-material";
 
@@ -108,9 +114,9 @@ function EditBoard(props: Props) {
     { name: "theme", placeholder: "ערכת נושא" },
   ];
   const thems: { name: Theme; title: string }[] = [
-    { name: "regular", title: "רגיל" },
-    { name: "nature", title: "טבע" },
-    { name: "gold", title: "מהודר" },
+    { name: "modern", title: "מודרני" },
+    { name: "column", title: "עמודות" },
+    // { name: "gold", title: "מהודר" },
   ];
   const boardTextColors: { name: string; title: string }[] = [
     { name: "black", title: "שחור" },
@@ -231,11 +237,24 @@ function EditBoard(props: Props) {
       navigate(`/board/${id}`);
     }
   };
+  const postCollectionCoustumId = async (
+    collectionName: string,
+    collectionValues: any,
+    idNameCollection: string
+  ) => {
+    const batch = writeBatch(db);
+    const boardRef = doc(collection(db, collectionName), idNameCollection); // Using 'calaniot' as the board ID
 
+    // Set the data for the board document
+    batch.set(boardRef, collectionValues);
+
+    // Commit the batch write
+    await batch.commit();
+  };
   return (
     <div
       style={{
-        background: `url(${require("../assets/edit-bg.jpg")}) `,
+        background: `url(${require("../assets/edit-bg1.png")}) `,
         backgroundSize: "cover !importent",
       }}
       className=" flex flex-col gap-2 sm:justify-center sm:items-center sm:w-full "
@@ -384,7 +403,7 @@ function EditBoard(props: Props) {
                     )}
                   </div>
                 )}
-                {name === "mapBackgroundImage" && (
+                {/* {name === "mapBackgroundImage" && (
                   <div className="flex gap-1 w-full overflow-x-auto">
                     {beautyColorsHex.map((item: string, index) => (
                       <div
@@ -400,7 +419,7 @@ function EditBoard(props: Props) {
                       ></div>
                     ))}
                   </div>
-                )}
+                )} */}
                 {name === "timesToShow" && (
                   <div className="grid grid-cols-2">
                     {Object.keys(translationsZmanimKeys).map((key: string) => {

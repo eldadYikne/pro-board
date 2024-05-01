@@ -267,6 +267,19 @@ export function getCurrentDate() {
   const day = String(currentDate.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 }
+export function getCurrentDateDayFirst() {
+  const currentDate = new Date();
+  const year = currentDate.getFullYear();
+  const month = String(currentDate.getMonth() + 1).padStart(2, "0"); // Months are zero-based
+  const day = String(currentDate.getDate()).padStart(2, "0");
+  return `${day}-${month}-${year}`;
+}
+export function getCurrentDateNoYear() {
+  const currentDate = new Date();
+  const month = String(currentDate.getMonth() + 1).padStart(2, "0"); // Months are zero-based
+  const day = String(currentDate.getDate()).padStart(2, "0");
+  return `${day}-${month}`;
+}
 export function getHoursAndMinutes(dateTimeString: string) {
   const dateObj = new Date(dateTimeString);
   const hours = String(dateObj.getHours()).padStart(2, "0");
