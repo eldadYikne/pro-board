@@ -49,13 +49,10 @@ function App() {
   const { id } = useParams();
   useEffect(() => {
     async function fetchData() {
-      if (id) {
-        await getParasha();
-      }
-      console.log("idddddddd", id);
+      await getParasha();
     }
     fetchData();
-  }, [id]);
+  }, []);
   const getParasha = async () => {
     console.log("getParasha");
     let shabatData;
