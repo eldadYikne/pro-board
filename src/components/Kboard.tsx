@@ -373,7 +373,7 @@ function Kboard(props: Props) {
                                         ? colors[2]
                                         : "black",
                                   }}
-                                  className="font-['Alef'] font-light sm:text-2xl "
+                                  className="font-['Alef'] font-light sm:text-3xl "
                                 >
                                   - {message.content}
                                 </li>
@@ -561,7 +561,7 @@ function Kboard(props: Props) {
                                         ? colors[2]
                                         : "black",
                                   }}
-                                  className="font-['Alef'] font-light sm:text-2xl "
+                                  className="font-['Alef'] font-light sm:text-4xl "
                                 >
                                   - {message.content}
                                 </li>

@@ -8,7 +8,13 @@ import MenuIcon from "@mui/icons-material/Menu";
 import Kmodal from "./Kmodal";
 import { useState, useEffect } from "react";
 import User from "../types/user";
-import { collection, doc, getDoc, getDocs } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  updateDoc,
+} from "firebase/firestore";
 import { db } from "..";
 import { useParams } from "react-router-dom";
 import { Board } from "../types/board";
@@ -22,10 +28,7 @@ export default function Navbar(props: Props) {
   useEffect(() => {
     async function fetchData() {
       console.log("id from navbar", id);
-      if (id) {
-        console.log("id from navbar", id);
-        await getBoardById(id);
-      }
+
       await getUsers();
     }
 
@@ -38,6 +41,27 @@ export default function Navbar(props: Props) {
       setUser(userToSet);
     }
   }, [id]);
+  // const postDataByNumberSeats = async () => {
+  //   let array: any[] = [];
+  //   users?.forEach((user: User) => {
+  //     array.push({
+  //       name: user.name,
+  //       present: user.present,
+  //       seats: user.seats?.map((seat: string) => ({
+  //         seatNumber: seat,
+  //         present: true,
+  //       })),
+  //     });
+  //   });
+
+  //   updateBoard("calaniot", {
+  //     ...dbBoard,
+  //     users: array,
+  //   });
+  //   // await postCollection("seats", array);
+  //   console.log("array", dbBoard);
+  // };
+
   const getBoardById = async (boardId: string) => {
     try {
       const boardDoc = await getDoc(doc(db, "boards", boardId));

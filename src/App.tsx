@@ -23,10 +23,7 @@ import {
 import { useEffect, useState } from "react";
 import { db } from ".";
 import User from "./types/user";
-import BottomNavigation from "@mui/material/BottomNavigation";
-import BottomNavigationAction from "@mui/material/BottomNavigationAction";
-import CreditScoreIcon from "@mui/icons-material/CreditScore";
-import WhatsAppIcon from "@mui/icons-material/WhatsApp";
+
 import {
   getCurrentDate,
   getHoursAndMinutes,
@@ -47,13 +44,18 @@ function App() {
   const [isMoridHatal, SetIsMoridHatal] = useState<boolean>();
   const location = useLocation();
   const { hash, pathname, search } = location;
+
   console.log("location.pathname ", pathname);
+  const { id } = useParams();
   useEffect(() => {
     async function fetchData() {
-      await getParasha();
+      if (id) {
+        await getParasha();
+      }
+      console.log("idddddddd", id);
     }
     fetchData();
-  }, []);
+  }, [id]);
   const getParasha = async () => {
     console.log("getParasha");
     let shabatData;
@@ -177,18 +179,20 @@ function App() {
     await batch.commit();
   };
   const postDataByNumberSeats = async () => {
-    let array: Seat[] = [];
+    let array: any[] = [];
     users?.forEach((user: User) => {
-      user.seats?.forEach((seat: string) =>
-        array.push({
-          name: user.name,
-          seat,
-          present: user.present,
-        })
-      );
+      array.push({
+        name: user.name,
+        present: user.present,
+        seats: user.seats?.map((seat: string) => ({
+          seatNumber: seat,
+          present: true,
+        })),
+      });
     });
 
-    await postCollection("seats", array);
+    // await postCollection("seats", array);
+    console.log("array", users);
   };
   const updateUser = async (userId: string, userData: any) => {
     const userRef = doc(collection(db, "users"), userId); // Get reference to the user document
@@ -271,9 +275,7 @@ function App() {
           </button>
      
         */}
-        {/* <button onClick={() => getBoardById("LnyqSBc5RtBE0E3dwCy2")}>
-            לחץ כאן לבדוק
-          </button> */}
+        {/* <button onClick={() => postDataByNumberSeats()}>לחץ כאן לבדוק</button> */}
         <Routes>
           <Route
             path="/confirm/:id"
@@ -288,6 +290,7 @@ function App() {
             }
           />
           <Route path="/" element={<div>עמוד לא נמצא</div>} />
+          <Route path="*" element={<div>404 עמוד לא נמצא</div>} />
           <Route path="/map" element={<Map parasha={parasha} />} />
           <Route
             path="/edit/:id"

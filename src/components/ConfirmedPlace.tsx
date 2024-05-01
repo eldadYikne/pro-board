@@ -28,12 +28,13 @@ function ConfirmedPlace(props: Props) {
   const [checked, setChecked] = useState(!!props.user.present);
   const [users, setUsers] = useState<User[]>();
   const [snackbarIsOpen, setSnackbarIsOpen] = useState<boolean>();
+  const [dbBoard, setDbBoard] = useState<Board>();
+
   const label = {
     inputProps: { "aria-label": "Switch demo" },
     label: checked ? "נמצא" : "לא נמצא",
   };
   const { id } = useParams();
-  const [dbBoard, setDbBoard] = useState<Board>();
 
   useEffect(() => {
     console.log("board id", id);
