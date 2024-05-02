@@ -112,6 +112,7 @@ function EditBoard(props: Props) {
     { name: "timesToShow", placeholder: "זמנים להצגה" },
     { name: "users", placeholder: "משתמשים" },
     { name: "theme", placeholder: "ערכת נושא" },
+    { name: "isMinchaSunset", placeholder: "הגדר מנחה לפני שקיעה" },
   ];
   const thems: { name: Theme; title: string }[] = [
     { name: "modern", title: "מודרני" },
@@ -237,6 +238,11 @@ function EditBoard(props: Props) {
       navigate(`/board/${id}`);
     }
   };
+  const showUsers = (id: String) => {
+    if (id) {
+      navigate(`/users/${id}`);
+    }
+  };
   const postCollectionCoustumId = async (
     collectionName: string,
     collectionValues: any,
@@ -270,6 +276,7 @@ function EditBoard(props: Props) {
                   name !== "mapBackgroundImage" &&
                   name !== "boardTextColor" &&
                   name !== "dateTypes" &&
+                  name !== "isMinchaSunset" &&
                   name !== "theme" && (
                     <TextField
                       dir="rtl"
@@ -493,6 +500,48 @@ function EditBoard(props: Props) {
                     })}
                   </div>
                 )}
+                {name === "isMinchaSunset" && (
+                  <div className="flex ">
+                    <div className="flex ">
+                      <div className="flex flex-col items-center justify-center">
+                        <span>הגדר</span>
+                        <Checkbox
+                          onClick={(e) => {
+                            setDbBoard({
+                              ...dbBoard,
+                              isMinchaSunset: {
+                                isActive: !dbBoard.isMinchaSunset.isActive,
+                                minBrforeSunSet:
+                                  dbBoard.isMinchaSunset.minBrforeSunSet,
+                              },
+                            });
+                          }}
+                          name={"isMinchaSunset"}
+                          checked={dbBoard.isMinchaSunset.isActive}
+                        />
+                      </div>
+
+                      <TextField
+                        dir="rtl"
+                        id="filled-basic"
+                        label="דקות לפני שקיעה"
+                        name={""}
+                        value={dbBoard.isMinchaSunset.minBrforeSunSet}
+                        type="number"
+                        onChange={(e) =>
+                          setDbBoard({
+                            ...dbBoard,
+                            isMinchaSunset: {
+                              isActive: dbBoard.isMinchaSunset.isActive,
+                              minBrforeSunSet: Number(e.target.value),
+                            },
+                          })
+                        }
+                        variant="filled"
+                      />
+                    </div>
+                  </div>
+                )}
                 {name === "theme" && (
                   <div className="flex gap-1 flex-1">
                     {thems.map((them: { name: Theme; title: string }) => {
@@ -556,6 +605,13 @@ function EditBoard(props: Props) {
           onClick={() => showBoard(id ?? "")}
         >
           להצגת הלוח
+        </Button>
+        <Button
+          className="mobile-only:w-full w-28"
+          variant="contained"
+          onClick={() => showUsers(id ?? "")}
+        >
+          להצגת מתפלים
         </Button>
       </div>
       {/* <div className="w-full h-56">

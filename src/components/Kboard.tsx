@@ -169,18 +169,13 @@ function Kboard(props: Props) {
               dbBoard.boardBackgroundImage +
               ".jpg")}) no-repeat`,
             backgroundSize: "cover !importent",
-            rotate: step === 0 ? "180deg" : "0deg",
           }}
-          className=" !bg-cover flex h-screen flex-col items-center justify-center p-3 w-full rounded-sm"
+          className={`!bg-cover flex h-screen flex-col items-center justify-center p-3 w-full rounded-sm ${
+            step === 0 ? "flip-image" : ""
+          }`}
         >
-          <div
-            style={{ rotate: step === 0 ? "180deg" : "0deg" }}
-            className="flex flex-col gap-4 h-full w-full items-center justify-center"
-          >
-            <div
-              // style={{ rotate: step === 0 ? "180deg" : "0deg" }}
-              className="flex flex-col gap-4 h-full w-full items-center justify-center"
-            >
+          <div className="flex flex-col gap-4 h-full w-full items-center justify-center">
+            <div className="flex flex-col gap-4 h-full w-full items-center justify-center">
               <div
                 className="sm:text-8xl py-4 font-bold font-['Yiddish'] text-shadow-headline"
                 style={{
@@ -373,7 +368,7 @@ function Kboard(props: Props) {
                                         ? colors[2]
                                         : "black",
                                   }}
-                                  className="font-['Alef'] font-light sm:text-3xl "
+                                  className="font-['Alef'] font-light sm:text-4xl "
                                 >
                                   - {message.content}
                                 </li>

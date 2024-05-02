@@ -1,3 +1,4 @@
+import User from "./user";
 import { TranslationsZmanimKeys } from "./zmanim";
 
 export interface Board {
@@ -14,9 +15,9 @@ export interface Board {
   boardTextColor: string;
   mapBackgroundImage: string;
   timesToShow: Array<keyof TranslationsZmanimKeys>;
-  users?: string[];
+  users?: User[];
   theme: Theme;
-  isMinchaSunset: boolean;
+  isMinchaSunset: { isActive: boolean; minBrforeSunSet: number };
   // password: string;
 }
 

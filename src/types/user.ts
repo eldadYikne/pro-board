@@ -1,12 +1,16 @@
 export default interface User {
   name: string;
-  seats?: string[];
+  seats: string[];
   present: boolean;
   id?: string;
 }
-export default interface Seat {
+export interface SeatUser {
   name: string;
   present: boolean;
-  seat: string;
+  seat: SeatNumber;
   id?: string;
+}
+export interface SeatNumber {
+  present: boolean;
+  seatNumber: string;
 }

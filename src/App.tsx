@@ -25,6 +25,7 @@ import {
 import { TranslationsZmanimKeys, Zman } from "./types/zmanim";
 import EditBoard from "./components/EditBoard";
 import Kboard from "./components/Kboard";
+import EditUsers from "./components/EditUsers";
 function App() {
   const [users, setUsers] = useState<any>();
   const [board, setBoard] = useState<any>();
@@ -179,10 +180,6 @@ function App() {
       array.push({
         name: user.name,
         present: user.present,
-        seats: user.seats?.map((seat: string) => ({
-          seatNumber: seat,
-          present: true,
-        })),
       });
     });
 
@@ -289,6 +286,7 @@ function App() {
             path="/edit/:id"
             element={<EditBoard zmanim={zmanim} parasha={parasha} />}
           />
+          <Route path="/users/:id" element={<EditUsers />} />
           <Route
             path="/board/:id"
             element={
