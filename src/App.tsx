@@ -299,7 +299,7 @@ function App() {
               />
             }
           />
-          <Route path="*" element={<div>404 עמוד לא נמצא</div>} />
+          {/* <Route path="*" element={<div>404 עמוד לא נמצא</div>} /> */}
         </Routes>
       </div>
     </div>
