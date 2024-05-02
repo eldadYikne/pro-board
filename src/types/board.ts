@@ -17,6 +17,7 @@ export interface Board {
   users?: string[];
   theme: Theme;
   isMinchaSunset: boolean;
+  // password: string;
 }
 
 export interface Tfila {

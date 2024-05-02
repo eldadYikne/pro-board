@@ -3,6 +3,7 @@ import Navbar from "./components/Navbar";
 import ConfirmedPlace from "./components/ConfirmedPlace";
 import { Route, Routes, useLocation, useParams } from "react-router-dom";
 import Map from "./components/Map";
+import ReactDOM from "react-dom/client";
 import {
   addDoc,
   collection,
@@ -117,13 +118,19 @@ function App() {
               item.date === currentDate
           );
         }
+        let minutesHavdala = new Date(currentCandles.date).getMinutes();
+        let formattedHavdalasMin =
+          minutesHavdala < 10 ? `0${minutesHavdala}` : `${minutesHavdala}`;
         const currentHavdalahDate = `${new Date(
           currentHavdalah.date
-        ).getHours()}:${new Date(currentHavdalah.date).getMinutes()}`;
+        ).getHours()}:${formattedHavdalasMin}`;
 
+        let minutesCandles = new Date(currentCandles.date).getMinutes();
+        let formattedCandlesMin =
+          minutesCandles < 10 ? `0${minutesCandles}` : `${minutesCandles}`;
         const currentCandlesDate = `${new Date(
           currentCandles.date
-        ).getHours()}:${new Date(currentCandles.date).getMinutes()}`;
+        ).getHours()}:${formattedCandlesMin}`;
 
         setHavdalah(currentHavdalahDate);
         setCandles(currentCandlesDate);
@@ -265,6 +272,9 @@ function App() {
         */}
         {/* <button onClick={() => postDataByNumberSeats()}>לחץ כאן לבדוק</button> */}
         <Routes>
+          <Route path="/" element={<div>עמוד לא נמצא</div>} />
+          <Route path="/map" element={<Map parasha={parasha} />} />
+          <Route path="/check" element={<div>check עמוד לא נמצא</div>} />
           <Route
             path="/confirm/:id"
             element={
@@ -277,10 +287,6 @@ function App() {
               />
             }
           />
-          <Route path="/" element={<div>עמוד לא נמצא</div>} />
-          <Route path="*" element={<div>404 עמוד לא נמצא</div>} />
-          <Route path="/map" element={<Map />} />
-          <Route path="/check" element={<div>check עמוד לא נמצא</div>} />
           <Route
             path="/edit/:id"
             element={<EditBoard zmanim={zmanim} parasha={parasha} />}
@@ -295,6 +301,7 @@ function App() {
               />
             }
           />
+          <Route path="*" element={<div>404 עמוד לא נמצא</div>} />
         </Routes>
       </div>
     </div>
