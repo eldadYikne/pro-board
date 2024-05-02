@@ -270,14 +270,10 @@ function App() {
           </button>
      
         */}
-        {/* <button onClick={() => postDataByNumberSeats()}>לחץ כאן לבדוק</button> */}
         <Routes>
           <Route path="/" element={<div>עמוד לא נמצא</div>} />
-          {/* <Route path="/map" element={<Map parasha={parasha} />} /> */}
-          <Route path="/check" element={<div>check עמוד לא נמצא</div>} />
-          <Route path="/1" element={<div>1 עמוד לא נמצא</div>} />
-          <Route path="/2" element={<div>2 עמוד לא נמצא</div>} />
-          {/* <Route
+          <Route path="/map" element={<Map parasha={parasha} />} />
+          <Route
             path="/confirm/:id"
             element={
               <ConfirmedPlace
@@ -302,7 +298,7 @@ function App() {
                 parasha={parasha}
               />
             }
-          /> */}
+          />
           <Route path="*" element={<div>404 עמוד לא נמצא</div>} />
         </Routes>
       </div>
