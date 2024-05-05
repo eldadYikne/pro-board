@@ -29,3 +29,22 @@ export interface TranslationsZmanimKeys {
   tzeit50min: string;
   tzeit72min: string;
 }
+export interface TimesDataScheme {
+  isMoridHatal: boolean;
+  hebrewDate: string;
+  sfiratOmer: string;
+  lastTimeDataUpdated: {
+    seconds: number;
+    nanoseconds: number;
+  };
+  dayTimes: {
+    name: string;
+    time: string;
+  }[];
+  sahabatTimes: {
+    havdala: string;
+    parasha: string;
+    candles: string;
+  };
+  id: string;
+}

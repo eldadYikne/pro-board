@@ -23,19 +23,22 @@ import {
   omerArrayDays,
   translationsZmanimKeys,
 } from "./utils/const";
-import { TranslationsZmanimKeys, Zman } from "./types/zmanim";
+import { TimesDataScheme, TranslationsZmanimKeys, Zman } from "./types/zmanim";
 import EditBoard from "./components/EditBoard";
 import Kboard from "./components/Kboard";
 import EditUsers from "./components/EditUsers";
+import { isTimeBetween0000And0130, isWithinPast24Hours } from "./utils/utils";
 function App() {
   const [users, setUsers] = useState<any>();
   const [board, setBoard] = useState<any>();
   const [newUser, setNewUser] = useState<any>();
+  const [hebrewDate, setHebrewDate] = useState<string>();
   const [parasha, setParasha] = useState("");
   const [candles, setCandles] = useState("");
   const [havdalah, setHavdalah] = useState("");
-  const [zmanim, setZmanim] = useState<Zman[]>();
-  const [isMoridHatal, SetIsMoridHatal] = useState<boolean>();
+  const [dayTimes, setDayTimes] = useState<Zman[]>();
+  const [isMoridHatal, setIsMoridHatal] = useState<boolean>();
+  const [lastTimeUpdatedTimesData, setLastTimeDataUpdated] = useState<string>();
   const location = useLocation();
   const [omerDays, setOmerDays] = useState<string>("");
   const { hash, pathname, search } = location;
@@ -44,15 +47,33 @@ function App() {
   const { id } = useParams();
   useEffect(() => {
     async function fetchData() {
-      await getParasha();
+      await getTimesFromDb();
     }
     fetchData();
+    const hourlyInterval = setInterval(async () => {
+      let timeBetween0000And0130 = isTimeBetween0000And0130();
+      const isPast24Hours = isWithinPast24Hours(
+        String(lastTimeUpdatedTimesData)
+      );
+
+      if (timeBetween0000And0130) {
+        await getTimesFromApi();
+        console.log("fetchDataFromAPI!");
+      } else if (isPast24Hours) {
+        await getTimesFromApi();
+        console.log("fetchDataFromAPI!");
+      }
+    }, 3600000);
+    return () => {
+      clearInterval(hourlyInterval);
+    };
   }, []);
-  const getParasha = async () => {
+  const getTimesFromApi = async () => {
     console.log("getParasha");
     let shabatData;
     let zmanimData: Zman[] = [];
     let currentDate = getCurrentDate();
+
     fetch(
       `https://www.hebcal.com/zmanim?cfg=json&geonameid=293619&date=${currentDate}`
     )
@@ -70,7 +91,10 @@ function App() {
           });
         }
         console.log("zmanimDatazmanimData ", zmanimData);
-        setZmanim(zmanimData);
+
+        setDayTimes(zmanimData);
+        // postCollection("zmanim", zmanimData);
+        updateCollectionById("times", { dayTimes: zmanimData }, "times");
       });
     fetch(
       `https://www.hebcal.com/converter?cfg=json&gy=now&gm=now&gd=now&g2h=1&date=${currentDate}`
@@ -93,13 +117,14 @@ function App() {
         } else if (newData.hm === "Cheshvan" && newData.hd > 7) {
           isRainySeason = true;
         }
+        let omerCurrentDay;
         if (newData.events) {
           const omer = newData.events.find((ev: string) => ev.includes("Omer"));
           if (omer) {
             let omerNumber = omer
               .split(" ")
               .find((word: string) => word.includes("th"));
-            let omerCurrentDay = omerArrayDays.find(
+            omerCurrentDay = omerArrayDays.find(
               (day) => day.number === omerNumber
             );
             if (omerCurrentDay?.he) {
@@ -107,8 +132,26 @@ function App() {
             }
           }
         }
+        let currentHebrewDate = `${newData.heDateParts.d} ${newData.heDateParts.m} ${newData.heDateParts.y}`;
+        if (currentHebrewDate) {
+          setHebrewDate(currentHebrewDate);
+        }
+        setIsMoridHatal(!isRainySeason);
 
-        SetIsMoridHatal(!isRainySeason);
+        postCollectionCoustumId(
+          "times",
+          {
+            isMoridHatal: !isRainySeason,
+            hebrewDate: currentHebrewDate,
+            sfiratOmer: omerCurrentDay?.he ?? "",
+          },
+          "times"
+        );
+        updateCollectionById(
+          "times",
+          { lastTimeDataUpdated: new Date() },
+          "times"
+        );
       });
 
     fetch(
@@ -153,11 +196,63 @@ function App() {
         setHavdalah(currentHavdalahDate);
         setCandles(currentCandlesDate);
         setParasha(currentParasha.hebrew);
+
+        updateCollectionById(
+          "times",
+          {
+            sahabatTimes: {
+              havdala: currentHavdalahDate,
+              parasha: currentParasha.hebrew,
+              candles: currentCandlesDate,
+            },
+          },
+          "times"
+        );
       })
 
       .catch((err) => console.log(err));
   };
+  const getTimesFromDb = async () => {
+    const timesCollection: TimesDataScheme =
+      (await getTimes()) as TimesDataScheme;
+    console.log("timesCollection", timesCollection);
+    const {
+      dayTimes,
+      hebrewDate,
+      isMoridHatal,
+      lastTimeDataUpdated,
+      sahabatTimes,
+      id,
+      sfiratOmer,
+    } = timesCollection;
+    setLastTimeDataUpdated(String(lastTimeDataUpdated));
+    const isPast24Hours = isWithinPast24Hours(String(lastTimeDataUpdated));
 
+    if (timesCollection && !isPast24Hours) {
+      setHavdalah(sahabatTimes.havdala);
+      setCandles(sahabatTimes.candles);
+      setParasha(sahabatTimes.parasha);
+      setHebrewDate(hebrewDate);
+      setOmerDays(sfiratOmer ?? "");
+      setDayTimes(dayTimes);
+      setIsMoridHatal(isMoridHatal);
+      console.log("fetchDataFromDb!", timesCollection);
+    } else if (isPast24Hours) {
+      await getTimesFromApi();
+      console.log("fetchDataFromAPI!", timesCollection);
+    }
+  };
+  const getZmanimAndParasha = async () => {
+    await getDocs(collection(db, "zmanim"))
+      .then((shot) => {
+        const news = shot.docs.map((doc) => ({ ...doc.data() }));
+        if (news) {
+          setDayTimes(news as Zman[]);
+        }
+        console.log("zmanim from db", news);
+      })
+      .catch((error) => console.log(error));
+  };
   const postCollection = async (
     collectionName: string,
     collectionValues: any[]
@@ -176,8 +271,23 @@ function App() {
 
     // Commit the batch write
     await batch.commit();
+    console.log(collectionName, "new collection is upload!");
   };
   const postCollectionCoustumId = async (
+    collectionName: string,
+    collectionValues: any,
+    idNameCollection: string
+  ) => {
+    const batch = writeBatch(db);
+    const boardRef = doc(collection(db, collectionName), idNameCollection); // Using 'calaniot' as the board ID
+
+    // Set the data for the board document
+    batch.set(boardRef, collectionValues);
+
+    // Commit the batch write
+    await batch.commit();
+  };
+  const postCollectionCoustumIdWithArrayObjects = async (
     collectionName: string,
     collectionValues: any[],
     idNameCollection: string
@@ -186,7 +296,7 @@ function App() {
     const boardRef = doc(collection(db, collectionName), idNameCollection); // Using 'calaniot' as the board ID
 
     // Set the data for the board document
-    batch.set(boardRef, collectionValues);
+    batch.set(boardRef, { [idNameCollection]: collectionValues });
 
     // Commit the batch write
     await batch.commit();
@@ -205,6 +315,20 @@ function App() {
   };
   const updateUser = async (userId: string, userData: any) => {
     const userRef = doc(collection(db, "users"), userId); // Get reference to the user document
+
+    try {
+      await updateDoc(userRef, userData); // Update the user document with new data
+      console.log("User updated successfully!");
+    } catch (error) {
+      console.error("Error updating user:", error);
+    }
+  };
+  const updateCollectionById = async (
+    cellectionName: string,
+    userData: any,
+    userId: string
+  ) => {
+    const userRef = doc(collection(db, cellectionName), userId); // Get reference to the user document
 
     try {
       await updateDoc(userRef, userData); // Update the user document with new data
@@ -255,13 +379,31 @@ function App() {
       throw error; // Rethrow the error to handle it where the function is called
     }
   };
+  const getTimes = async () => {
+    try {
+      const boardDoc = await getDoc(doc(db, "times", "times"));
+      if (boardDoc.exists()) {
+        // Document exists, return its data along with the ID
+        const dbBoard = { ...boardDoc.data(), id: boardDoc.id };
+        console.log(dbBoard);
+        return dbBoard;
+      } else {
+        // Document does not exist
+        console.log("User not found");
+        return null;
+      }
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      throw error; // Rethrow the error to handle it where the function is called
+    }
+  };
 
-  const getBoards = async () => {
-    await getDocs(collection(db, "boards"))
+  const getCollectionByName = async (collectionName: string) => {
+    await getDocs(collection(db, collectionName))
       .then((shot) => {
         const news = shot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
-        // setBoard(news);
-        console.log("boards", news);
+        console.log(collectionName, news);
+        return news;
       })
       .catch((error) => console.log(error));
   };
@@ -295,13 +437,13 @@ function App() {
                 candles={candles}
                 parasha={parasha}
                 user={newUser}
-                zmanim={zmanim}
+                zmanim={dayTimes}
               />
             }
           />
           <Route
             path="/edit/:id"
-            element={<EditBoard zmanim={zmanim} parasha={parasha} />}
+            element={<EditBoard zmanim={dayTimes} parasha={parasha} />}
           />
           <Route path="/users/:id" element={<EditUsers />} />
           <Route
@@ -309,7 +451,7 @@ function App() {
             element={
               <Kboard
                 isMoridHatal={isMoridHatal}
-                zmanim={zmanim}
+                zmanim={dayTimes}
                 parasha={parasha}
                 omerDays={omerDays}
               />
