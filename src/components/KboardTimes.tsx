@@ -48,6 +48,17 @@ function KboardTimes(props: Props) {
       >
         {props.isMoridHatal ? "מוריד הטל" : "משיב הרוח ומוריד הגשם"}
       </div>
+      {props.omerDays && (
+        <div
+          style={{
+            color:
+              dbBoard.boardTextColor === "auto" ? props.colors[1] : "black",
+          }}
+          className="backdrop-opacity-10 rounded-md backdrop-invert bg-white/50 px-3 py-4 h-full w-full   flex items-center justify-center shadow-sm font-['Yiddish'] sm:text-6xl text-amber-600-600/75"
+        >
+          {props.omerDays} לעומר
+        </div>
+      )}
     </div>
   );
 }
@@ -59,6 +70,7 @@ KboardTimes.defaultProps = {
   isMoridHatal: false,
   colors: ["#00000", "#00000", "#00000", "#00000"],
   hebrewDate: "",
+  omerDays: "",
 };
 
 interface Props {
@@ -68,6 +80,7 @@ interface Props {
   isMoridHatal: boolean;
   colors: string[];
   hebrewDate: string;
+  omerDays: string;
   formattedMinutes: string;
   hours: number;
 }

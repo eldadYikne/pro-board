@@ -5,6 +5,7 @@ import { doc, getDoc, onSnapshot } from "firebase/firestore";
 import { db } from "..";
 import { Board, Tfila } from "../types/board";
 import {
+  OmerDay,
   getCurrentDate,
   getCurrentDateDayFirst,
   getCurrentDateNoYear,
@@ -196,6 +197,7 @@ function Kboard(props: Props) {
                     isMoridHatal={props.isMoridHatal}
                     parasha={props.parasha}
                     zmanim={props.zmanim}
+                    omerDays={props.omerDays}
                   />
                   <div className="backdrop-opacity-10 rounded-md backdrop-invert bg-white/50 h-full sm:min-w-96 w-full  flex flex-col p-6 ">
                     <div
@@ -652,10 +654,12 @@ Kboard.defaultProps = {
   parasha: "",
   zmanim: undefined,
   isMoridHatal: false,
+  omerDays: "",
 };
 
 interface Props {
   parasha: string;
+  omerDays?: string;
   zmanim: Zman[] | undefined;
   board?: Board;
   isMoridHatal: boolean;

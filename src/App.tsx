@@ -20,6 +20,7 @@ import User from "./types/user";
 import {
   getCurrentDate,
   getHoursAndMinutes,
+  omerArrayDays,
   translationsZmanimKeys,
 } from "./utils/const";
 import { TranslationsZmanimKeys, Zman } from "./types/zmanim";
@@ -36,6 +37,7 @@ function App() {
   const [zmanim, setZmanim] = useState<Zman[]>();
   const [isMoridHatal, SetIsMoridHatal] = useState<boolean>();
   const location = useLocation();
+  const [omerDays, setOmerDays] = useState<string>("");
   const { hash, pathname, search } = location;
 
   console.log("location.pathname ", pathname);
@@ -91,6 +93,21 @@ function App() {
         } else if (newData.hm === "Cheshvan" && newData.hd > 7) {
           isRainySeason = true;
         }
+        if (newData.events) {
+          const omer = newData.events.find((ev: string) => ev.includes("Omer"));
+          if (omer) {
+            let omerNumber = omer
+              .split(" ")
+              .find((word: string) => word.includes("th"));
+            let omerCurrentDay = omerArrayDays.find(
+              (day) => day.number === omerNumber
+            );
+            if (omerCurrentDay?.he) {
+              setOmerDays(omerCurrentDay?.he ?? "");
+            }
+          }
+        }
+
         SetIsMoridHatal(!isRainySeason);
       });
 
@@ -294,6 +311,7 @@ function App() {
                 isMoridHatal={isMoridHatal}
                 zmanim={zmanim}
                 parasha={parasha}
+                omerDays={omerDays}
               />
             }
           />

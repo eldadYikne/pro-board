@@ -4,6 +4,9 @@ import { useParams } from "react-router-dom";
 import { Board } from "../types/board";
 import { db } from "..";
 import User, { SeatUser } from "../types/user";
+import { Button } from "@mui/material";
+import { Payment } from "@mui/icons-material";
+import Ktable from "./Ktable";
 
 function EditUsers(props: Props) {
   const { id } = useParams();
@@ -49,12 +52,29 @@ function EditUsers(props: Props) {
 
   return (
     <div>
+      {/* {dbBoard?.users && (
+        <Ktable
+          columnData={dbBoard?.users.map((user) => ({
+            name: user.name,
+            seats: user.seats.length,
+            action: [
+              { actionName: "הוסף חיוב", type: "payment", action: () => {} },
+            ],
+          }))}
+          rowsData={["שם", "מס מקומות", "פעולות"]}
+        />
+      )} */}
       {dbBoard?.users &&
         dbBoard.users.map((user: User) => {
           return (
             <div className="flex m-2 p-3 shadow-sm border-teal-500 rounded-md border">
-              <div className="flex gap-1">
-                {user.name} - {user.seats.length}
+              <div className="flex w-full gap-1 justify-between">
+                <span>
+                  {user.name} - {user.seats.length}
+                </span>
+                <Button variant="contained" startIcon={<Payment />}>
+                  <span className="mx-2">הוסף חוב</span>
+                </Button>
               </div>
             </div>
           );
