@@ -20,7 +20,7 @@ function Kboard(props: Props) {
   const [step, setStep] = useState(0);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [hebrewDate, setHebrewDate] = useState("");
-  const [timeBetweenScreens, setTimeBetweenScreens] = useState(
+  const [timeBetweenScreens, setTimeBetweenScreens] = useState<number>(
     dbBoard?.timeScreenPass ? Number(dbBoard?.timeScreenPass) * 1000 : 10000
   );
   const getHebrewDay = (day: number) => {
@@ -73,15 +73,15 @@ function Kboard(props: Props) {
     const intervalId = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
-    // const intervalStep = setInterval(() => {
-    //   setStep((prevStep) => (prevStep === 2 ? 0 : prevStep + 1));
-    // }, timeBetweenScreens);
+    const intervalStep = setInterval(() => {
+      setStep((prevStep) => (prevStep === 2 ? 0 : prevStep + 1));
+    }, timeBetweenScreens);
 
     // Clear the interval when the component unmounts
     fetchData();
     return () => {
       clearInterval(intervalId);
-      // clearInterval(intervalStep);
+      clearInterval(intervalStep);
     };
   }, [id]);
 
@@ -122,6 +122,7 @@ function Kboard(props: Props) {
           const newBoard = { ...boardDoc.data(), id: boardDoc.id };
           if (newBoard) {
             setDbBoard(newBoard as Board);
+            setTimeBetweenScreens(Number(dbBoard?.timeScreenPass) ?? 10);
           }
           console.log(newBoard);
         } else {
