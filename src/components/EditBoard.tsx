@@ -1,5 +1,12 @@
 import { useEffect, useState } from "react";
-import { Board, Message, Tfila, Theme } from "../types/board";
+import {
+  Board,
+  Message,
+  ShabatDayTfila,
+  ShabatTimesToEdit,
+  Tfila,
+  Theme,
+} from "../types/board";
 import {
   Alert,
   Box,
@@ -158,7 +165,7 @@ function EditBoard(props: Props) {
   };
   const addObjectToArray = (
     arrayName: "tfilaTimes" | "forUplifting" | "forMedicine" | "messages",
-    isRegularTfila?: boolean
+    dayTfila?: ShabatDayTfila
   ) => {
     if (dbBoard && Array.isArray(dbBoard[arrayName])) {
       if (arrayName !== "tfilaTimes") {
@@ -169,10 +176,10 @@ function EditBoard(props: Props) {
           ...dbBoard,
           [arrayName]: addObjectToArray,
         });
-      } else if (arrayName === "tfilaTimes") {
+      } else if (arrayName === "tfilaTimes" && dayTfila) {
         const addObjectToArray: Tfila[] = dbBoard[arrayName];
         let newItem: Tfila = {
-          isSaturdayTfila: !isRegularTfila,
+          day: dayTfila,
           name: "",
           time: "",
         };
@@ -262,7 +269,11 @@ function EditBoard(props: Props) {
     // Commit the batch write
     await batch.commit();
   };
-
+  const shabatTimesToEdit: ShabatTimesToEdit[] = [
+    { type: "weekday", name: " זמני יום חול" },
+    { type: "friday", name: "זמני ערב שבת" },
+    { type: "saturday", name: "זמני שבת" },
+  ];
   return (
     <div
       style={{
@@ -276,7 +287,9 @@ function EditBoard(props: Props) {
           inputsBoard.map(({ name, placeholder }) => {
             return (
               <div key={name} className="flex flex-col gap-1 p-2">
-                {name !== "users" && <span>{placeholder}:</span>}
+                {name !== "users" && name !== "tfilaTimes" && (
+                  <span>{placeholder}:</span>
+                )}
                 {!Array.isArray(dbBoard[name]) &&
                   name !== "boardBackgroundImage" &&
                   name !== "mapBackgroundImage" &&
@@ -297,110 +310,77 @@ function EditBoard(props: Props) {
                 {name === "tfilaTimes" && (
                   <div className="flw flex-col">
                     <div className="flex flex-col gap-2">
-                      {dbBoard[name].map(
-                        (tfila: Tfila, idx) =>
-                          !tfila.isSaturdayTfila && (
-                            <div key={idx} className="flex  gap-1">
-                              {Object.keys(tfila).map((key: string) => {
-                                return (
-                                  key !== "isSaturdayTfila" && (
-                                    <div className="flex" key={key}>
-                                      <TextField
-                                        dir="rtl"
-                                        id="filled-basic"
-                                        label={dataKeysToHebrewName[key]}
-                                        name={key}
-                                        value={tfila[key as keyof Tfila]}
-                                        onChange={(e) =>
-                                          handleInputArrayChange(e, idx, name)
+                      {shabatTimesToEdit.map((time) => {
+                        return (
+                          <div className="flex flex-col gap-1">
+                            <span>{time.name} :</span>
+                            <div className="flex flex-col gap-1">
+                              {dbBoard.tfilaTimes.map(
+                                (tfila: Tfila, idx: number) => {
+                                  return (
+                                    time.type === tfila.day && (
+                                      <div className="flex  gap-1">
+                                        {Object.keys(tfila).map(
+                                          (key: string) => {
+                                            return (
+                                              key !== "day" && (
+                                                <div className="flex" key={key}>
+                                                  <TextField
+                                                    dir="rtl"
+                                                    id="filled-basic"
+                                                    label={
+                                                      dataKeysToHebrewName[key]
+                                                    }
+                                                    name={key}
+                                                    value={
+                                                      tfila[key as keyof Tfila]
+                                                    }
+                                                    onChange={(e) =>
+                                                      handleInputArrayChange(
+                                                        e,
+                                                        idx,
+                                                        name
+                                                      )
+                                                    }
+                                                    variant="filled"
+                                                  />
+                                                </div>
+                                              )
+                                            );
+                                          }
+                                        )}
+                                        {
+                                          <div className="flex">
+                                            <Button
+                                              onClick={(e) =>
+                                                removeObjectFromArray(name, idx)
+                                              }
+                                              startIcon={<Delete />}
+                                            >
+                                              הסר
+                                            </Button>
+                                          </div>
                                         }
-                                        variant="filled"
-                                      />
-                                    </div>
-                                  )
-                                );
-                              })}
-                              {
-                                <div className="flex">
-                                  {/* <div className="flex flex-col items-center justify-center text-center">
-                                  {
-                                    <Checkbox
-                                      onChange={(e) =>
-                                        handleInputArrayChange(
-                                          e,
-                                          idx,
-                                          name,
-                                          true
-                                        )
-                                      }
-                                      name={"isSaturdayTfila"}
-                                      checked={tfila.isSaturdayTfila}
-                                    />
-                                  }
-                                  <span>תפילת שבת</span>
-                                </div> */}
-                                  <Button
-                                    onClick={(e) =>
-                                      removeObjectFromArray(name, idx)
-                                    }
-                                    startIcon={<Delete />}
-                                  >
-                                    הסר
-                                  </Button>
-                                </div>
-                              }
+                                      </div>
+                                    )
+                                  );
+                                }
+                              )}
                             </div>
-                          )
-                      )}
-                      <div>
-                        <Button
-                          onClick={() => addObjectToArray(name, true)}
-                          variant="contained"
-                        >
-                          הוסף
-                        </Button>
-                      </div>
-                    </div>
-                    <div className="flex flex-col gap-1">
-                      <span className="my-3">זמני שבת:</span>
-                      {dbBoard[name].map(
-                        (tfila: Tfila, idx) =>
-                          tfila.isSaturdayTfila && (
-                            <div key={idx} className="flex  gap-2">
-                              {Object.keys(tfila).map((key: string) => {
-                                return (
-                                  key !== "isSaturdayTfila" && (
-                                    <div className="flex" key={key}>
-                                      <TextField
-                                        dir="rtl"
-                                        id="filled-basic"
-                                        label={dataKeysToHebrewName[key]}
-                                        name={key}
-                                        value={tfila[key as keyof Tfila]}
-                                        onChange={(e) =>
-                                          handleInputArrayChange(e, idx, name)
-                                        }
-                                        variant="filled"
-                                      />
-                                    </div>
-                                  )
-                                );
-                              })}
-                              {
-                                <div className="flex">
-                                  <Button
-                                    onClick={(e) =>
-                                      removeObjectFromArray(name, idx)
-                                    }
-                                    startIcon={<Delete />}
-                                  >
-                                    הסר
-                                  </Button>
-                                </div>
-                              }
+
+                            <div>
+                              <Button
+                                onClick={() =>
+                                  addObjectToArray(name, time.type)
+                                }
+                                variant="contained"
+                              >
+                                הוסף
+                              </Button>
                             </div>
-                          )
-                      )}
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
@@ -437,8 +417,7 @@ function EditBoard(props: Props) {
                       </Button>
                     </div>
                   ))}
-                {(name === "tfilaTimes" ||
-                  name === "messages" ||
+                {(name === "messages" ||
                   name === "forMedicine" ||
                   name === "forUplifting") && (
                   <div>

@@ -48,6 +48,7 @@ function App() {
   useEffect(() => {
     async function fetchData() {
       await getTimesFromDb();
+      // await getTimesFromApi();
     }
     fetchData();
     const hourlyInterval = setInterval(async () => {
@@ -94,6 +95,7 @@ function App() {
 
         setDayTimes(zmanimData);
         // postCollection("zmanim", zmanimData);
+
         updateCollectionById("times", { dayTimes: zmanimData }, "times");
       });
     fetch(
@@ -138,7 +140,7 @@ function App() {
         }
         setIsMoridHatal(!isRainySeason);
 
-        postCollectionCoustumId(
+        updateCollectionById(
           "times",
           {
             isMoridHatal: !isRainySeason,
@@ -222,7 +224,6 @@ function App() {
       isMoridHatal,
       lastTimeDataUpdated,
       sahabatTimes,
-      id,
       sfiratOmer,
     } = timesCollection;
     setLastTimeDataUpdated(String(lastTimeDataUpdated));

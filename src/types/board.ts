@@ -24,7 +24,12 @@ export interface Board {
 export interface Tfila {
   time: string;
   name: string;
-  isSaturdayTfila: boolean;
+  day: ShabatDayTfila;
+}
+export type ShabatDayTfila = "saturday" | "friday" | "weekday";
+export interface ShabatTimesToEdit {
+  type: ShabatDayTfila;
+  name: string;
 }
 export interface Message {
   content: string;
@@ -35,6 +40,7 @@ interface BoardBackgroundImage {
   tfilaTimes: string;
   messages: string;
 }
+
 type TfilaName =
   | "מנחה"
   | "שחרית"

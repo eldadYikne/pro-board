@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { doc, getDoc, onSnapshot } from "firebase/firestore";
 import { db } from "..";
-import { Board, Tfila } from "../types/board";
+import { Board, ShabatTimesToEdit, Tfila } from "../types/board";
 import {
   OmerDay,
   getCurrentDate,
@@ -73,15 +73,15 @@ function Kboard(props: Props) {
     const intervalId = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
-    const intervalStep = setInterval(() => {
-      setStep((prevStep) => (prevStep === 2 ? 0 : prevStep + 1));
-    }, timeBetweenScreens);
+    // const intervalStep = setInterval(() => {
+    //   setStep((prevStep) => (prevStep === 2 ? 0 : prevStep + 1));
+    // }, timeBetweenScreens);
 
     // Clear the interval when the component unmounts
     fetchData();
     return () => {
       clearInterval(intervalId);
-      clearInterval(intervalStep);
+      // clearInterval(intervalStep);
     };
   }, [id]);
 
@@ -138,7 +138,11 @@ function Kboard(props: Props) {
       throw error; // Rethrow the error to handle it where the function is called
     }
   };
-
+  const shabatTimesToEdit: ShabatTimesToEdit[] = [
+    { type: "weekday", name: "יום חול" },
+    { type: "friday", name: " ערב שבת" },
+    { type: "saturday", name: " שבת" },
+  ];
   return (
     <div>
       {dbBoard && (
@@ -177,7 +181,7 @@ function Kboard(props: Props) {
                     zmanim={props.zmanim}
                     omerDays={props.omerDays}
                   />
-                  <div className="backdrop-opacity-10 rounded-md backdrop-invert bg-white/50 h-full sm:min-w-96 w-full  flex flex-col p-6 ">
+                  <div className="backdrop-opacity-10 rounded-md backdrop-invert bg-white/50 h-full sm:min-w-[33%] w-full  flex flex-col p-6 ">
                     <div
                       className=" py-2 font-['Yiddish']  sm:text-5xl text-amber-600-600/75"
                       style={{
@@ -237,7 +241,58 @@ function Kboard(props: Props) {
                       {step === 1 && (
                         <div className="flex flex-col gap-2">
                           <div className="flex flex-col">
-                            {dbBoard.tfilaTimes.filter(
+                            {shabatTimesToEdit.map((time) => {
+                              return (
+                                <div>
+                                  <div
+                                    className="font-bold underline py-2 font-['Alef'] sm:text-3xl text-amber-600-600/75"
+                                    style={{
+                                      color:
+                                        dbBoard.boardTextColor === "auto"
+                                          ? colors[1]
+                                          : "black",
+                                    }}
+                                  >
+                                    {time.name}
+                                  </div>
+                                  <div className="grid gap-2 xl:grid-cols-3 sm:grid-cols-2 ">
+                                    {dbBoard.tfilaTimes.map((tfila: Tfila) => {
+                                      return (
+                                        time.type === tfila.day && (
+                                          <div>
+                                            <div
+                                              style={{
+                                                color:
+                                                  dbBoard.boardTextColor ===
+                                                  "auto"
+                                                    ? colors[2]
+                                                    : "black",
+                                              }}
+                                              className="font-['Alef'] font-light sm:text-2xl"
+                                            >
+                                              {tfila.name}{" "}
+                                            </div>
+                                            <div
+                                              style={{
+                                                color:
+                                                  dbBoard.boardTextColor ===
+                                                  "auto"
+                                                    ? colors[2]
+                                                    : "black",
+                                              }}
+                                              className="font-['Damka'] sm:text-3xl [text-shadow:_0_1px_0_rgb(0_0_0_/_30%)]"
+                                            >
+                                              {tfila.time}
+                                            </div>
+                                          </div>
+                                        )
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                            {/* {dbBoard.tfilaTimes.filter(
                               (tfila) => !tfila.isSaturdayTfila
                             ) && (
                               <div
@@ -283,9 +338,9 @@ function Kboard(props: Props) {
                                   <span className="hidden"></span>
                                 );
                               })}
-                            </div>
+                            </div> */}
                           </div>
-                          <div className="flex flex-col">
+                          {/* <div className="flex flex-col">
                             {dbBoard.tfilaTimes.filter(
                               (tfila) => tfila.isSaturdayTfila
                             ) && (
@@ -333,7 +388,7 @@ function Kboard(props: Props) {
                                 );
                               })}
                             </div>
-                          </div>
+                          </div> */}
                         </div>
                       )}
                       {step === 2 && (
@@ -363,7 +418,7 @@ function Kboard(props: Props) {
               {dbBoard.theme === "column" && (
                 <div className="flex gap-6 w-[90%] min-h-[80%]">
                   {step === 0 && (
-                    <div className="backdrop-opacity-10 rounded-md backdrop-invert bg-white/50 h-full sm:min-w-96 w-full  flex flex-col p-6 ">
+                    <div className="backdrop-opacity-10 rounded-md backdrop-invert bg-white/50 h-full sm:min-w-[33%] w-full  flex flex-col p-6 ">
                       <div
                         className=" py-2 font-['Yiddish'] w-full flex justify-center sm:text-6xl text-amber-600-600/75"
                         style={{
@@ -376,45 +431,43 @@ function Kboard(props: Props) {
                         זמני תפילות יום חול
                       </div>
                       <div className="flex flex-col py-6 ">
-                        {step === 0 && (
-                          <div
-                            className="grid gap-2  "
-                            style={{
-                              gridTemplateColumns: "repeat(2, minmax(0, 1fr)) ",
-                            }}
-                          >
-                            {dbBoard.tfilaTimes.map((tfila: Tfila) => {
-                              return !tfila.isSaturdayTfila ? (
-                                <div>
-                                  <div
-                                    style={{
-                                      color:
-                                        dbBoard.boardTextColor === "auto"
-                                          ? colors[2]
-                                          : "black",
-                                    }}
-                                    className="font-['Alef'] font-light sm:text-4xl"
-                                  >
-                                    {tfila.name}{" "}
-                                  </div>
-                                  <div
-                                    style={{
-                                      color:
-                                        dbBoard.boardTextColor === "auto"
-                                          ? colors[2]
-                                          : "black",
-                                    }}
-                                    className="font-['Damka'] sm:text-5xl [text-shadow:_0_1px_0_rgb(0_0_0_/_30%)]"
-                                  >
-                                    {tfila.time}
-                                  </div>
+                        <div
+                          className="grid gap-2  "
+                          style={{
+                            gridTemplateColumns: "repeat(2, minmax(0, 1fr)) ",
+                          }}
+                        >
+                          {dbBoard.tfilaTimes.map((tfila: Tfila) => {
+                            return tfila.day === "weekday" ? (
+                              <div>
+                                <div
+                                  style={{
+                                    color:
+                                      dbBoard.boardTextColor === "auto"
+                                        ? colors[2]
+                                        : "black",
+                                  }}
+                                  className="font-['Alef'] font-light sm:text-4xl"
+                                >
+                                  {tfila.name}{" "}
                                 </div>
-                              ) : (
-                                <span className="hidden"></span>
-                              );
-                            })}
-                          </div>
-                        )}
+                                <div
+                                  style={{
+                                    color:
+                                      dbBoard.boardTextColor === "auto"
+                                        ? colors[2]
+                                        : "black",
+                                  }}
+                                  className="font-['Damka'] sm:text-5xl [text-shadow:_0_1px_0_rgb(0_0_0_/_30%)]"
+                                >
+                                  {tfila.time}
+                                </div>
+                              </div>
+                            ) : (
+                              <span className="hidden"></span>
+                            );
+                          })}
+                        </div>
                       </div>
                     </div>
                   )}
@@ -429,7 +482,7 @@ function Kboard(props: Props) {
                     zmanim={props.zmanim}
                   />
 
-                  <div className="backdrop-opacity-10 rounded-md backdrop-invert bg-white/50 h-full sm:min-w-96 w-full  flex flex-col p-6 ">
+                  <div className="backdrop-opacity-10 rounded-md backdrop-invert bg-white/50 h-full sm:min-w-[33%] w-full  flex flex-col p-6 ">
                     <div
                       className={`py-2 font-['Yiddish'] sm:text-6xl text-amber-600-600/75 ${
                         step === 0 ? "w-full flex justify-center" : ""
@@ -490,35 +543,66 @@ function Kboard(props: Props) {
                       )}
                       {step === 0 && (
                         <div className="flex ">
-                          <div className="grid gap-4  py-5 xl:grid-cols-2 sm:grid-cols-2 ">
-                            {dbBoard.tfilaTimes.map((tfila: Tfila) => {
-                              return tfila.isSaturdayTfila ? (
-                                <div>
-                                  <div
-                                    style={{
-                                      color:
-                                        dbBoard.boardTextColor === "auto"
-                                          ? colors[2]
-                                          : "black",
-                                    }}
-                                    className="font-['Alef'] font-light sm:text-4xl"
-                                  >
-                                    {tfila.name}
+                          <div className="flex flex-col gap-4  py-5  ">
+                            {shabatTimesToEdit.map((time) => {
+                              return (
+                                time.type !== "weekday" && (
+                                  <div>
+                                    <div
+                                      style={{
+                                        color:
+                                          dbBoard.boardTextColor === "auto"
+                                            ? colors[2]
+                                            : "black",
+                                      }}
+                                      className="font-['Alef'] underline font-light sm:text-4xl"
+                                    >
+                                      {time.name}{" "}
+                                    </div>
+                                    <div
+                                      className="grid gap-2  "
+                                      style={{
+                                        gridTemplateColumns:
+                                          "repeat(2, minmax(0, 1fr)) ",
+                                      }}
+                                    >
+                                      {dbBoard.tfilaTimes.map(
+                                        (tfila: Tfila) => {
+                                          return (
+                                            time.type === tfila.day && (
+                                              <div>
+                                                <div
+                                                  style={{
+                                                    color:
+                                                      dbBoard.boardTextColor ===
+                                                      "auto"
+                                                        ? colors[2]
+                                                        : "black",
+                                                  }}
+                                                  className="font-['Alef'] font-light sm:text-3xl"
+                                                >
+                                                  {tfila.name}
+                                                </div>
+                                                <div
+                                                  style={{
+                                                    color:
+                                                      dbBoard.boardTextColor ===
+                                                      "auto"
+                                                        ? colors[2]
+                                                        : "black",
+                                                  }}
+                                                  className="font-['Damka'] sm:text-5xl [text-shadow:_0_1px_0_rgb(0_0_0_/_30%)]"
+                                                >
+                                                  {tfila.time}
+                                                </div>
+                                              </div>
+                                            )
+                                          );
+                                        }
+                                      )}
+                                    </div>
                                   </div>
-                                  <div
-                                    style={{
-                                      color:
-                                        dbBoard.boardTextColor === "auto"
-                                          ? colors[2]
-                                          : "black",
-                                    }}
-                                    className="font-['Damka'] sm:text-5xl [text-shadow:_0_1px_0_rgb(0_0_0_/_30%)]"
-                                  >
-                                    {tfila.time}
-                                  </div>
-                                </div>
-                              ) : (
-                                <span className="hidden"></span>
+                                )
                               );
                             })}
                           </div>
