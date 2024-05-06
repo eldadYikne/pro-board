@@ -450,6 +450,7 @@ function App() {
             path="/board/:id"
             element={
               <Kboard
+                hebrewDate={hebrewDate}
                 isMoridHatal={isMoridHatal}
                 zmanim={dayTimes}
                 parasha={parasha}

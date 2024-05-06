@@ -70,27 +70,6 @@ function Kboard(props: Props) {
       }
     }
 
-    const updateHebrewDate = () => {
-      const currentDate = new Date();
-      const options = {
-        weekday: "long" as const, // Specify "long" for full weekday name
-        year: "numeric" as const,
-        month: "long" as const,
-        day: "2-digit" as const,
-        calendar: "hebrew" as const,
-      };
-
-      const formatter = new Intl.DateTimeFormat("he-IL", options);
-      const [weekday, a, day, c, month] = formatter.formatToParts(currentDate); // Extract month and day
-      console.log("dayday", weekday, day, a, c, month);
-      console.log("month", month);
-      const hebrewDay = String(getHebrewDay(Number(parseInt(day.value, 10)))); // Convert numeric day to Hebrew letters
-      const formattedHebrewDate = `${weekday.value} ${hebrewDay}' ${month.value}`;
-      setHebrewDate(formattedHebrewDate);
-    };
-
-    updateHebrewDate();
-    const intervalId2 = setInterval(updateHebrewDate, 24 * 60 * 60 * 1000);
     const intervalId = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
@@ -101,7 +80,6 @@ function Kboard(props: Props) {
     // Clear the interval when the component unmounts
     fetchData();
     return () => {
-      clearInterval(intervalId2);
       clearInterval(intervalId);
       clearInterval(intervalStep);
     };
@@ -193,7 +171,7 @@ function Kboard(props: Props) {
                     formattedMinutes={formattedMinutes}
                     hours={hours}
                     colors={colors}
-                    hebrewDate={hebrewDate}
+                    hebrewDate={props.hebrewDate}
                     isMoridHatal={props.isMoridHatal}
                     parasha={props.parasha}
                     zmanim={props.zmanim}
@@ -445,7 +423,7 @@ function Kboard(props: Props) {
                     formattedMinutes={formattedMinutes}
                     hours={hours}
                     colors={colors}
-                    hebrewDate={hebrewDate}
+                    hebrewDate={props.hebrewDate}
                     isMoridHatal={props.isMoridHatal}
                     parasha={props.parasha}
                     zmanim={props.zmanim}
@@ -655,6 +633,7 @@ Kboard.defaultProps = {
   zmanim: undefined,
   isMoridHatal: false,
   omerDays: "",
+  hebrewDate: "",
 };
 
 interface Props {
@@ -663,4 +642,5 @@ interface Props {
   zmanim: Zman[] | undefined;
   board?: Board;
   isMoridHatal: boolean;
+  hebrewDate: string;
 }
