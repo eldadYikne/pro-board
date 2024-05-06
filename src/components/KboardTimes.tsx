@@ -7,7 +7,7 @@ function KboardTimes(props: Props) {
   const [dbBoard, setDbBoard] = useState<Board>(props.board);
 
   return (
-    <div className="flex flex-col justify-between gap-3 sm:min-w-96 w-full ">
+    <div className="flex flex-col justify-between gap-3  w-full ">
       <div
         style={{
           color: dbBoard.boardTextColor === "auto" ? props.colors[1] : "black",

@@ -122,7 +122,11 @@ function Kboard(props: Props) {
           const newBoard = { ...boardDoc.data(), id: boardDoc.id };
           if (newBoard) {
             setDbBoard(newBoard as Board);
-            setTimeBetweenScreens(Number(dbBoard?.timeScreenPass) ?? 10);
+            if (Number(dbBoard?.timeScreenPass) * 1000 !== timeBetweenScreens) {
+              // setTimeBetweenScreens(
+              //   Number(dbBoard?.timeScreenPass) * 1000 ?? 10000
+              // );
+            }
           }
           console.log(newBoard);
         } else {
@@ -171,18 +175,20 @@ function Kboard(props: Props) {
               </div>
               {dbBoard.theme === "modern" && (
                 <div className="flex gap-6 w-[80%] min-h-[65%]">
-                  <KboardTimes
-                    board={dbBoard}
-                    formattedMinutes={formattedMinutes}
-                    hours={hours}
-                    colors={colors}
-                    hebrewDate={props.hebrewDate}
-                    isMoridHatal={props.isMoridHatal}
-                    parasha={props.parasha}
-                    zmanim={props.zmanim}
-                    omerDays={props.omerDays}
-                  />
-                  <div className="backdrop-opacity-10 rounded-md backdrop-invert bg-white/50 h-full sm:min-w-[33%] w-full  flex flex-col p-6 ">
+                  <div className="w-1/2">
+                    <KboardTimes
+                      board={dbBoard}
+                      formattedMinutes={formattedMinutes}
+                      hours={hours}
+                      colors={colors}
+                      hebrewDate={props.hebrewDate}
+                      isMoridHatal={props.isMoridHatal}
+                      parasha={props.parasha}
+                      zmanim={props.zmanim}
+                      omerDays={props.omerDays}
+                    />
+                  </div>
+                  <div className="backdrop-opacity-10 rounded-md backdrop-invert bg-white/50 h-full sm:w-1/2   flex flex-col p-6 ">
                     <div
                       className=" py-2 font-['Yiddish']  sm:text-5xl text-amber-600-600/75"
                       style={{
