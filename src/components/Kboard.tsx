@@ -162,7 +162,11 @@ function Kboard(props: Props) {
             step === 0 ? "flip-image" : ""
           }`}
         >
-          <div className="flex flex-col gap-4 h-full w-full items-center justify-center">
+          <div
+            className={`flex flex-col gap-4 h-full w-full items-center justify-center ${
+              step === 0 ? "flip-image" : ""
+            }`}
+          >
             <div className="flex flex-col gap-4 h-full w-full items-center justify-center">
               <div
                 className="sm:text-8xl py-4 font-bold font-['Yiddish'] text-shadow-headline"
@@ -210,7 +214,7 @@ function Kboard(props: Props) {
                           {dbBoard.timesToShow.map((time: string) => (
                             <div className="flex flex-col">
                               <span
-                                className="font-['Alef'] font-light text-2xl"
+                                className="font-['Alef'] font-light text-4xl"
                                 style={{
                                   color:
                                     dbBoard.boardTextColor === "auto"
@@ -231,7 +235,7 @@ function Kboard(props: Props) {
                                       ? colors[2]
                                       : "black",
                                 }}
-                                className="font-['Damka'] text-3xl [text-shadow:_0_1px_0_rgb(0_0_0_/_30%)]"
+                                className="font-['Damka'] text-5xl [text-shadow:_0_1px_0_rgb(0_0_0_/_30%)]"
                               >
                                 {props.zmanim?.find(
                                   (zman) =>
@@ -275,7 +279,7 @@ function Kboard(props: Props) {
                                                     ? colors[2]
                                                     : "black",
                                               }}
-                                              className="font-['Alef'] font-light sm:text-2xl"
+                                              className="font-['Alef'] font-light sm:text-4xl"
                                             >
                                               {tfila.name}{" "}
                                             </div>
@@ -287,7 +291,7 @@ function Kboard(props: Props) {
                                                     ? colors[2]
                                                     : "black",
                                               }}
-                                              className="font-['Damka'] sm:text-3xl [text-shadow:_0_1px_0_rgb(0_0_0_/_30%)]"
+                                              className="font-['Damka'] sm:text-5xl [text-shadow:_0_1px_0_rgb(0_0_0_/_30%)]"
                                             >
                                               {tfila.time}
                                             </div>
@@ -299,107 +303,11 @@ function Kboard(props: Props) {
                                 </div>
                               );
                             })}
-                            {/* {dbBoard.tfilaTimes.filter(
-                              (tfila) => !tfila.isSaturdayTfila
-                            ) && (
-                              <div
-                                className=" py-2 font-['Alef'] sm:text-3xl text-amber-600-600/75"
-                                style={{
-                                  color:
-                                    dbBoard.boardTextColor === "auto"
-                                      ? colors[1]
-                                      : "black",
-                                }}
-                              >
-                                יום חול
-                              </div>
-                            )}
-                            <div className="grid gap-2 xl:grid-cols-3 sm:grid-cols-2 ">
-                              {dbBoard.tfilaTimes.map((tfila: Tfila) => {
-                                return !tfila.isSaturdayTfila ? (
-                                  <div>
-                                    <div
-                                      style={{
-                                        color:
-                                          dbBoard.boardTextColor === "auto"
-                                            ? colors[2]
-                                            : "black",
-                                      }}
-                                      className="font-['Alef'] font-light sm:text-2xl"
-                                    >
-                                      {tfila.name}{" "}
-                                    </div>
-                                    <div
-                                      style={{
-                                        color:
-                                          dbBoard.boardTextColor === "auto"
-                                            ? colors[2]
-                                            : "black",
-                                      }}
-                                      className="font-['Damka'] sm:text-3xl [text-shadow:_0_1px_0_rgb(0_0_0_/_30%)]"
-                                    >
-                                      {tfila.time}
-                                    </div>
-                                  </div>
-                                ) : (
-                                  <span className="hidden"></span>
-                                );
-                              })}
-                            </div> */}
                           </div>
-                          {/* <div className="flex flex-col">
-                            {dbBoard.tfilaTimes.filter(
-                              (tfila) => tfila.isSaturdayTfila
-                            ) && (
-                              <div
-                                className=" py-2 font-['Alef'] sm:text-3xl text-amber-600-600/75"
-                                style={{
-                                  color:
-                                    dbBoard.boardTextColor === "auto"
-                                      ? colors[1]
-                                      : "black",
-                                }}
-                              >
-                                שבת
-                              </div>
-                            )}
-                            <div className="grid gap-2 xl:grid-cols-3 sm:grid-cols-2 ">
-                              {dbBoard.tfilaTimes.map((tfila: Tfila) => {
-                                return tfila.isSaturdayTfila ? (
-                                  <div>
-                                    <div
-                                      style={{
-                                        color:
-                                          dbBoard.boardTextColor === "auto"
-                                            ? colors[2]
-                                            : "black",
-                                      }}
-                                      className="font-['Alef'] font-light sm:text-2xl"
-                                    >
-                                      {tfila.name}{" "}
-                                    </div>
-                                    <div
-                                      style={{
-                                        color:
-                                          dbBoard.boardTextColor === "auto"
-                                            ? colors[2]
-                                            : "black",
-                                      }}
-                                      className="font-['Damka'] sm:text-3xl [text-shadow:_0_1px_0_rgb(0_0_0_/_30%)]"
-                                    >
-                                      {tfila.time}
-                                    </div>
-                                  </div>
-                                ) : (
-                                  <span className="hidden"></span>
-                                );
-                              })}
-                            </div>
-                          </div> */}
                         </div>
                       )}
                       {step === 2 && (
-                        <ul className="flex flex-col gap-2">
+                        <ul className="flex flex-col gap-5">
                           {dbBoard.messages.length > 0 &&
                             dbBoard.messages.map((message) => {
                               return (
@@ -616,7 +524,7 @@ function Kboard(props: Props) {
                         </div>
                       )}
                       {step === 2 && (
-                        <ul className="flex flex-col gap-2">
+                        <ul className="flex flex-col gap-5">
                           {dbBoard.messages.length > 0 &&
                             dbBoard.messages.map((message) => {
                               return (

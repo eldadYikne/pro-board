@@ -21,7 +21,8 @@ import { Alert, Checkbox, FormControlLabel, Snackbar } from "@mui/material";
 import { Zman } from "../types/zmanim";
 import EditBoard from "./EditBoard";
 import { useParams } from "react-router-dom";
-import { Board } from "../types/board";
+import { Board, Message, ShabatTimesToEdit, Tfila } from "../types/board";
+import { getCurrentDateDayFirstByGetDate } from "../utils/const";
 
 function ConfirmedPlace(props: Props) {
   const [user, setUser] = useState<User>();
@@ -50,7 +51,7 @@ function ConfirmedPlace(props: Props) {
       }
     }
     fetchData();
-  }, [props.user]);
+  }, [props.user, id]);
   const getBoardById = async (boardId: string) => {
     try {
       const boardDoc = await getDoc(doc(db, "boards", boardId));
@@ -125,8 +126,13 @@ function ConfirmedPlace(props: Props) {
 
     setSnackbarIsOpen(false);
   };
+  const shabatTimesToEdit: ShabatTimesToEdit[] = [
+    { type: "weekday", name: "יום חול" },
+    { type: "friday", name: " ערב שבת" },
+    { type: "saturday", name: " שבת" },
+  ];
   return (
-    <div className="flex flex-col justify-center items-center w-full p-2">
+    <div className="flex flex-col justify-center items-center w-full gap-3 p-2">
       <Card sx={{ maxWidth: 345 }}>
         <CardMedia
           component="img"
@@ -183,10 +189,54 @@ function ConfirmedPlace(props: Props) {
         </CardContent>
       </Card>
 
-      {/* <div className="w-full h-full ">
-        <Board zmanim={props.zmanim} />
-      </div> */}
-      {/* {<EditBoard />} */}
+      {dbBoard && (
+        <Card sx={{ width: 345 }}>
+          <CardContent>
+            <div className="w-full flex justify-center text-xl">
+              זמני תפילות
+            </div>
+            {shabatTimesToEdit.map((time) => {
+              return (
+                <div className="flex flex-col gap-1 text-base">
+                  <div className="underline">{time.name}</div>
+                  {dbBoard.tfilaTimes.map((tfila: Tfila) => {
+                    return (
+                      time.type === tfila.day && (
+                        <div className="flex flex-col">
+                          <div className="flex gap-1">
+                            <span>{tfila.name}:</span>
+                            <span>{tfila.time} </span>
+                          </div>
+                        </div>
+                      )
+                    );
+                  })}
+                </div>
+              );
+            })}
+          </CardContent>
+        </Card>
+      )}
+      {dbBoard && (
+        <Card sx={{ width: 345 }}>
+          <CardContent>
+            <div className="w-full flex justify-center text-xl">
+              הודעות לציבור
+            </div>
+            <div className="flex flex-col gap-4 text-base">
+              {dbBoard.messages.map((message: Message) => {
+                return (
+                  <div className="flex flex-col">
+                    {/* <span>{String(message.date)}:</span> */}
+                    <span>-{message.content} </span>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <div>
         <Snackbar
           className="flex flex-row-reverse"

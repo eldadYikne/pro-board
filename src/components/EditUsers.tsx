@@ -69,7 +69,7 @@ function EditUsers(props: Props) {
           return (
             <div className="flex m-2 p-3 shadow-sm border-teal-500 rounded-md border">
               <div className="flex w-full gap-1 justify-between">
-                <span>
+                <span className="flex items-center h-full justify-center">
                   {user.name} - {user.seats.length}
                 </span>
                 <Button variant="contained" startIcon={<Payment />}>
