@@ -69,7 +69,7 @@ function Kboard(props: Props) {
       clearInterval(intervalId);
       clearInterval(intervalStep);
     };
-  }, [id, props.lastTimeDataUpdated]);
+  }, [id, props.lastTimeDataUpdated, dbBoard?.theme]);
 
   const hours = currentTime.getHours();
   const minutes = currentTime.getMinutes();
