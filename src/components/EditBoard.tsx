@@ -431,32 +431,46 @@ function EditBoard(props: Props) {
                 )}
                 {name === "boardBackgroundImage" && (
                   <div className="flex gap-1 w-full overflow-x-auto">
-                    {["1", "2", "3", "4", "5", "6", "7", "8", "9"].map(
-                      (item, index) => (
-                        <div
-                          onClick={() =>
-                            setDbBoard({
-                              ...dbBoard,
-                              boardBackgroundImage: item,
-                            })
-                          }
-                          key={index}
-                          className="min-w-20 min-h-16"
-                        >
-                          <img
-                            src={require("../assets/backgrounds/" +
-                              item +
-                              ".jpg")}
-                            className={`min-w-20 min-h-16 rounded-md ${
-                              item === dbBoard.boardBackgroundImage
-                                ? "border-2 border-sky-500 border-spacing-1"
-                                : ""
-                            }`}
-                            alt={item}
-                          />
-                        </div>
-                      )
-                    )}
+                    {[
+                      "1",
+                      "2",
+                      "3",
+                      "4",
+                      "5",
+                      "6",
+                      "7",
+                      "8",
+                      "9",
+                      "10",
+                      "11",
+                      "12",
+                      "13",
+                      "14",
+                      "15",
+                    ].map((item, index) => (
+                      <div
+                        onClick={() =>
+                          setDbBoard({
+                            ...dbBoard,
+                            boardBackgroundImage: item,
+                          })
+                        }
+                        key={index}
+                        className="min-w-20 min-h-16"
+                      >
+                        <img
+                          src={require("../assets/backgrounds/" +
+                            item +
+                            ".jpg")}
+                          className={`min-w-20 min-h-16 rounded-md ${
+                            item === dbBoard.boardBackgroundImage
+                              ? "border-2 border-sky-500 border-spacing-1"
+                              : ""
+                          }`}
+                          alt={item}
+                        />
+                      </div>
+                    ))}
                   </div>
                 )}
                 {/* {name === "mapBackgroundImage" && (

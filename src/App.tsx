@@ -37,6 +37,8 @@ function App() {
   const [parasha, setParasha] = useState("");
   const [candles, setCandles] = useState("");
   const [havdalah, setHavdalah] = useState("");
+  const [holiday, setHoliday] = useState("");
+  const [roshChodesh, setRoshChodesh] = useState("");
   const [dayTimes, setDayTimes] = useState<Zman[]>();
   const [isMoridHatal, setIsMoridHatal] = useState<boolean>();
   const [lastTimeUpdatedTimesData, setLastTimeDataUpdated] =
@@ -175,6 +177,17 @@ function App() {
         const currentHavdalah = shabatData.items.find(
           (item: any) => item.category === "havdalah"
         );
+        const currentRoshChodesh =
+          shabatData.items.find(
+            (item: any) =>
+              item.category === "roshchodesh" && item.date === currentDate
+          ) ?? "";
+        const currentHoliday =
+          shabatData.items.find(
+            (item: any) =>
+              item.category === "holiday" && item.date === currentDate
+          ) ?? "";
+
         if (!currentParasha) {
           currentParasha = shabatData.items.find(
             (item: any) =>
@@ -183,6 +196,7 @@ function App() {
               item.date === currentDate
           );
         }
+
         let minutesHavdala = new Date(currentCandles.date).getMinutes();
         let formattedHavdalasMin =
           minutesHavdala < 10 ? `0${minutesHavdala}` : `${minutesHavdala}`;
@@ -196,7 +210,8 @@ function App() {
         const currentCandlesDate = `${new Date(
           currentCandles.date
         ).getHours()}:${formattedCandlesMin}`;
-
+        setHoliday(currentHoliday.hebrew);
+        setRoshChodesh(currentRoshChodesh.hebrew);
         setHavdalah(currentHavdalahDate);
         setCandles(currentCandlesDate);
         setParasha(currentParasha.hebrew);
@@ -204,6 +219,8 @@ function App() {
         updateCollectionById(
           "times",
           {
+            holiday: currentHoliday.hebrew,
+            roshChodesh: currentRoshChodesh.hebrew,
             sahabatTimes: {
               havdala: currentHavdalahDate,
               parasha: currentParasha.hebrew,
@@ -227,6 +244,8 @@ function App() {
       lastTimeDataUpdated,
       sahabatTimes,
       sfiratOmer,
+      roshChodesh,
+      holiday,
     } = timesCollection;
     setLastTimeDataUpdated(lastTimeDataUpdated);
     const { seconds, nanoseconds } = lastTimeDataUpdated;
@@ -241,6 +260,8 @@ function App() {
       setCandles(sahabatTimes.candles);
       setParasha(sahabatTimes.parasha);
       setHebrewDate(hebrewDate);
+      setHoliday(holiday);
+      setRoshChodesh(roshChodesh);
       setOmerDays(sfiratOmer ?? "");
       setDayTimes(dayTimes);
       setIsMoridHatal(isMoridHatal);
@@ -464,6 +485,8 @@ function App() {
                 parasha={parasha}
                 omerDays={omerDays}
                 lastTimeDataUpdated={lastTimeUpdatedTimesData}
+                roshChodesh={roshChodesh}
+                holiday={holiday}
                 getTimesFromDb={getTimesFromDb}
               />
             }

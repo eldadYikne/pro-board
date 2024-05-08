@@ -176,6 +176,8 @@ function Kboard(props: Props) {
                       parasha={props.parasha}
                       zmanim={props.zmanim}
                       omerDays={props.omerDays}
+                      roshChodesh={props.roshChodesh}
+                      holiday={props.holiday}
                     />
                   </div>
                   <div className="backdrop-opacity-10 rounded-md backdrop-invert bg-white/50 h-full sm:w-1/2   flex flex-col p-6 ">
@@ -406,6 +408,8 @@ function Kboard(props: Props) {
                     parasha={props.parasha}
                     zmanim={props.zmanim}
                     omerDays={props.omerDays}
+                    roshChodesh={props.roshChodesh}
+                    holiday={props.holiday}
                   />
 
                   <div className="backdrop-opacity-10 rounded-md backdrop-invert bg-white/50 h-full sm:min-w-[33%] w-full  flex flex-col p-6 ">
@@ -622,6 +626,8 @@ Kboard.defaultProps = {
   isMoridHatal: false,
   omerDays: "",
   hebrewDate: "",
+  roshChodesh: "",
+  holiday: "",
   lastTimeDataUpdated: { seconds: 0, nanoseconds: 0 },
   getTimesFromDb: () => {},
 };
@@ -633,6 +639,8 @@ interface Props {
   board?: Board;
   isMoridHatal: boolean;
   hebrewDate: string;
+  roshChodesh: string;
+  holiday: string;
   lastTimeDataUpdated: TimeObj;
   getTimesFromDb: Function;
 }

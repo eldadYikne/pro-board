@@ -32,7 +32,9 @@ export interface TranslationsZmanimKeys {
 export interface TimesDataScheme {
   isMoridHatal: boolean;
   hebrewDate: string;
+  holiday: string;
   sfiratOmer: string;
+  roshChodesh: string;
   lastTimeDataUpdated: {
     seconds: number;
     nanoseconds: number;
