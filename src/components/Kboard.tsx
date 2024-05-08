@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { doc, getDoc, onSnapshot } from "firebase/firestore";
 import { db } from "..";
-import { Board, ShabatTimesToEdit, Tfila } from "../types/board";
+import { Board, ShabatTimesToEdit, Tfila, TimeObj } from "../types/board";
 import {
   OmerDay,
   getCurrentDate,
@@ -13,6 +13,7 @@ import {
 } from "../utils/const";
 import Color, { Palette } from "color-thief-react";
 import KboardTimes from "./KboardTimes";
+import { checkIsPast24Hours } from "../utils/utils";
 
 function Kboard(props: Props) {
   const [dbBoard, setDbBoard] = useState<Board>();
@@ -23,42 +24,7 @@ function Kboard(props: Props) {
   const [timeBetweenScreens, setTimeBetweenScreens] = useState<number>(
     dbBoard?.timeScreenPass ? Number(dbBoard?.timeScreenPass) * 1000 : 10000
   );
-  const getHebrewDay = (day: number) => {
-    console.log("day", day);
-    const hebrewDays = [
-      "א",
-      "ב",
-      "ג",
-      "ד",
-      "ה",
-      "ו",
-      "ז",
-      "ח",
-      "ט",
-      "י",
-      "יא",
-      "יב",
-      "יג",
-      "יד",
-      "טו",
-      "טז",
-      "יז",
-      "יח",
-      "יט",
-      "כ",
-      "כא",
-      "כב",
-      "כג",
-      "כד",
-      "כה",
-      "כו",
-      "כז",
-      "כח",
-      "כט",
-      "ל",
-    ];
-    return hebrewDays[day - 1];
-  };
+
   const { id } = useParams();
   useEffect(() => {
     async function fetchData() {
@@ -69,21 +35,41 @@ function Kboard(props: Props) {
         setDbBoard(props.board);
       }
     }
+    const hourlyInterval = setInterval(async () => {
+      props.getTimesFromDb();
 
+      const { seconds, nanoseconds } = props.lastTimeDataUpdated;
+      const milliseconds = seconds * 1000 + nanoseconds / 1000000;
+      const date = new Date(milliseconds);
+      const isPast24Hours = checkIsPast24Hours(String(date));
+      console.log(
+        "checkifisTime24Past!",
+        isPast24Hours,
+        ` ${date.getHours()}:${date.getMinutes()}`
+      );
+
+      if (isPast24Hours) {
+        console.log("isTime24Past!");
+        props.getTimesFromDb();
+      }
+    }, 3600000);
     const intervalId = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
     const intervalStep = setInterval(() => {
-      setStep((prevStep) => (prevStep === 2 ? 0 : prevStep + 1));
+      const number = dbBoard?.theme === "modern" ? 2 : 1;
+      setStep((prevStep) => (prevStep === number ? 0 : prevStep + 1));
     }, timeBetweenScreens);
 
     // Clear the interval when the component unmounts
     fetchData();
     return () => {
+      clearInterval(hourlyInterval);
+
       clearInterval(intervalId);
       clearInterval(intervalStep);
     };
-  }, [id]);
+  }, [id, props.lastTimeDataUpdated]);
 
   const hours = currentTime.getHours();
   const minutes = currentTime.getMinutes();
@@ -235,7 +221,7 @@ function Kboard(props: Props) {
                                       ? colors[2]
                                       : "black",
                                 }}
-                                className="font-['Damka'] text-5xl [text-shadow:_0_1px_0_rgb(0_0_0_/_30%)]"
+                                className="font-['Alef'] text-4xl [text-shadow:_0_1px_0_rgb(0_0_0_/_30%)]"
                               >
                                 {props.zmanim?.find(
                                   (zman) =>
@@ -291,7 +277,7 @@ function Kboard(props: Props) {
                                                     ? colors[2]
                                                     : "black",
                                               }}
-                                              className="font-['Damka'] sm:text-5xl [text-shadow:_0_1px_0_rgb(0_0_0_/_30%)]"
+                                              className="font-['Alef'] sm:text-4xl [text-shadow:_0_1px_0_rgb(0_0_0_/_30%)]"
                                             >
                                               {tfila.time}
                                             </div>
@@ -331,8 +317,8 @@ function Kboard(props: Props) {
                 </div>
               )}
               {dbBoard.theme === "column" && (
-                <div className="flex gap-6 w-[90%] min-h-[80%]">
-                  {step === 0 && (
+                <div className="flex gap-6 w-[90%] h-[75%]">
+                  {
                     <div className="backdrop-opacity-10 rounded-md backdrop-invert bg-white/50 h-full sm:min-w-[33%] w-full  flex flex-col p-6 ">
                       <div
                         className=" py-2 font-['Yiddish'] w-full flex justify-center sm:text-6xl text-amber-600-600/75"
@@ -343,49 +329,73 @@ function Kboard(props: Props) {
                               : "black",
                         }}
                       >
-                        זמני תפילות יום חול
+                        {step === 0 ? " זמני תפילות יום חול" : "הודעות לציבור"}
                       </div>
-                      <div className="flex flex-col py-6 ">
-                        <div
-                          className="grid gap-2  "
-                          style={{
-                            gridTemplateColumns: "repeat(2, minmax(0, 1fr)) ",
-                          }}
-                        >
-                          {dbBoard.tfilaTimes.map((tfila: Tfila) => {
-                            return tfila.day === "weekday" ? (
-                              <div>
-                                <div
-                                  style={{
-                                    color:
-                                      dbBoard.boardTextColor === "auto"
-                                        ? colors[2]
-                                        : "black",
-                                  }}
-                                  className="font-['Alef'] font-light sm:text-4xl"
-                                >
-                                  {tfila.name}{" "}
+
+                      {step === 0 && (
+                        <div className="flex flex-col py-6 ">
+                          <div
+                            className="grid gap-2  "
+                            style={{
+                              gridTemplateColumns: "repeat(2, minmax(0, 1fr)) ",
+                            }}
+                          >
+                            {dbBoard.tfilaTimes.map((tfila: Tfila) => {
+                              return tfila.day === "weekday" ? (
+                                <div>
+                                  <div
+                                    style={{
+                                      color:
+                                        dbBoard.boardTextColor === "auto"
+                                          ? colors[2]
+                                          : "black",
+                                    }}
+                                    className="font-['Alef'] font-light sm:text-4xl"
+                                  >
+                                    {tfila.name}{" "}
+                                  </div>
+                                  <div
+                                    style={{
+                                      color:
+                                        dbBoard.boardTextColor === "auto"
+                                          ? colors[2]
+                                          : "black",
+                                    }}
+                                    className="font-['Alef'] sm:text-4xl [text-shadow:_0_1px_0_rgb(0_0_0_/_30%)]"
+                                  >
+                                    {tfila.time}
+                                  </div>
                                 </div>
-                                <div
-                                  style={{
-                                    color:
-                                      dbBoard.boardTextColor === "auto"
-                                        ? colors[2]
-                                        : "black",
-                                  }}
-                                  className="font-['Damka'] sm:text-5xl [text-shadow:_0_1px_0_rgb(0_0_0_/_30%)]"
-                                >
-                                  {tfila.time}
-                                </div>
-                              </div>
-                            ) : (
-                              <span className="hidden"></span>
-                            );
-                          })}
+                              ) : (
+                                <span className="hidden"></span>
+                              );
+                            })}
+                          </div>
                         </div>
-                      </div>
+                      )}
+                      {step === 1 && (
+                        <ul className="flex flex-col gap-5">
+                          {dbBoard.messages.length > 0 &&
+                            dbBoard.messages.map((message) => {
+                              return (
+                                <li
+                                  style={{
+                                    color:
+                                      dbBoard.boardTextColor === "auto"
+                                        ? colors[2]
+                                        : "black",
+                                  }}
+                                  className="font-['Alef'] font-light sm:text-4xl "
+                                >
+                                  - {message.content}
+                                </li>
+                              );
+                            })}
+                        </ul>
+                      )}
                     </div>
-                  )}
+                  }
+
                   <KboardTimes
                     board={dbBoard}
                     formattedMinutes={formattedMinutes}
@@ -395,13 +405,12 @@ function Kboard(props: Props) {
                     isMoridHatal={props.isMoridHatal}
                     parasha={props.parasha}
                     zmanim={props.zmanim}
+                    omerDays={props.omerDays}
                   />
 
                   <div className="backdrop-opacity-10 rounded-md backdrop-invert bg-white/50 h-full sm:min-w-[33%] w-full  flex flex-col p-6 ">
                     <div
-                      className={`py-2 font-['Yiddish'] sm:text-6xl text-amber-600-600/75 ${
-                        step === 0 ? "w-full flex justify-center" : ""
-                      }`}
+                      className={`py-2 font-['Yiddish'] sm:text-6xl text-amber-600-600/75 w-full flex justify-center`}
                       style={{
                         color:
                           dbBoard.boardTextColor === "auto"
@@ -442,7 +451,7 @@ function Kboard(props: Props) {
                                       ? colors[2]
                                       : "black",
                                 }}
-                                className="font-['Damka'] text-5xl [text-shadow:_0_1px_0_rgb(0_0_0_/_30%)]"
+                                className="font-['Alef'] text-4xl [text-shadow:_0_1px_0_rgb(0_0_0_/_30%)]"
                               >
                                 {props.zmanim?.find(
                                   (zman) =>
@@ -506,7 +515,7 @@ function Kboard(props: Props) {
                                                         ? colors[2]
                                                         : "black",
                                                   }}
-                                                  className="font-['Damka'] sm:text-5xl [text-shadow:_0_1px_0_rgb(0_0_0_/_30%)]"
+                                                  className="font-['Alef'] sm:text-4xl [text-shadow:_0_1px_0_rgb(0_0_0_/_30%)]"
                                                 >
                                                   {tfila.time}
                                                 </div>
@@ -522,26 +531,6 @@ function Kboard(props: Props) {
                             })}
                           </div>
                         </div>
-                      )}
-                      {step === 2 && (
-                        <ul className="flex flex-col gap-5">
-                          {dbBoard.messages.length > 0 &&
-                            dbBoard.messages.map((message) => {
-                              return (
-                                <li
-                                  style={{
-                                    color:
-                                      dbBoard.boardTextColor === "auto"
-                                        ? colors[2]
-                                        : "black",
-                                  }}
-                                  className="font-['Alef'] font-light sm:text-4xl "
-                                >
-                                  - {message.content}
-                                </li>
-                              );
-                            })}
-                        </ul>
                       )}
                     </div>
                   </div>
@@ -633,6 +622,8 @@ Kboard.defaultProps = {
   isMoridHatal: false,
   omerDays: "",
   hebrewDate: "",
+  lastTimeDataUpdated: { seconds: 0, nanoseconds: 0 },
+  getTimesFromDb: () => {},
 };
 
 interface Props {
@@ -642,4 +633,6 @@ interface Props {
   board?: Board;
   isMoridHatal: boolean;
   hebrewDate: string;
+  lastTimeDataUpdated: TimeObj;
+  getTimesFromDb: Function;
 }

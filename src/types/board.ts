@@ -55,3 +55,7 @@ type TfilaName =
   | "ערבית צאת שבת";
 
 export type Theme = "modern" | "column" | "gold";
+export interface TimeObj {
+  seconds: number;
+  nanoseconds: number;
+}

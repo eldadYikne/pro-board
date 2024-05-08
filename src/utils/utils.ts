@@ -1,4 +1,4 @@
-export function isWithinPast24Hours(stringDate: string) {
+export function checkIsPast24Hours(stringDate: string) {
   // Get the current time in milliseconds
   const currentTime = new Date().getTime();
   let date = new Date(stringDate);
@@ -12,7 +12,7 @@ export function isWithinPast24Hours(stringDate: string) {
   const millisecondsIn24Hours = 24 * 60 * 60 * 1000;
 
   // Check if the difference is less than the number of milliseconds in 24 hours
-  return difference <= millisecondsIn24Hours;
+  return difference >= millisecondsIn24Hours;
 }
 export function isTimeBetween0000And0030() {
   // Extract the hours and minutes from the provided date

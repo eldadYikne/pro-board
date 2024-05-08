@@ -27,7 +27,8 @@ import { TimesDataScheme, TranslationsZmanimKeys, Zman } from "./types/zmanim";
 import EditBoard from "./components/EditBoard";
 import Kboard from "./components/Kboard";
 import EditUsers from "./components/EditUsers";
-import { isTimeBetween0000And0130, isWithinPast24Hours } from "./utils/utils";
+import { isTimeBetween0000And0130, checkIsPast24Hours } from "./utils/utils";
+import { TimeObj } from "./types/board";
 function App() {
   const [users, setUsers] = useState<any>();
   const [board, setBoard] = useState<any>();
@@ -38,7 +39,8 @@ function App() {
   const [havdalah, setHavdalah] = useState("");
   const [dayTimes, setDayTimes] = useState<Zman[]>();
   const [isMoridHatal, setIsMoridHatal] = useState<boolean>();
-  const [lastTimeUpdatedTimesData, setLastTimeDataUpdated] = useState<string>();
+  const [lastTimeUpdatedTimesData, setLastTimeDataUpdated] =
+    useState<TimeObj>();
   const location = useLocation();
   const [omerDays, setOmerDays] = useState<string>("");
   const { hash, pathname, search } = location;
@@ -51,23 +53,23 @@ function App() {
       // await getTimesFromApi();
     }
     fetchData();
-    const hourlyInterval = setInterval(async () => {
-      let timeBetween0000And0130 = isTimeBetween0000And0130();
-      const isPast24Hours = isWithinPast24Hours(
-        String(lastTimeUpdatedTimesData)
-      );
+    // const hourlyInterval = setInterval(async () => {
+    //   let timeBetween0000And0130 = isTimeBetween0000And0130();
+    //   const isPast24Hours = isWithinPast24Hours(
+    //     String(lastTimeUpdatedTimesData)
+    //   );
 
-      if (timeBetween0000And0130) {
-        await getTimesFromApi();
-        console.log("fetchDataFromAPI!");
-      } else if (isPast24Hours) {
-        await getTimesFromApi();
-        console.log("fetchDataFromAPI!");
-      }
-    }, 3600000);
-    return () => {
-      clearInterval(hourlyInterval);
-    };
+    //   if (timeBetween0000And0130) {
+    //     await getTimesFromApi();
+    //     console.log("fetchDataFromAPI!");
+    //   } else if (isPast24Hours) {
+    //     await getTimesFromApi();
+    //     console.log("fetchDataFromAPI!");
+    //   }
+    // }, 3600000);
+    // return () => {
+    //   clearInterval(hourlyInterval);
+    // };
   }, []);
   const getTimesFromApi = async () => {
     console.log("getParasha");
@@ -226,8 +228,13 @@ function App() {
       sahabatTimes,
       sfiratOmer,
     } = timesCollection;
-    setLastTimeDataUpdated(String(lastTimeDataUpdated));
-    const isPast24Hours = isWithinPast24Hours(String(lastTimeDataUpdated));
+    setLastTimeDataUpdated(lastTimeDataUpdated);
+    const { seconds, nanoseconds } = lastTimeDataUpdated;
+    const milliseconds = seconds * 1000 + nanoseconds / 1000000;
+    const date = new Date(milliseconds);
+    const isPast24Hours = checkIsPast24Hours(String(date));
+    console.log("isPast24Hours", isPast24Hours);
+    console.log("lastTimeDataUpdated", date);
 
     if (timesCollection && !isPast24Hours) {
       setHavdalah(sahabatTimes.havdala);
@@ -382,15 +389,15 @@ function App() {
   };
   const getTimes = async () => {
     try {
-      const boardDoc = await getDoc(doc(db, "times", "times"));
-      if (boardDoc.exists()) {
+      const timesDoc = await getDoc(doc(db, "times", "times"));
+      if (timesDoc.exists()) {
         // Document exists, return its data along with the ID
-        const dbBoard = { ...boardDoc.data(), id: boardDoc.id };
-        console.log(dbBoard);
-        return dbBoard;
+        const dbtimes = { ...timesDoc.data(), id: timesDoc.id };
+        console.log(dbtimes);
+        return dbtimes;
       } else {
         // Document does not exist
-        console.log("User not found");
+        console.log("times not found");
         return null;
       }
     } catch (error) {
@@ -456,6 +463,8 @@ function App() {
                 zmanim={dayTimes}
                 parasha={parasha}
                 omerDays={omerDays}
+                lastTimeDataUpdated={lastTimeUpdatedTimesData}
+                getTimesFromDb={getTimesFromDb}
               />
             }
           />

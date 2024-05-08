@@ -12,7 +12,7 @@ function KboardTimes(props: Props) {
         style={{
           color: dbBoard.boardTextColor === "auto" ? props.colors[1] : "black",
         }}
-        className="backdrop-opacity-10 rounded-md backdrop-invert bg-white/50 px-3 py-4 h-full w-full   flex items-center justify-center shadow-sm font-['Yiddish'] sm:text-7xl  text-amber-600-600/75"
+        className="backdrop-opacity-10 text-center rounded-md backdrop-invert bg-white/50 px-3 py-4 h-full w-full   flex items-center justify-center shadow-sm font-['Yiddish'] sm:text-7xl  text-amber-600-600/75"
       >
         {props.hours}:{props.formattedMinutes}
       </div>
@@ -20,7 +20,7 @@ function KboardTimes(props: Props) {
         style={{
           color: dbBoard.boardTextColor === "auto" ? props.colors[2] : "black",
         }}
-        className="backdrop-opacity-10 rounded-md backdrop-invert bg-white/50 px-3 py-4 h-full w-full   flex items-center justify-center shadow-sm font-['Yiddish'] sm:text-6xl text-amber-600-600/75"
+        className="backdrop-opacity-10 text-center rounded-md backdrop-invert bg-white/50 px-3 py-4 h-full w-full   flex items-center justify-center shadow-sm font-['Yiddish'] sm:text-6xl text-amber-600-600/75"
       >
         <div className=" w-full justify-center items-center flex flex-col gap-8">
           {dbBoard.dateTypes.includes("hebrew") && (
@@ -36,7 +36,7 @@ function KboardTimes(props: Props) {
         style={{
           color: dbBoard.boardTextColor === "auto" ? props.colors[1] : "black",
         }}
-        className="backdrop-opacity-10 rounded-md backdrop-invert bg-white/50 px-3 py-4 h-full w-full   flex items-center justify-center shadow-sm font-['Yiddish'] sm:text-6xl text-amber-600-600/75"
+        className="backdrop-opacity-10 text-center rounded-md backdrop-invert bg-white/50 px-3 py-4 h-full w-full   flex items-center justify-center shadow-sm font-['Yiddish'] sm:text-6xl text-amber-600-600/75"
       >
         {props.parasha}
       </div>
@@ -44,7 +44,7 @@ function KboardTimes(props: Props) {
         style={{
           color: dbBoard.boardTextColor === "auto" ? props.colors[1] : "black",
         }}
-        className="backdrop-opacity-10 rounded-md backdrop-invert bg-white/50 px-3 py-4 h-full w-full   flex items-center justify-center shadow-sm font-['Yiddish'] sm:text-6xl text-amber-600-600/75"
+        className="backdrop-opacity-10 text-center rounded-md backdrop-invert bg-white/50 px-3 py-4 h-full w-full   flex items-center justify-center shadow-sm font-['Yiddish'] sm:text-6xl text-amber-600-600/75"
       >
         {props.isMoridHatal ? "מוריד הטל" : "משיב הרוח ומוריד הגשם"}
       </div>
@@ -54,7 +54,7 @@ function KboardTimes(props: Props) {
             color:
               dbBoard.boardTextColor === "auto" ? props.colors[1] : "black",
           }}
-          className="backdrop-opacity-10 rounded-md backdrop-invert bg-white/50 px-3 py-4 h-full w-full   flex items-center justify-center shadow-sm font-['Yiddish'] sm:text-6xl text-amber-600-600/75"
+          className="backdrop-opacity-10  rounded-md backdrop-invert bg-white/50 px-3 py-4 h-full w-full   flex items-center justify-center text-center shadow-sm font-['Yiddish'] sm:text-6xl text-amber-600-600/75"
         >
           {props.omerDays} לעומר
         </div>
