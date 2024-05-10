@@ -3,7 +3,9 @@ import Navbar from "./components/Navbar";
 import ConfirmedPlace from "./components/ConfirmedPlace";
 import { Route, Routes, useLocation, useParams } from "react-router-dom";
 import Map from "./components/Map";
-import ReactDOM from "react-dom/client";
+import React from "react";
+// import { Cloudinary } from "@cloudinary/url-gen";
+// import { AdvancedImage, placeholder, lazyload } from "@cloudinary/react";
 import {
   addDoc,
   collection,
@@ -46,32 +48,16 @@ function App() {
   const location = useLocation();
   const [omerDays, setOmerDays] = useState<string>("");
   const { hash, pathname, search } = location;
-
+  // const cloudinary = new Cloudinary({ cloud: { cloudName: "dwdpgwxqv" } });
   console.log("location.pathname ", pathname);
   const { id } = useParams();
+
   useEffect(() => {
     async function fetchData() {
       await getTimesFromDb();
       // await getTimesFromApi();
     }
     fetchData();
-    // const hourlyInterval = setInterval(async () => {
-    //   let timeBetween0000And0130 = isTimeBetween0000And0130();
-    //   const isPast24Hours = isWithinPast24Hours(
-    //     String(lastTimeUpdatedTimesData)
-    //   );
-
-    //   if (timeBetween0000And0130) {
-    //     await getTimesFromApi();
-    //     console.log("fetchDataFromAPI!");
-    //   } else if (isPast24Hours) {
-    //     await getTimesFromApi();
-    //     console.log("fetchDataFromAPI!");
-    //   }
-    // }, 3600000);
-    // return () => {
-    //   clearInterval(hourlyInterval);
-    // };
   }, []);
   const getTimesFromApi = async () => {
     console.log("getParasha");
@@ -210,8 +196,11 @@ function App() {
         const currentCandlesDate = `${new Date(
           currentCandles.date
         ).getHours()}:${formattedCandlesMin}`;
-        setHoliday(currentHoliday.hebrew);
-        setRoshChodesh(currentRoshChodesh.hebrew);
+
+        setHoliday(currentHoliday?.hebrew);
+        setRoshChodesh(
+          currentRoshChodesh?.hebrew ? currentRoshChodesh?.hebrew : ""
+        );
         setHavdalah(currentHavdalahDate);
         setCandles(currentCandlesDate);
         setParasha(currentParasha.hebrew);
@@ -219,8 +208,10 @@ function App() {
         updateCollectionById(
           "times",
           {
-            holiday: currentHoliday.hebrew,
-            roshChodesh: currentRoshChodesh.hebrew,
+            holiday: currentHoliday?.hebrew ? currentHoliday?.hebrew : "",
+            roshChodesh: currentRoshChodesh?.hebrew
+              ? currentRoshChodesh?.hebrew
+              : "",
             sahabatTimes: {
               havdala: currentHavdalahDate,
               parasha: currentParasha.hebrew,

@@ -22,7 +22,8 @@ function Kboard(props: Props) {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [hebrewDate, setHebrewDate] = useState("");
   const [timeBetweenScreens, setTimeBetweenScreens] = useState<number>(
-    dbBoard?.timeScreenPass ? Number(dbBoard?.timeScreenPass) * 1000 : 10000
+    // dbBoard?.timeScreenPass ? Number(dbBoard?.timeScreenPass) * 1000 : 10000
+    20000
   );
 
   const { id } = useParams();
@@ -35,6 +36,7 @@ function Kboard(props: Props) {
         setDbBoard(props.board);
       }
     }
+
     const hourlyInterval = setInterval(async () => {
       props.getTimesFromDb();
 
@@ -202,7 +204,7 @@ function Kboard(props: Props) {
                           {dbBoard.timesToShow.map((time: string) => (
                             <div className="flex flex-col">
                               <span
-                                className="font-['Alef'] font-light text-4xl"
+                                className="font-['Suez'] underline font-light text-4xl"
                                 style={{
                                   color:
                                     dbBoard.boardTextColor === "auto"
@@ -267,7 +269,7 @@ function Kboard(props: Props) {
                                                     ? colors[2]
                                                     : "black",
                                               }}
-                                              className="font-['Alef'] font-light sm:text-4xl"
+                                              className="font-['Suez']  font-bold sm:text-4xl"
                                             >
                                               {tfila.name}{" "}
                                             </div>
@@ -352,7 +354,7 @@ function Kboard(props: Props) {
                                           ? colors[2]
                                           : "black",
                                     }}
-                                    className="font-['Alef'] font-light sm:text-4xl"
+                                    className="font-['Suez']  sm:text-4xl"
                                   >
                                     {tfila.name}{" "}
                                   </div>
@@ -434,7 +436,7 @@ function Kboard(props: Props) {
                           {dbBoard.timesToShow.map((time: string) => (
                             <div className="flex flex-col">
                               <span
-                                className="font-['Alef'] font-light text-4xl"
+                                className="font-['Suez'] font-light text-4xl"
                                 style={{
                                   color:
                                     dbBoard.boardTextColor === "auto"
@@ -507,7 +509,7 @@ function Kboard(props: Props) {
                                                         ? colors[2]
                                                         : "black",
                                                   }}
-                                                  className="font-['Alef'] font-light sm:text-3xl"
+                                                  className="font-['Suez']   sm:text-3xl"
                                                 >
                                                   {tfila.name}
                                                 </div>

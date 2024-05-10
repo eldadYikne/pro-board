@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Board } from "../types/board";
 import { Zman } from "../types/zmanim";
 import { getCurrentDateDayFirst } from "../utils/const";
 
 function KboardTimes(props: Props) {
   const [dbBoard, setDbBoard] = useState<Board>(props.board);
-
+  useEffect(() => {}, [props.colors, props.board]);
   return (
     <div className="flex flex-col justify-between gap-3 h-full  w-full ">
       <div
