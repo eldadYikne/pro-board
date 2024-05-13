@@ -18,6 +18,7 @@ export interface Board {
   users?: User[];
   theme: Theme;
   isMinchaSunset: { isActive: boolean; minBrforeSunSet: number };
+  screens: ScreenType[];
   // password: string;
 }
 
@@ -26,6 +27,13 @@ export interface Tfila {
   name: string;
   day: ShabatDayTfila;
 }
+export interface ScreenType {
+  type: ScreenTypeTypes;
+  text: "תמונה" | "הודעה לציבור";
+  title: string;
+  content: string;
+}
+export type ScreenTypeTypes = "image" | "message";
 export type ShabatDayTfila = "saturday" | "friday" | "weekday";
 export interface ShabatTimesToEdit {
   type: ShabatDayTfila;

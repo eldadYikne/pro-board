@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import {
   Board,
   Message,
+  ScreenType,
+  ScreenTypeTypes,
   ShabatDayTfila,
   ShabatTimesToEdit,
   Tfila,
@@ -12,6 +14,7 @@ import {
   Box,
   Button,
   Checkbox,
+  Modal,
   Snackbar,
   TextField,
   Typography,
@@ -34,10 +37,18 @@ import {
   translationsZmanimKeys,
 } from "../utils/const";
 import { TranslationsZmanimKeys, Zman } from "../types/zmanim";
+import { UploadWidget } from "./UploadWidget";
+import KdropDown from "./KdropDown";
+import { AdvancedImage } from "@cloudinary/react";
 
 function EditBoard(props: Props) {
   const [dbBoard, setDbBoard] = useState<Board>();
   const [snackbarIsOpen, setSnackbarIsOpen] = useState<boolean>();
+  const [imageUrl, setImageUrl] = useState("");
+  const [screenEditorIsOpen, setScreenEditorIsOpen] = useState<boolean>(false);
+  const [screenTypeEdit, setScreenTypeEdit] = useState<ScreenTypeTypes>();
+  const [editingScreen, setEditingScreen] = useState<ScreenType>();
+
   const navigate = useNavigate();
   const { id } = useParams();
   useEffect(() => {
@@ -104,10 +115,20 @@ function EditBoard(props: Props) {
     time: "זמן",
     content: "שם",
   };
+  const screenTypes: ScreenType[] = [
+    { type: "image", text: "תמונה", title: "", content: "" },
+    {
+      type: "message",
+      text: "הודעה לציבור",
+      title: "נא לא לדבר בשעת התפילה!",
+      content: "",
+    },
+  ];
   const inputsBoard: { name: keyof Board; placeholder: string }[] = [
     { name: "boardName", placeholder: "שם בית כנסת" },
     { name: "geoId", placeholder: "איזור לעדכון זמן" },
     { name: "timeScreenPass", placeholder: "זמן מעבר בין מסכים" },
+    // { name: "screens", placeholder: "הוסף מסך" },
     { name: "tfilaTimes", placeholder: "זמני יום חול" },
     { name: "forUplifting", placeholder: "לעילוי נשמת" },
     { name: "dateTypes", placeholder: "סוג תאריך" },
@@ -130,6 +151,31 @@ function EditBoard(props: Props) {
     { name: "black", title: "שחור" },
     { name: "auto", title: "אוטומטי" },
   ];
+
+  const onSetImageUrl = (url: ScreenType) => {
+    console.log(url);
+    // setImageUrl(url);
+    // const newScreen: ScreenType = {
+    //   type: "image",
+    //   content: url,
+    //   text: "תמונה",
+    //   title: "",
+    // };
+
+    // let newBoardScreens: ScreenType[] = [
+    //   ...(dbBoard?.screens ?? []),
+    //   newScreen,
+    // ];
+
+    // console.log("url", url);
+    // if (dbBoard) {
+    //   setDbBoard({
+    //     ...dbBoard,
+    //     screens: newBoardScreens,
+    //   });
+    //   console.log("dbBoard", dbBoard);
+    // }
+  };
   const handleInputArrayChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
     index: number,
@@ -162,6 +208,13 @@ function EditBoard(props: Props) {
       });
       console.log(dbBoard[arrayName]);
     }
+  };
+  const handleAddScreen = (screenType: ScreenTypeTypes) => {
+    setScreenTypeEdit(screenType);
+    setScreenEditorIsOpen(true);
+  };
+  const handleEditScreen = (screen: ScreenType) => {
+    setEditingScreen(screen);
   };
   const addObjectToArray = (
     arrayName: "tfilaTimes" | "forUplifting" | "forMedicine" | "messages",
@@ -295,6 +348,7 @@ function EditBoard(props: Props) {
                   name !== "mapBackgroundImage" &&
                   name !== "boardTextColor" &&
                   name !== "dateTypes" &&
+                  name !== "screens" &&
                   name !== "isMinchaSunset" &&
                   name !== "theme" && (
                     <TextField
@@ -650,6 +704,92 @@ function EditBoard(props: Props) {
                     )}
                   </div>
                 )}
+                {/* {name === "screens" && (
+                  <div className="flex flex-col">
+                    <div className="flex gap-2">
+                  
+                      {screenTypes.map((screen: ScreenType, index) => {
+                        return (
+                          <div
+                            className="shadow-lg bg-white rounded-lg flex items-center justify-center  w-20 h-16 "
+                            key={index}
+                            onClick={() => handleAddScreen(screen.type)}
+                          >
+                            {screen.text}
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <Modal
+                      open={screenEditorIsOpen}
+                      onClose={() => setScreenEditorIsOpen(false)}
+                      aria-labelledby="modal-modal-title"
+                      aria-describedby="modal-modal-description"
+                    >
+                      <Box sx={style}>
+                        <div className="w-full h-full flex flex-col gap-3">
+                          <span className="text-center"> כך זה יראה</span>
+                          <div
+                            style={{
+                              background: `url(${require("../assets/backgrounds/" +
+                                dbBoard.boardBackgroundImage +
+                                ".jpg")}) no-repeat`,
+                              backgroundSize: "cover !importent",
+                            }}
+                            className="w-full h-full !bg-cover flex justify-center items-center p-3  "
+                          >
+                            {screenTypeEdit === "image" && imageUrl && (
+                              <div className="flex-col">
+                                <img className="w-full h-full" src={imageUrl} />
+                              </div>
+                            )}
+                          </div>
+                          {screenTypeEdit === "image" && (
+                            <div className="w-full">
+                              <UploadWidget
+                                text={"הוסף תמונה"}
+                                onSetImageUrl={(e:string)=>handleEditScreen({
+                                  content: e,
+                                  type: "image",
+                                  text: "תמונה",
+                                  title: ""
+                                })}
+                              />
+                            </div>
+                          )}
+                          <Button
+                            onClick={() => setScreenEditorIsOpen(false)}
+                            variant="contained"
+                          >
+                            אישור
+                          </Button>
+                        </div>
+                      </Box>
+                    </Modal>
+                    <div>
+                      {dbBoard.screens && (
+                        <div>
+                          <div> המסכים שלך :</div>
+                          <div className="flex gap-2">
+                            {dbBoard.screens.map(
+                              (screen: ScreenType, index) => {
+                                return (
+                                  <div key={index}>
+                                    {screen.type === "image" && (
+                                      <div className="flex items-center justify-center rounded-sm  w-32 h-20">
+                                        <img src={screen.content} alt="" />
+                                      </div>
+                                    )}
+                                  </div>
+                                );
+                              }
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )} */}
               </div>
             );
           })}
@@ -711,3 +851,14 @@ interface Props {
   parasha: string;
   zmanim: Zman[] | undefined;
 }
+const style = {
+  position: "absolute" as "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 350,
+  bgcolor: "background.paper",
+  border: "",
+  boxShadow: 24,
+  p: 6,
+};

@@ -4,8 +4,9 @@ import ConfirmedPlace from "./components/ConfirmedPlace";
 import { Route, Routes, useLocation, useParams } from "react-router-dom";
 import Map from "./components/Map";
 import React from "react";
-// import { Cloudinary } from "@cloudinary/url-gen";
-// import { AdvancedImage, placeholder, lazyload } from "@cloudinary/react";
+import { Cloudinary } from "@cloudinary/url-gen";
+import { AdvancedImage, placeholder, lazyload } from "@cloudinary/react";
+import { fill } from "@cloudinary/url-gen/actions/resize";
 import {
   addDoc,
   collection,
@@ -31,6 +32,7 @@ import Kboard from "./components/Kboard";
 import EditUsers from "./components/EditUsers";
 import { isTimeBetween0000And0130, checkIsPast24Hours } from "./utils/utils";
 import { TimeObj } from "./types/board";
+import { UploadWidget } from "./components/UploadWidget";
 function App() {
   const [users, setUsers] = useState<any>();
   const [board, setBoard] = useState<any>();
@@ -48,7 +50,12 @@ function App() {
   const location = useLocation();
   const [omerDays, setOmerDays] = useState<string>("");
   const { hash, pathname, search } = location;
-  // const cloudinary = new Cloudinary({ cloud: { cloudName: "dwdpgwxqv" } });
+  const cld = new Cloudinary({ cloud: { cloudName: "dwdpgwxqv" } });
+  const myImage = cld.image("docs/models");
+
+  // Resize to 250 x 250 pixels using the 'fill' crop mode.
+  myImage.resize(fill().width(250).height(250));
+
   console.log("location.pathname ", pathname);
   const { id } = useParams();
 
@@ -432,6 +439,7 @@ function App() {
     <div dir="rtl" className="site-container">
       <div className="content-wrap">
         {!pathname.includes("board") && <Navbar setNewUser={setNewUser} />}
+        {/* <AdvancedImage cldImg={myImage} /> */}
         {/* <button onClick={getUsers}>לחץ כאן להביא משתמשים</button> */}
         {/* <button onClick={() => postCollectionCoustumId("boards", [dbBoard],'calaniot')}>
           לחץ כאן להעלות

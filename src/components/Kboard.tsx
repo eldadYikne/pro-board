@@ -180,6 +180,7 @@ function Kboard(props: Props) {
                       omerDays={props.omerDays}
                       roshChodesh={props.roshChodesh}
                       holiday={props.holiday}
+                      boardTextColor={dbBoard.boardTextColor}
                     />
                   </div>
                   <div className="backdrop-opacity-10 rounded-md backdrop-invert bg-white/50 h-full sm:w-1/2   flex flex-col p-6 ">
@@ -412,6 +413,8 @@ function Kboard(props: Props) {
                     omerDays={props.omerDays}
                     roshChodesh={props.roshChodesh}
                     holiday={props.holiday}
+                    boardTextColor={dbBoard.boardTextColor}
+                    dateTypes={dbBoard.dateTypes}
                   />
 
                   <div className="backdrop-opacity-10 rounded-md backdrop-invert bg-white/50 h-full sm:min-w-[33%] w-full  flex flex-col p-6 ">
