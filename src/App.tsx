@@ -45,8 +45,7 @@ function App() {
   const [roshChodesh, setRoshChodesh] = useState("");
   const [dayTimes, setDayTimes] = useState<Zman[]>();
   const [isMoridHatal, setIsMoridHatal] = useState<boolean>();
-  const [lastTimeUpdatedTimesData, setLastTimeDataUpdated] =
-    useState<TimeObj>();
+  const [lastTimeUpdatedTimesData, setLastTimeDataUpdated] = useState<number>();
   const location = useLocation();
   const [omerDays, setOmerDays] = useState<string>("");
   const { hash, pathname, search } = location;
@@ -148,7 +147,7 @@ function App() {
         );
         updateCollectionById(
           "times",
-          { lastTimeDataUpdated: new Date() },
+          { lastTimeDataUpdated: new Date().setHours(0, 30, 0, 0) },
           "times"
         );
       });
@@ -246,12 +245,15 @@ function App() {
       holiday,
     } = timesCollection;
     setLastTimeDataUpdated(lastTimeDataUpdated);
-    const { seconds, nanoseconds } = lastTimeDataUpdated;
-    const milliseconds = seconds * 1000 + nanoseconds / 1000000;
-    const date = new Date(milliseconds);
+    // const { seconds, nanoseconds } = lastTimeDataUpdated;
+    console.log("lastTimeDataUpdated", lastTimeDataUpdated);
+    // const milliseconds = seconds * 1000 + nanoseconds / 1000000;
+
+    const date = new Date(lastTimeDataUpdated);
+    console.log("date from App", date);
     const isPast24Hours = checkIsPast24Hours(String(date));
     console.log("isPast24Hours", isPast24Hours);
-    console.log("lastTimeDataUpdated", date);
+    // console.log("lastTimeDataUpdated", date);
 
     if (timesCollection && !isPast24Hours) {
       setHavdalah(sahabatTimes.havdala);

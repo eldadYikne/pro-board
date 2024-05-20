@@ -40,9 +40,9 @@ function Kboard(props: Props) {
     const hourlyInterval = setInterval(async () => {
       props.getTimesFromDb();
 
-      const { seconds, nanoseconds } = props.lastTimeDataUpdated;
-      const milliseconds = seconds * 1000 + nanoseconds / 1000000;
-      const date = new Date(milliseconds);
+      // const { seconds, nanoseconds } = props.lastTimeDataUpdated;
+      // const milliseconds = seconds * 1000 + nanoseconds / 1000000;
+      const date = new Date(props.lastTimeDataUpdated);
       const isPast24Hours = checkIsPast24Hours(String(date));
       console.log(
         "checkifisTime24Past!",
@@ -340,14 +340,14 @@ function Kboard(props: Props) {
                       {step === 0 && (
                         <div className="flex flex-col py-6 ">
                           <div
-                            className="grid gap-2  "
+                            className="flex flex-col gap-2 items-center justify-center "
                             style={{
                               gridTemplateColumns: "repeat(2, minmax(0, 1fr)) ",
                             }}
                           >
                             {dbBoard.tfilaTimes.map((tfila: Tfila) => {
                               return tfila.day === "weekday" ? (
-                                <div>
+                                <div className="flex justify-between w-full">
                                   <div
                                     style={{
                                       color:
@@ -435,11 +435,11 @@ function Kboard(props: Props) {
                     </div>
                     <div className="flex flex-col ">
                       {step === 1 && (
-                        <div className="grid gap-2 xl:grid-cols-3 sm:grid-cols-2 ">
+                        <div className="flex flex-col gap-2 ">
                           {dbBoard.timesToShow.map((time: string) => (
-                            <div className="flex flex-col">
+                            <div className="flex w-full justify-between ">
                               <span
-                                className="font-['Suez'] font-light text-4xl"
+                                className="font-['Suez'] font-light text-3xl"
                                 style={{
                                   color:
                                     dbBoard.boardTextColor === "auto"
@@ -460,7 +460,7 @@ function Kboard(props: Props) {
                                       ? colors[2]
                                       : "black",
                                 }}
-                                className="font-['Alef'] text-4xl [text-shadow:_0_1px_0_rgb(0_0_0_/_30%)]"
+                                className="font-['Alef'] text-3xl [text-shadow:_0_1px_0_rgb(0_0_0_/_30%)]"
                               >
                                 {props.zmanim?.find(
                                   (zman) =>
@@ -493,7 +493,7 @@ function Kboard(props: Props) {
                                       {time.name}{" "}
                                     </div>
                                     <div
-                                      className="grid gap-2  "
+                                      className="flex flex-col  gap-2  "
                                       style={{
                                         gridTemplateColumns:
                                           "repeat(2, minmax(0, 1fr)) ",
@@ -503,7 +503,7 @@ function Kboard(props: Props) {
                                         (tfila: Tfila) => {
                                           return (
                                             time.type === tfila.day && (
-                                              <div>
+                                              <div className="flex w-full justify-between gap-2">
                                                 <div
                                                   style={{
                                                     color:
@@ -633,7 +633,7 @@ Kboard.defaultProps = {
   hebrewDate: "",
   roshChodesh: "",
   holiday: "",
-  lastTimeDataUpdated: { seconds: 0, nanoseconds: 0 },
+  lastTimeDataUpdated: 0,
   getTimesFromDb: () => {},
 };
 
@@ -646,6 +646,6 @@ interface Props {
   hebrewDate: string;
   roshChodesh: string;
   holiday: string;
-  lastTimeDataUpdated: TimeObj;
+  lastTimeDataUpdated: number;
   getTimesFromDb: Function;
 }

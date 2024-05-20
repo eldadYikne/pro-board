@@ -35,10 +35,7 @@ export interface TimesDataScheme {
   holiday: string;
   sfiratOmer: string;
   roshChodesh: string;
-  lastTimeDataUpdated: {
-    seconds: number;
-    nanoseconds: number;
-  };
+  lastTimeDataUpdated: number;
   dayTimes: {
     name: string;
     time: string;
