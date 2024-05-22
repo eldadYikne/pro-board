@@ -28,8 +28,9 @@ export interface Tfila {
   day: ShabatDayTfila;
 }
 export interface ScreenType {
+  id: string;
   type: ScreenTypeTypes;
-  text: "תמונה" | "הודעה לציבור";
+  text: "תמונה" | "הודעה לציבור" | "";
   title: string;
   content: string;
 }

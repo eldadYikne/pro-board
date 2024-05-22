@@ -17,7 +17,6 @@ import {
   Modal,
   Snackbar,
   TextField,
-  Typography,
 } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -30,16 +29,10 @@ import {
 import { db } from "..";
 import { Delete } from "@mui/icons-material";
 
-import {
-  DateToShow,
-  beautyColorsHex,
-  dateToShow,
-  translationsZmanimKeys,
-} from "../utils/const";
+import { DateToShow, dateToShow, translationsZmanimKeys } from "../utils/const";
 import { TranslationsZmanimKeys, Zman } from "../types/zmanim";
 import { UploadWidget } from "./UploadWidget";
-import KdropDown from "./KdropDown";
-import { AdvancedImage } from "@cloudinary/react";
+import { generateRandomId } from "../utils/utils";
 
 function EditBoard(props: Props) {
   const [dbBoard, setDbBoard] = useState<Board>();
@@ -116,8 +109,9 @@ function EditBoard(props: Props) {
     content: "שם",
   };
   const screenTypes: ScreenType[] = [
-    { type: "image", text: "תמונה", title: "", content: "" },
+    { type: "image", text: "תמונה", title: "", content: "", id: "" },
     {
+      id: "",
       type: "message",
       text: "הודעה לציבור",
       title: "נא לא לדבר בשעת התפילה!",
@@ -128,7 +122,7 @@ function EditBoard(props: Props) {
     { name: "boardName", placeholder: "שם בית כנסת" },
     { name: "geoId", placeholder: "איזור לעדכון זמן" },
     { name: "timeScreenPass", placeholder: "זמן מעבר בין מסכים" },
-    // { name: "screens", placeholder: "הוסף מסך" },
+    { name: "screens", placeholder: "הוסף מסך" },
     { name: "tfilaTimes", placeholder: "זמני יום חול" },
     { name: "forUplifting", placeholder: "לעילוי נשמת" },
     { name: "dateTypes", placeholder: "סוג תאריך" },
@@ -152,30 +146,6 @@ function EditBoard(props: Props) {
     { name: "auto", title: "אוטומטי" },
   ];
 
-  const onSetImageUrl = (url: ScreenType) => {
-    console.log(url);
-    // setImageUrl(url);
-    // const newScreen: ScreenType = {
-    //   type: "image",
-    //   content: url,
-    //   text: "תמונה",
-    //   title: "",
-    // };
-
-    // let newBoardScreens: ScreenType[] = [
-    //   ...(dbBoard?.screens ?? []),
-    //   newScreen,
-    // ];
-
-    // console.log("url", url);
-    // if (dbBoard) {
-    //   setDbBoard({
-    //     ...dbBoard,
-    //     screens: newBoardScreens,
-    //   });
-    //   console.log("dbBoard", dbBoard);
-    // }
-  };
   const handleInputArrayChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
     index: number,
@@ -209,12 +179,85 @@ function EditBoard(props: Props) {
       console.log(dbBoard[arrayName]);
     }
   };
-  const handleAddScreen = (screenType: ScreenTypeTypes) => {
+  const onDeleteScreen = (screenToDelete: ScreenType) => {
+    const filterScreens = dbBoard?.screens.filter(
+      (screen) => screen.id !== screenToDelete.id
+    );
+    if (dbBoard) {
+      setDbBoard({
+        ...dbBoard,
+        screens: [...(filterScreens ?? [])],
+      });
+    }
+  };
+  const handleAddScreen = () => {
+    setScreenEditorIsOpen(false);
+    let newScreen: ScreenType;
+    console.log("editingScreen", editingScreen);
+    if (editingScreen?.id) {
+      handleEditScreen(editingScreen);
+      return;
+    }
+    if (screenTypeEdit === "message") {
+      if (editingScreen?.content) {
+        newScreen = {
+          id: generateRandomId(),
+          content: editingScreen.content,
+          text: editingScreen.text,
+          title: editingScreen.title,
+          type: editingScreen.type,
+        };
+        if (dbBoard) {
+          setDbBoard({
+            ...dbBoard,
+            screens: [...(dbBoard.screens ?? []), newScreen],
+          });
+        }
+        console.log(dbBoard?.screens);
+      } else {
+      }
+    } else if (screenTypeEdit === "image") {
+      if (editingScreen?.content) {
+        newScreen = {
+          id: generateRandomId(),
+          content: editingScreen?.content ?? "",
+          text: "תמונה",
+          title: "",
+          type: "image",
+        };
+        if (dbBoard) {
+          setDbBoard({
+            ...dbBoard,
+            screens: [...(dbBoard.screens ?? []), newScreen],
+          });
+        }
+      }
+    }
+  };
+
+  const handleOpenModalScreen = (screenType: ScreenTypeTypes) => {
     setScreenTypeEdit(screenType);
+    setEditingScreen({
+      id: "",
+      content: "",
+      text: "",
+      title: "",
+      type: screenType,
+    });
     setScreenEditorIsOpen(true);
   };
-  const handleEditScreen = (screen: ScreenType) => {
-    setEditingScreen(screen);
+  const handleEditScreen = (screenToEdit: ScreenType) => {
+    console.log("screenToEdit", screenToEdit);
+    console.log("dbBoard.screens", dbBoard?.screens);
+    const filterScreens = dbBoard?.screens.filter(
+      (screen) => screen.id !== screenToEdit.id
+    );
+    if (dbBoard) {
+      setDbBoard({
+        ...dbBoard,
+        screens: [...(filterScreens ?? []), screenToEdit],
+      });
+    }
   };
   const addObjectToArray = (
     arrayName: "tfilaTimes" | "forUplifting" | "forMedicine" | "messages",
@@ -704,16 +747,15 @@ function EditBoard(props: Props) {
                     )}
                   </div>
                 )}
-                {/* {name === "screens" && (
+                {name === "screens" && (
                   <div className="flex flex-col">
                     <div className="flex gap-2">
-                  
                       {screenTypes.map((screen: ScreenType, index) => {
                         return (
                           <div
-                            className="shadow-lg bg-white rounded-lg flex items-center justify-center  w-20 h-16 "
+                            className="shadow-lg cursor-pointer bg-white rounded-lg flex items-center justify-center  w-20 h-16 "
                             key={index}
-                            onClick={() => handleAddScreen(screen.type)}
+                            onClick={() => handleOpenModalScreen(screen.type)}
                           >
                             {screen.text}
                           </div>
@@ -727,7 +769,7 @@ function EditBoard(props: Props) {
                       aria-describedby="modal-modal-description"
                     >
                       <Box sx={style}>
-                        <div className="w-full h-full flex flex-col gap-3">
+                        <div className="w-full min-h-[320px]  flex flex-col gap-3">
                           <span className="text-center"> כך זה יראה</span>
                           <div
                             style={{
@@ -738,27 +780,84 @@ function EditBoard(props: Props) {
                             }}
                             className="w-full h-full !bg-cover flex justify-center items-center p-3  "
                           >
-                            {screenTypeEdit === "image" && imageUrl && (
-                              <div className="flex-col">
-                                <img className="w-full h-full" src={imageUrl} />
-                              </div>
-                            )}
+                            {screenTypeEdit === "image" &&
+                              editingScreen?.content && (
+                                <div
+                                  dir="rtl"
+                                  className="flex flex-col w-full items-center justify-center text-center text-2xl font-['David']"
+                                >
+                                  <span>{editingScreen?.title}</span>
+                                  <img
+                                    className="w-full h-3/4"
+                                    alt=""
+                                    src={editingScreen?.content}
+                                  />
+                                </div>
+                              )}
+                            {screenTypeEdit === "message" &&
+                              editingScreen?.content && (
+                                <div
+                                  dir="rtl"
+                                  className="flex w-full items-center justify-center text-center text-2xl font-['David']"
+                                >
+                                  {editingScreen?.content}
+                                </div>
+                              )}
                           </div>
-                          {screenTypeEdit === "image" && (
+                          {screenTypeEdit === "image" && editingScreen && (
                             <div className="w-full">
+                              <input
+                                dir="rtl"
+                                className="border border-black w-full h-8 px-3 mb-3 rounded-sm"
+                                placeholder="הוסף כותרת"
+                                type="text"
+                                value={editingScreen?.title}
+                                onChange={(e) =>
+                                  setEditingScreen({
+                                    id: editingScreen?.id,
+                                    text: editingScreen?.text,
+                                    title: e.target.value,
+                                    type: editingScreen?.type,
+                                    content: editingScreen.content,
+                                  })
+                                }
+                              />
                               <UploadWidget
                                 text={"הוסף תמונה"}
-                                onSetImageUrl={(e:string)=>handleEditScreen({
-                                  content: e,
-                                  type: "image",
-                                  text: "תמונה",
-                                  title: ""
-                                })}
+                                onSetImageUrl={(e: string) =>
+                                  setEditingScreen({
+                                    id: editingScreen?.id,
+                                    text: editingScreen?.text,
+                                    title: editingScreen?.title,
+                                    type: editingScreen?.type,
+                                    content: e,
+                                  })
+                                }
+                              />
+                            </div>
+                          )}
+                          {screenTypeEdit === "message" && editingScreen && (
+                            <div className="w-full">
+                              <input
+                                dir="rtl"
+                                className="border border-black w-full h-8 px-3 rounded-sm"
+                                placeholder="הקלד הודעה"
+                                type="text"
+                                value={editingScreen?.content}
+                                onChange={(e) =>
+                                  setEditingScreen({
+                                    id: editingScreen?.id,
+                                    text: editingScreen?.text,
+                                    title: editingScreen?.title,
+                                    type: editingScreen?.type,
+                                    content: e.target?.value,
+                                  })
+                                }
                               />
                             </div>
                           )}
                           <Button
-                            onClick={() => setScreenEditorIsOpen(false)}
+                            onClick={() => handleAddScreen()}
                             variant="contained"
                           >
                             אישור
@@ -774,12 +873,67 @@ function EditBoard(props: Props) {
                             {dbBoard.screens.map(
                               (screen: ScreenType, index) => {
                                 return (
-                                  <div key={index}>
-                                    {screen.type === "image" && (
-                                      <div className="flex items-center justify-center rounded-sm  w-32 h-20">
-                                        <img src={screen.content} alt="" />
-                                      </div>
-                                    )}
+                                  <div
+                                    className="flex flex-col gap-2"
+                                    key={index}
+                                  >
+                                    <div
+                                      style={{
+                                        background: `url(${require("../assets/backgrounds/" +
+                                          dbBoard.boardBackgroundImage +
+                                          ".jpg")}) no-repeat`,
+                                        backgroundSize: "cover !importent",
+                                      }}
+                                      className="w-20 h-16 !bg-cover flex justify-center items-center p-3  "
+                                    >
+                                      {screen.type === "image" &&
+                                        screen?.content && (
+                                          <div
+                                            dir="rtl"
+                                            className="flex flex-col max-h-full w-full items-center justify-center text-center text-[10px] font-['David']"
+                                          >
+                                            <div>
+                                              {screen.title && (
+                                                <span className="">
+                                                  {screen.title}
+                                                </span>
+                                              )}
+                                              <img
+                                                className="w-full h-full"
+                                                src={screen?.content}
+                                                alt=""
+                                              />
+                                            </div>
+                                          </div>
+                                        )}
+                                      {screen.type === "message" &&
+                                        screen?.content && (
+                                          <div
+                                            dir="rtl"
+                                            className="flex w-full items-center justify-center text-center text-[10px] font-['David']"
+                                          >
+                                            {screen?.content}
+                                          </div>
+                                        )}
+                                    </div>
+                                    <Button
+                                      onClick={() => {
+                                        setEditingScreen(screen);
+                                        setScreenEditorIsOpen(true);
+                                        setScreenTypeEdit(screen.type);
+                                      }}
+                                      variant="contained"
+                                    >
+                                      ערוך
+                                    </Button>
+                                    <Button
+                                      onClick={() => {
+                                        onDeleteScreen(screen);
+                                      }}
+                                      variant="contained"
+                                    >
+                                      הסר
+                                    </Button>
                                   </div>
                                 );
                               }
@@ -789,7 +943,7 @@ function EditBoard(props: Props) {
                       )}
                     </div>
                   </div>
-                )} */}
+                )}
               </div>
             );
           })}

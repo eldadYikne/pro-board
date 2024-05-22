@@ -13,6 +13,10 @@
   src: url("./BonaNova-Regular.ttf") format("truetype");
 }
 @font-face {
+  font-family: "David";
+  src: url("./DavidLibre-Regular.ttf") format("truetype");
+}
+@font-face {
   font-family: "Suez";
   src: url("./SuezOne-Regular.ttf") format("truetype");
 }

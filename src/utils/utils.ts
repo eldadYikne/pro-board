@@ -32,3 +32,15 @@ export function isTimeBetween0000And0130() {
   // Check if the time is between 00:00 and 01:30
   return (hours === 0 && minutes >= 0) || (hours === 1 && minutes <= 30);
 }
+export function generateRandomId() {
+  let length = 15;
+  const characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let randomId = "";
+  for (let i = 0; i < length; i++) {
+    randomId += characters.charAt(
+      Math.floor(Math.random() * characters.length)
+    );
+  }
+  return randomId;
+}

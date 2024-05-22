@@ -3,7 +3,13 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { doc, getDoc, onSnapshot } from "firebase/firestore";
 import { db } from "..";
-import { Board, ShabatTimesToEdit, Tfila, TimeObj } from "../types/board";
+import {
+  Board,
+  ScreenType,
+  ShabatTimesToEdit,
+  Tfila,
+  TimeObj,
+} from "../types/board";
 import {
   OmerDay,
   getCurrentDate,
@@ -24,6 +30,7 @@ function Kboard(props: Props) {
   const [timeBetweenScreens, setTimeBetweenScreens] = useState<number>(
     // dbBoard?.timeScreenPass ? Number(dbBoard?.timeScreenPass) * 1000 : 10000
     20000
+    // 5000
   );
 
   const { id } = useParams();
@@ -59,7 +66,10 @@ function Kboard(props: Props) {
       setCurrentTime(new Date());
     }, 1000);
     const intervalStep = setInterval(() => {
-      const number = dbBoard?.theme === "modern" ? 2 : 1;
+      let number = dbBoard?.theme === "modern" ? 2 : 1;
+      if (dbBoard?.screens && dbBoard?.screens.length > 0) {
+        number = number + dbBoard?.screens.length;
+      }
       setStep((prevStep) => (prevStep === number ? 0 : prevStep + 1));
     }, timeBetweenScreens);
 
@@ -156,16 +166,18 @@ function Kboard(props: Props) {
             }`}
           >
             <div className="flex flex-col gap-4 h-full w-full items-center justify-center">
-              <div
-                className="sm:text-8xl py-4 font-bold font-['Yiddish'] text-shadow-headline"
-                style={{
-                  color:
-                    dbBoard.boardTextColor === "auto" ? colors[2] : "black",
-                }}
-              >
-                {dbBoard.boardName}
-              </div>
-              {dbBoard.theme === "modern" && (
+              {step <= 1 && (
+                <div
+                  className="sm:text-8xl py-4 font-bold font-['Yiddish'] text-shadow-headline"
+                  style={{
+                    color:
+                      dbBoard.boardTextColor === "auto" ? colors[2] : "black",
+                  }}
+                >
+                  {dbBoard.boardName}
+                </div>
+              )}
+              {/* {dbBoard.theme === "modern" && (
                 <div className="flex gap-6 w-[80%] min-h-[65%]">
                   <div className="w-1/2">
                     <KboardTimes
@@ -320,8 +332,8 @@ function Kboard(props: Props) {
                     </div>
                   </div>
                 </div>
-              )}
-              {dbBoard.theme === "column" && (
+              )} */}
+              {dbBoard.theme === "column" && step <= 1 && (
                 <div className="flex gap-6 w-[90%] h-[75%]">
                   {
                     <div className="backdrop-opacity-10 rounded-md backdrop-invert bg-white/50 h-full sm:min-w-[33%] w-full  flex flex-col p-6 ">
@@ -546,6 +558,33 @@ function Kboard(props: Props) {
                 </div>
               )}
             </div>
+            {dbBoard?.screens &&
+              dbBoard.screens.length > 0 &&
+              dbBoard.screens.map((screen: ScreenType, index: number) => {
+                return (
+                  step === index + 2 && (
+                    <div className="w-full h-full items-center justify-center">
+                      {screen.type === "image" && screen?.content && (
+                        <div
+                          dir="rtl"
+                          className="flex flex-col h-full items-center justify-center text-center text-4xl font-['David'] image-screen"
+                        >
+                          <span>{screen?.title}</span>
+                          <img className="" alt="" src={screen?.content} />
+                        </div>
+                      )}
+                      {screen.type === "message" && screen?.content && (
+                        <div
+                          dir="rtl"
+                          className="flex w-full items-center justify-center text-center text-6xl font-['David']"
+                        >
+                          {screen?.content}
+                        </div>
+                      )}
+                    </div>
+                  )
+                );
+              })}
             {dbBoard.forUplifting.length > 0 && (
               <div id="scroll-container">
                 {dbBoard.forUplifting.length > 5 ? (

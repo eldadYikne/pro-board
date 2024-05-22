@@ -55,3 +55,6 @@
   -webkit-transform: scaleX(-1);
   transform: scaleX(-1);
 }
+.image-screen img {
+  max-height: 85% !important;
+}

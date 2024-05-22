@@ -190,20 +190,30 @@ function ConfirmedPlace(props: Props) {
       </Card>
 
       {dbBoard && (
-        <Card sx={{ width: 345 }}>
+        <Card
+          sx={{
+            width: 345,
+            backgroundColor: "#e5bdbd",
+            border: "9px #4c5676 double",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
           <CardContent>
-            <div className="w-full flex justify-center text-xl">
+            <div className="w-full flex justify-center text-xl font-bold">
               זמני תפילות
             </div>
             {shabatTimesToEdit.map((time) => {
               return (
-                <div className="flex flex-col gap-1 text-base">
-                  <div className="underline">{time.name}</div>
+                <div className="flex flex-col gap-1 w-full text-base">
+                  <div className="underline w-full font-bold">{time.name}</div>
                   {dbBoard.tfilaTimes.map((tfila: Tfila) => {
                     return (
                       time.type === tfila.day && (
-                        <div className="flex flex-col">
-                          <div className="flex gap-1">
+                        <div className="flex w-full flex-col">
+                          <div className="flex w-full justify-between gap-1">
                             <span>{tfila.name}:</span>
                             <span>{tfila.time} </span>
                           </div>
@@ -218,9 +228,19 @@ function ConfirmedPlace(props: Props) {
         </Card>
       )}
       {dbBoard && (
-        <Card sx={{ width: 345 }}>
+        <Card
+          sx={{
+            width: 345,
+            backgroundColor: "#e5bdbd",
+            border: "9px #4c5676 double",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
           <CardContent>
-            <div className="w-full flex justify-center text-xl">
+            <div className="w-full flex justify-center font-bold text-xl">
               הודעות לציבור
             </div>
             <div className="flex flex-col gap-4 text-base">
