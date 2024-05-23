@@ -21,6 +21,10 @@
   src: url("./SuezOne-Regular.ttf") format("truetype");
 }
 @font-face {
+  font-family: "Comix";
+  src: url("./comixno2clm_medium-webfont.ttf") format("truetype");
+}
+@font-face {
   font-family: "Yiddish";
   src: url("./YiddishkeitAlefAlefAlef-Bold.otf") format("opentype");
 }

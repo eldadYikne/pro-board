@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Board,
   Message,
@@ -13,6 +13,8 @@ import {
   Alert,
   Box,
   Button,
+  Card,
+  CardContent,
   Checkbox,
   Modal,
   Snackbar,
@@ -33,14 +35,18 @@ import { DateToShow, dateToShow, translationsZmanimKeys } from "../utils/const";
 import { TranslationsZmanimKeys, Zman } from "../types/zmanim";
 import { UploadWidget } from "./UploadWidget";
 import { generateRandomId } from "../utils/utils";
+import { toPng } from "html-to-image";
 
 function EditBoard(props: Props) {
   const [dbBoard, setDbBoard] = useState<Board>();
   const [snackbarIsOpen, setSnackbarIsOpen] = useState<boolean>();
   const [imageUrl, setImageUrl] = useState("");
   const [screenEditorIsOpen, setScreenEditorIsOpen] = useState<boolean>(false);
+  const [downloadTimesImgIsOpen, setDownloadTimesImgIsOpen] =
+    useState<boolean>(false);
   const [screenTypeEdit, setScreenTypeEdit] = useState<ScreenTypeTypes>();
   const [editingScreen, setEditingScreen] = useState<ScreenType>();
+  const elementRef = useRef(null);
 
   const navigate = useNavigate();
   const { id } = useParams();
@@ -301,6 +307,25 @@ function EditBoard(props: Props) {
         [arrayName]: removeObjectToArray,
       });
     }
+  };
+  const onDownloadTimesImg = () => {
+    if (elementRef.current) {
+      console.log("download img");
+      toPng(elementRef.current, {
+        // cacheBust: false,
+        // backgroundColor: "#f2d4b0",
+      })
+        .then((dataUrl) => {
+          const link = document.createElement("a");
+          link.download = `${props?.parasha} - ${dbBoard?.boardName}.png`;
+          link.href = dataUrl;
+          link.click();
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+    setTimeout(() => setDownloadTimesImgIsOpen(false), 1000);
   };
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -948,32 +973,152 @@ function EditBoard(props: Props) {
             );
           })}
       </div>
-      <div className="w-full flex justify-center gap-2 items-center my-3">
+      <div className="w-full flex flex-col justify-center gap-2 items-center my-3">
         <Button
-          className="mobile-only:w-full w-28"
+          className="mobile-only:w-3/4 w-36"
           variant="contained"
           onClick={() => updateBoard(id ?? "", dbBoard)}
         >
           עדכן לוח
         </Button>
         <Button
-          className="mobile-only:w-full w-28"
+          className="mobile-only:w-3/4 w-36"
           variant="contained"
           onClick={() => showBoard(id ?? "")}
         >
           להצגת הלוח
         </Button>
-        <Button
-          className="mobile-only:w-full w-28"
+        {/* <Button
+          className="mobile-only:w-3/4 w-36"
           variant="contained"
           onClick={() => showUsers(id ?? "")}
         >
-          להצגת מתפלים
+          מתפללים
+        </Button> */}
+        <Button
+          className="mobile-only:w-3/4 w-36"
+          variant="contained"
+          onClick={() => setDownloadTimesImgIsOpen(true)}
+        >
+          יצא תמונה
         </Button>
       </div>
       {/* <div className="w-full h-56">
         <Kboard board={dbBoard} zmanim={props.zmanim} parasha={props.parasha} />
       </div> */}
+      <div className="">
+        <Modal
+          open={downloadTimesImgIsOpen}
+          onClose={() => setDownloadTimesImgIsOpen(false)}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+          <Box sx={styleDownloadImgBox}>
+            {dbBoard && (
+              <div ref={elementRef}>
+                <Card
+                  className="!bg-cover bg-repeat-round py-4"
+                  sx={{
+                    width: 345,
+
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    background: `url(${require("../assets/background-times.webp")}) no-repeat`,
+                    backgroundSize: "cover !importent",
+                  }}
+                >
+                  <CardContent>
+                    <div className="w-full font-['Comix'] flex flex-col items-center weekly-times ">
+                      <div className="w-full font-['Comix'] flex justify-center text-xl font-bold">
+                        {dbBoard.boardName}
+                      </div>
+                      <div className="flex flex-col items-center justify-center px-2 w-[85%]">
+                        <table dir="rtl" className="">
+                          <tr>
+                            <th>{props.parasha}</th>
+                            <th>ימי חול</th>
+                          </tr>
+                          <tr>
+                            <td className="w-1/2 px-1">
+                              {shabatTimesToEdit.map((time) => {
+                                return (
+                                  <div className="flex flex-col gap-1 w-full text-base   ">
+                                    {/* <div className="underline w-full font-bold">{time.name}</div> */}
+                                    {dbBoard.tfilaTimes.map((tfila: Tfila) => {
+                                      return (
+                                        tfila.day !== "weekday" &&
+                                        time.type === tfila.day && (
+                                          <div className="flex  w-full flex-col  ">
+                                            <div className="flex w-full items-center justify-between gap-1">
+                                              <span className="leading-4">
+                                                {tfila.name}:
+                                              </span>
+                                              <span>{tfila.time} </span>
+                                            </div>
+                                          </div>
+                                        )
+                                      );
+                                    })}
+                                  </div>
+                                );
+                              })}
+                            </td>
+                            <td className="w-1/2 p-2  ">
+                              {shabatTimesToEdit.map((time) => {
+                                return (
+                                  <div className="flex flex-col gap-1 w-full text-base items-center justify-center border-black  ">
+                                    {/* <div className="underline w-full font-bold">{time.name}</div> */}
+                                    {dbBoard.tfilaTimes.map((tfila: Tfila) => {
+                                      return (
+                                        tfila.day === "weekday" &&
+                                        time.type === tfila.day && (
+                                          <div className="flex w-full flex-col  ">
+                                            <div className="flex w-full items-center justify-center gap-2">
+                                              <span>{tfila.name}:</span>
+                                              <span>{tfila.time} </span>
+                                            </div>
+                                          </div>
+                                        )
+                                      );
+                                    })}
+                                  </div>
+                                );
+                              })}
+                            </td>
+                          </tr>
+                        </table>
+                        <div className="relative">
+                          {dbBoard.messages && dbBoard.messages.length > 0 && (
+                            <div className="w-full flex flex-col items-center justify-center text-center">
+                              <div className="font-bold">הודעות</div>
+                              {dbBoard.messages.map((message) => {
+                                return (
+                                  <div dir="rtl" className="font-sm flex">
+                                    <span>-</span>
+                                    {` ${message.content} `}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
+                          {/* <div className="relative">
+                    <Decorative1 className="absolute top-[-58px" />
+                  </div> */}
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+            <Button onClick={onDownloadTimesImg} variant="contained">
+              הורד
+            </Button>
+          </Box>
+        </Modal>
+      </div>
 
       <Snackbar
         className="flex flex-row-reverse"
@@ -1014,5 +1159,21 @@ const style = {
   bgcolor: "background.paper",
   border: "",
   boxShadow: 24,
+  p: 6,
+};
+const styleDownloadImgBox = {
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  gap: 2,
+  position: "absolute" as "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 450,
+  bgcolor: "background.paper",
+  border: "",
+  boxShadow: 24,
+
   p: 6,
 };

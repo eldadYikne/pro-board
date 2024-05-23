@@ -58,3 +58,10 @@
 .image-screen img {
   max-height: 85% !important;
 }
+.weekly-times {
+  table,
+  th,
+  td {
+    border: 1px solid black;
+  }
+}

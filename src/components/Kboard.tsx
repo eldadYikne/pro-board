@@ -488,7 +488,7 @@ function Kboard(props: Props) {
                       )}
                       {step === 0 && (
                         <div className="flex ">
-                          <div className="flex flex-col gap-4  py-5  ">
+                          <div className="flex flex-col gap-4  py-5 w-full  ">
                             {shabatTimesToEdit.map((time) => {
                               return (
                                 time.type !== "weekday" && (

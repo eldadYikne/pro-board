@@ -23,7 +23,7 @@ import EditBoard from "./EditBoard";
 import { useParams } from "react-router-dom";
 import { Board, Message, ShabatTimesToEdit, Tfila } from "../types/board";
 import { getCurrentDateDayFirstByGetDate } from "../utils/const";
-
+import { ReactComponent as Decorative1 } from "../assets/decorative-1.svg";
 function ConfirmedPlace(props: Props) {
   const [user, setUser] = useState<User>();
   const [checked, setChecked] = useState(!!props.user.present);
@@ -193,7 +193,7 @@ function ConfirmedPlace(props: Props) {
         <Card
           sx={{
             width: 345,
-            backgroundColor: "#e5bdbd",
+            backgroundColor: "#f7e4c7f7",
             border: "9px #4c5676 double",
             display: "flex",
             flexDirection: "column",
@@ -231,7 +231,7 @@ function ConfirmedPlace(props: Props) {
         <Card
           sx={{
             width: 345,
-            backgroundColor: "#e5bdbd",
+            backgroundColor: "#f7e4c7f7",
             border: "9px #4c5676 double",
             display: "flex",
             flexDirection: "column",
