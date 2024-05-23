@@ -753,7 +753,7 @@ function EditBoard(props: Props) {
                       {screenTypes.map((screen: ScreenType, index) => {
                         return (
                           <div
-                            className="shadow-lg cursor-pointer bg-white rounded-lg flex items-center justify-center  w-20 h-16 "
+                            className="shadow-lg text-center cursor-pointer bg-white rounded-lg flex items-center justify-center  w-20 h-16 "
                             key={index}
                             onClick={() => handleOpenModalScreen(screen.type)}
                           >
