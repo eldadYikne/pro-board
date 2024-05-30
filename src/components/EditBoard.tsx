@@ -1057,7 +1057,7 @@ function EditBoard(props: Props) {
             {dbBoard && (
               <div ref={elementRef}>
                 <Card
-                  className="!bg-cover !bg-repeat-round pt-8 pb-6"
+                  className="!bg-cover !bg-repeat-round pt-8 pb-6 p-2"
                   sx={{
                     width: 345,
                     display: "flex",
@@ -1154,7 +1154,7 @@ function EditBoard(props: Props) {
                 </Card>
               </div>
             )}
-            {dbBoard && (
+            {/* {dbBoard && (
               <div className="flex gap-1 w-full overflow-x-auto">
                 {["1", "2", "3", "4", "5"].map((item, index) => (
                   <div
@@ -1181,7 +1181,7 @@ function EditBoard(props: Props) {
                   </div>
                 ))}
               </div>
-            )}
+            )} */}
             <Button onClick={onDownloadTimesImg} variant="contained">
               הורד
             </Button>
@@ -1232,6 +1232,7 @@ const style = {
 };
 const styleDownloadImgBox = {
   display: "flex",
+  overflow: "auto",
   flexDirection: "column",
   alignItems: "center",
   gap: 2,
