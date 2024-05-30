@@ -123,6 +123,14 @@ function EditBoard(props: Props) {
       title: "נא לא לדבר בשעת התפילה!",
       content: "",
     },
+    {
+      type: "birthday",
+      text: "איחולים",
+      title: "",
+      background: "birthday2",
+      content: "",
+      id: "",
+    },
   ];
   const inputsBoard: { name: keyof Board; placeholder: string }[] = [
     { name: "boardName", placeholder: "שם בית כנסת" },
@@ -139,7 +147,7 @@ function EditBoard(props: Props) {
     { name: "mapBackgroundImage", placeholder: "תמונת רקע למפה" },
     { name: "timesToShow", placeholder: "זמנים להצגה" },
     { name: "users", placeholder: "משתמשים" },
-    { name: "theme", placeholder: "ערכת נושא" },
+    // { name: "theme", placeholder: "ערכת נושא" },
     { name: "isMinchaSunset", placeholder: "הגדר מנחה לפני שקיעה" },
   ];
   const thems: { name: Theme; title: string }[] = [
@@ -204,7 +212,7 @@ function EditBoard(props: Props) {
       handleEditScreen(editingScreen);
       return;
     }
-    if (screenTypeEdit === "message") {
+    if (screenTypeEdit === "message" || screenTypeEdit === "birthday") {
       if (editingScreen?.content) {
         newScreen = {
           id: generateRandomId(),
@@ -212,6 +220,7 @@ function EditBoard(props: Props) {
           text: editingScreen.text,
           title: editingScreen.title,
           type: editingScreen.type,
+          background: editingScreen.background,
         };
         if (dbBoard) {
           setDbBoard({
@@ -243,13 +252,25 @@ function EditBoard(props: Props) {
 
   const handleOpenModalScreen = (screenType: ScreenTypeTypes) => {
     setScreenTypeEdit(screenType);
-    setEditingScreen({
-      id: "",
-      content: "",
-      text: "",
-      title: "",
-      type: screenType,
-    });
+    if (screenType === "birthday") {
+      setEditingScreen({
+        id: "",
+        content: "",
+        text: "",
+        title: "",
+        type: screenType,
+        background: "birthday2",
+      });
+    } else {
+      setEditingScreen({
+        id: "",
+        content: "",
+        text: "",
+        title: "",
+        type: screenType,
+      });
+    }
+
     setScreenEditorIsOpen(true);
   };
   const handleEditScreen = (screenToEdit: ScreenType) => {
@@ -581,7 +602,7 @@ function EditBoard(props: Props) {
                         className="min-w-20 min-h-16"
                       >
                         <img
-                          src={require("../assets/backgrounds/" +
+                          src={require("../assets/board-backgrounds/" +
                             item +
                             ".jpg")}
                           className={`min-w-20 min-h-16 rounded-md ${
@@ -798,12 +819,14 @@ function EditBoard(props: Props) {
                           <span className="text-center"> כך זה יראה</span>
                           <div
                             style={{
-                              background: `url(${require("../assets/backgrounds/" +
-                                dbBoard.boardBackgroundImage +
-                                ".jpg")}) no-repeat`,
+                              background: `url(${require(`../assets/board-backgrounds/${
+                                screenTypeEdit === "birthday"
+                                  ? `${editingScreen?.background}`
+                                  : dbBoard.boardBackgroundImage
+                              }.jpg`)}) no-repeat`,
                               backgroundSize: "cover !importent",
                             }}
-                            className="w-full h-full !bg-cover flex justify-center items-center p-3  "
+                            className="w-full min-h-[160px] !bg-cover flex justify-center items-center p-3  "
                           >
                             {screenTypeEdit === "image" &&
                               editingScreen?.content && (
@@ -820,6 +843,15 @@ function EditBoard(props: Props) {
                                 </div>
                               )}
                             {screenTypeEdit === "message" &&
+                              editingScreen?.content && (
+                                <div
+                                  dir="rtl"
+                                  className="flex w-full items-center justify-center text-center text-2xl font-['David']"
+                                >
+                                  {editingScreen?.content}
+                                </div>
+                              )}
+                            {screenTypeEdit === "birthday" &&
                               editingScreen?.content && (
                                 <div
                                   dir="rtl"
@@ -861,26 +893,29 @@ function EditBoard(props: Props) {
                               />
                             </div>
                           )}
-                          {screenTypeEdit === "message" && editingScreen && (
-                            <div className="w-full">
-                              <input
-                                dir="rtl"
-                                className="border border-black w-full h-8 px-3 rounded-sm"
-                                placeholder="הקלד הודעה"
-                                type="text"
-                                value={editingScreen?.content}
-                                onChange={(e) =>
-                                  setEditingScreen({
-                                    id: editingScreen?.id,
-                                    text: editingScreen?.text,
-                                    title: editingScreen?.title,
-                                    type: editingScreen?.type,
-                                    content: e.target?.value,
-                                  })
-                                }
-                              />
-                            </div>
-                          )}
+                          {(screenTypeEdit === "message" ||
+                            screenTypeEdit === "birthday") &&
+                            editingScreen && (
+                              <div className="w-full">
+                                <input
+                                  dir="rtl"
+                                  className="border border-black w-full h-8 px-3 rounded-sm"
+                                  placeholder="הקלד הודעה"
+                                  type="text"
+                                  value={editingScreen?.content}
+                                  onChange={(e) =>
+                                    setEditingScreen({
+                                      id: editingScreen?.id,
+                                      text: editingScreen?.text,
+                                      title: editingScreen?.title,
+                                      type: editingScreen?.type,
+                                      background: editingScreen.background,
+                                      content: e.target?.value,
+                                    })
+                                  }
+                                />
+                              </div>
+                            )}
                           <Button
                             onClick={() => handleAddScreen()}
                             variant="contained"
@@ -904,9 +939,11 @@ function EditBoard(props: Props) {
                                   >
                                     <div
                                       style={{
-                                        background: `url(${require("../assets/backgrounds/" +
-                                          dbBoard.boardBackgroundImage +
-                                          ".jpg")}) no-repeat`,
+                                        background: `url(${require(`../assets/board-backgrounds/${
+                                          screen.type === "birthday"
+                                            ? `${screen?.background}`
+                                            : dbBoard.boardBackgroundImage
+                                        }.jpg`)}) no-repeat`,
                                         backgroundSize: "cover !importent",
                                       }}
                                       className="w-20 h-16 !bg-cover flex justify-center items-center p-3  "
@@ -931,7 +968,8 @@ function EditBoard(props: Props) {
                                             </div>
                                           </div>
                                         )}
-                                      {screen.type === "message" &&
+                                      {(screen.type === "message" ||
+                                        screen.type === "birthday") &&
                                         screen?.content && (
                                           <div
                                             dir="rtl"
@@ -1017,10 +1055,9 @@ function EditBoard(props: Props) {
             {dbBoard && (
               <div ref={elementRef}>
                 <Card
-                  className="!bg-cover bg-repeat-round py-4"
+                  className="!bg-cover !bg-repeat-round pt-8 pb-6"
                   sx={{
                     width: 345,
-
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
@@ -1092,7 +1129,7 @@ function EditBoard(props: Props) {
                         <div className="relative">
                           {dbBoard.messages && dbBoard.messages.length > 0 && (
                             <div className="w-full flex flex-col items-center justify-center text-center">
-                              <div className="font-bold">הודעות</div>
+                              <div className="font-bold underline">הודעות</div>
                               {dbBoard.messages.map((message) => {
                                 return (
                                   <div dir="rtl" className="font-sm flex">

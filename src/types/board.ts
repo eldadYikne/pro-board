@@ -30,11 +30,12 @@ export interface Tfila {
 export interface ScreenType {
   id: string;
   type: ScreenTypeTypes;
-  text: "תמונה" | "הודעה לציבור" | "";
+  text: "תמונה" | "הודעה לציבור" | "איחולים" | "";
   title: string;
   content: string;
+  background?: string;
 }
-export type ScreenTypeTypes = "image" | "message";
+export type ScreenTypeTypes = "image" | "message" | "birthday";
 export type ShabatDayTfila = "saturday" | "friday" | "weekday";
 export interface ShabatTimesToEdit {
   type: ShabatDayTfila;

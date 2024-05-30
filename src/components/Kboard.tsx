@@ -26,11 +26,12 @@ function Kboard(props: Props) {
   const [colors, setColors] = useState<string[]>([]);
   const [step, setStep] = useState(0);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [screenBackground, setScreenBackground] = useState<string>("");
   const [hebrewDate, setHebrewDate] = useState("");
   const [timeBetweenScreens, setTimeBetweenScreens] = useState<number>(
     // dbBoard?.timeScreenPass ? Number(dbBoard?.timeScreenPass) * 1000 : 10000
     20000
-    // 5000
+    // 10000
   );
 
   const { id } = useParams();
@@ -54,7 +55,7 @@ function Kboard(props: Props) {
       console.log(
         "checkifisTime24Past!",
         isPast24Hours,
-        ` ${date.getHours()}:${date.getMinutes()}`
+        `${date.getHours()}:${date.getMinutes()}`
       );
 
       if (isPast24Hours) {
@@ -65,12 +66,27 @@ function Kboard(props: Props) {
     const intervalId = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
+
     const intervalStep = setInterval(() => {
       let number = dbBoard?.theme === "modern" ? 2 : 1;
       if (dbBoard?.screens && dbBoard?.screens.length > 0) {
         number = number + dbBoard?.screens.length;
       }
-      setStep((prevStep) => (prevStep === number ? 0 : prevStep + 1));
+
+      setStep((prevStep) => {
+        const updatedStep = prevStep >= number ? 0 : prevStep + 1;
+        console.log("step after update", updatedStep);
+        if (updatedStep < 2) {
+          setScreenBackground("");
+        } else {
+          let backgroundScreen =
+            dbBoard?.screens[updatedStep - 2].background ?? "";
+          console.log("backgroundScreen", backgroundScreen);
+          setScreenBackground(backgroundScreen);
+        }
+
+        return updatedStep;
+      });
     }, timeBetweenScreens);
 
     // Clear the interval when the component unmounts
@@ -151,9 +167,11 @@ function Kboard(props: Props) {
       {dbBoard && (
         <div
           style={{
-            background: `url(${require("../assets/backgrounds/" +
-              dbBoard.boardBackgroundImage +
-              ".jpg")}) no-repeat`,
+            background: `url(${require(`../assets/board-backgrounds/${
+              screenBackground !== ""
+                ? screenBackground
+                : dbBoard.boardBackgroundImage
+            }.jpg`)}) no-repeat`,
             backgroundSize: "cover !importent",
           }}
           className={`!bg-cover flex h-screen flex-col items-center justify-center p-3 w-full rounded-sm ${
@@ -557,34 +575,37 @@ function Kboard(props: Props) {
                   </div>
                 </div>
               )}
+              {dbBoard?.screens &&
+                dbBoard.screens.length > 0 &&
+                dbBoard.screens.map((screen: ScreenType, index: number) => {
+                  return (
+                    step === index + 2 && (
+                      <div className="w-full  items-center justify-center">
+                        {screen.type === "image" && screen?.content && (
+                          <div
+                            dir="rtl"
+                            className="flex flex-col h-full items-center justify-center text-center text-4xl font-['David'] image-screen"
+                          >
+                            <span>{screen?.title}</span>
+                            <img className="" alt="" src={screen?.content} />
+                          </div>
+                        )}
+                        {(screen.type === "message" ||
+                          screen.type === "birthday") &&
+                          screen?.content && (
+                            <div
+                              dir="rtl"
+                              className="flex w-full items-center justify-center text-center text-6xl font-['David']"
+                            >
+                              {screen?.content}
+                            </div>
+                          )}
+                      </div>
+                    )
+                  );
+                })}
             </div>
-            {dbBoard?.screens &&
-              dbBoard.screens.length > 0 &&
-              dbBoard.screens.map((screen: ScreenType, index: number) => {
-                return (
-                  step === index + 2 && (
-                    <div className="w-full h-full items-center justify-center">
-                      {screen.type === "image" && screen?.content && (
-                        <div
-                          dir="rtl"
-                          className="flex flex-col h-full items-center justify-center text-center text-4xl font-['David'] image-screen"
-                        >
-                          <span>{screen?.title}</span>
-                          <img className="" alt="" src={screen?.content} />
-                        </div>
-                      )}
-                      {screen.type === "message" && screen?.content && (
-                        <div
-                          dir="rtl"
-                          className="flex w-full items-center justify-center text-center text-6xl font-['David']"
-                        >
-                          {screen?.content}
-                        </div>
-                      )}
-                    </div>
-                  )
-                );
-              })}
+
             {dbBoard.forUplifting.length > 0 && (
               <div id="scroll-container">
                 {dbBoard.forUplifting.length > 5 ? (
@@ -633,7 +654,7 @@ function Kboard(props: Props) {
       )}
       {dbBoard && (
         <Palette
-          src={require("../assets/backgrounds/" +
+          src={require("../assets/board-backgrounds/" +
             dbBoard.boardBackgroundImage +
             ".jpg")}
           crossOrigin="anonymous"
