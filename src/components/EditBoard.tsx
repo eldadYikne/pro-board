@@ -29,8 +29,7 @@ import {
   writeBatch,
 } from "firebase/firestore";
 import { db } from "..";
-import { Delete } from "@mui/icons-material";
-
+import { Delete, Cancel } from "@mui/icons-material";
 import { DateToShow, dateToShow, translationsZmanimKeys } from "../utils/const";
 import { TranslationsZmanimKeys, Zman } from "../types/zmanim";
 import { UploadWidget } from "./UploadWidget";
@@ -1054,6 +1053,12 @@ function EditBoard(props: Props) {
           aria-describedby="modal-modal-description"
         >
           <Box sx={styleDownloadImgBox}>
+            <span
+              className="absolute top-[40px] left-[45px]"
+              onClick={() => setDownloadTimesImgIsOpen(false)}
+            >
+              <Cancel />
+            </span>
             {dbBoard && (
               <div ref={elementRef}>
                 <Card
