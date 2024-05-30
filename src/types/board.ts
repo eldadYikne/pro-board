@@ -19,6 +19,7 @@ export interface Board {
   theme: Theme;
   isMinchaSunset: { isActive: boolean; minBrforeSunSet: number };
   screens: ScreenType[];
+  backgroundToWhatsappImg: string;
   // password: string;
 }
 

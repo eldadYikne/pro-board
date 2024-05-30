@@ -1044,6 +1044,8 @@ function EditBoard(props: Props) {
       {/* <div className="w-full h-56">
         <Kboard board={dbBoard} zmanim={props.zmanim} parasha={props.parasha} />
       </div> */}
+
+      {/* MODAL TO DOWNLOAD IMG TO WHATSAPP */}
       <div className="">
         <Modal
           open={downloadTimesImgIsOpen}
@@ -1062,7 +1064,9 @@ function EditBoard(props: Props) {
                     flexDirection: "column",
                     alignItems: "center",
                     justifyContent: "center",
-                    background: `url(${require("../assets/background-times.webp")}) no-repeat`,
+                    background: `url(${require(`../assets/${
+                      dbBoard.backgroundToWhatsappImg ?? "background-frame2"
+                    }.jpg`)}) no-repeat`,
                     backgroundSize: "cover !importent",
                   }}
                 >
@@ -1148,6 +1152,34 @@ function EditBoard(props: Props) {
                     </div>
                   </CardContent>
                 </Card>
+              </div>
+            )}
+            {dbBoard && (
+              <div className="flex gap-1 w-full overflow-x-auto">
+                {["1", "2", "3", "4", "5"].map((item, index) => (
+                  <div
+                    onClick={() =>
+                      setDbBoard({
+                        ...dbBoard,
+                        backgroundToWhatsappImg: `background-frame${item}`,
+                      })
+                    }
+                    key={index}
+                    className="min-w-20 max-h-32"
+                  >
+                    <img
+                      src={require("../assets/background-frame" +
+                        item +
+                        ".jpg")}
+                      className={`min-w-20 h-28 rounded-md ${
+                        item === dbBoard.backgroundToWhatsappImg
+                          ? "border-2 border-sky-500 border-spacing-1"
+                          : ""
+                      }`}
+                      alt={item}
+                    />
+                  </div>
+                ))}
               </div>
             )}
             <Button onClick={onDownloadTimesImg} variant="contained">

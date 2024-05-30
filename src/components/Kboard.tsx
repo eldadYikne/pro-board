@@ -30,8 +30,8 @@ function Kboard(props: Props) {
   const [hebrewDate, setHebrewDate] = useState("");
   const [timeBetweenScreens, setTimeBetweenScreens] = useState<number>(
     // dbBoard?.timeScreenPass ? Number(dbBoard?.timeScreenPass) * 1000 : 10000
-    20000
-    // 10000
+    // 20000
+    10000
   );
 
   const { id } = useParams();
@@ -580,7 +580,7 @@ function Kboard(props: Props) {
                 dbBoard.screens.map((screen: ScreenType, index: number) => {
                   return (
                     step === index + 2 && (
-                      <div className="w-full  items-center justify-center">
+                      <div className="w-full h-full flex flex-col items-center justify-center">
                         {screen.type === "image" && screen?.content && (
                           <div
                             dir="rtl"
