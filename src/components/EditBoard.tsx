@@ -915,6 +915,32 @@ function EditBoard(props: Props) {
                                 />
                               </div>
                             )}
+                          {screenTypeEdit === "birthday" && editingScreen && (
+                            <div className="flex gap-2 overflow-x-auto">
+                              {["1", "2", "3"].map((item) => {
+                                return (
+                                  <div
+                                    onClick={() =>
+                                      setEditingScreen({
+                                        id: editingScreen?.id,
+                                        text: editingScreen?.text,
+                                        title: editingScreen?.title,
+                                        type: editingScreen?.type,
+                                        background: `birthday${item}`,
+                                        content: editingScreen?.content,
+                                      })
+                                    }
+                                    key={item}
+                                    style={{
+                                      background: `url(${require(`../assets/board-backgrounds/birthday${item}.jpg`)}) no-repeat`,
+                                      backgroundSize: "cover !importent",
+                                    }}
+                                    className="h-16 w-24 !bg-cover flex justify-center items-center p-3  "
+                                  ></div>
+                                );
+                              })}
+                            </div>
+                          )}
                           <Button
                             onClick={() => handleAddScreen()}
                             variant="contained"
