@@ -97,7 +97,7 @@ function Kboard(props: Props) {
       clearInterval(intervalId);
       clearInterval(intervalStep);
     };
-  }, [id, props.lastTimeDataUpdated, dbBoard?.theme]);
+  }, [id, props.lastTimeDataUpdated, dbBoard?.theme, dbBoard?.screens]);
 
   const hours = currentTime.getHours();
   const minutes = currentTime.getMinutes();
@@ -125,38 +125,64 @@ function Kboard(props: Props) {
       throw error; // Rethrow the error to handle it where the function is called
     }
   };
+  // const getBoardByIdSnap = async (boardId: string) => {
+  //   try {
+  //     const boardRef = doc(db, "boards", boardId);
+
+  //     // Listen to changes in the board document
+  //     const unsubscribe = onSnapshot(boardRef, (boardDoc) => {
+  //       if (boardDoc.exists()) {
+  //         // Document exists, return its data along with the ID
+  //         const newBoard = { ...boardDoc.data(), id: boardDoc.id };
+  //         if (newBoard) {
+  //           setDbBoard(newBoard as Board);
+  //           if (Number(dbBoard?.timeScreenPass) * 1000 !== timeBetweenScreens) {
+  //             // setTimeBetweenScreens(
+  //             //   Number(dbBoard?.timeScreenPass) * 1000 ?? 10000
+  //             // );
+  //           }
+  //         }
+  //         console.log(newBoard);
+  //       } else {
+  //         // Document does not exist
+  //         console.log("Board not found");
+  //         // setDbBoard(null); // or however you handle this case in your application
+  //       }
+  //     });
+
+  //     // Return the unsubscribe function to stop listening when needed
+  //     return unsubscribe;
+  //   } catch (error) {
+  //     console.error("Error fetching board:", error);
+  //     throw error; // Rethrow the error to handle it where the function is called
+  //   }
+  // };
   const getBoardByIdSnap = async (boardId: string) => {
     try {
       const boardRef = doc(db, "boards", boardId);
+      const boardDataArray: any = []; // Array to store board data
 
       // Listen to changes in the board document
       const unsubscribe = onSnapshot(boardRef, (boardDoc) => {
         if (boardDoc.exists()) {
-          // Document exists, return its data along with the ID
+          // Document exists, push its data into the array along with the ID
           const newBoard = { ...boardDoc.data(), id: boardDoc.id };
-          if (newBoard) {
-            setDbBoard(newBoard as Board);
-            if (Number(dbBoard?.timeScreenPass) * 1000 !== timeBetweenScreens) {
-              // setTimeBetweenScreens(
-              //   Number(dbBoard?.timeScreenPass) * 1000 ?? 10000
-              // );
-            }
-          }
+          boardDataArray.push(newBoard);
           console.log(newBoard);
         } else {
           // Document does not exist
           console.log("Board not found");
-          // setDbBoard(null); // or however you handle this case in your application
         }
       });
 
-      // Return the unsubscribe function to stop listening when needed
-      return unsubscribe;
+      // Return the array and the unsubscribe function
+      return { boardDataArray, unsubscribe };
     } catch (error) {
       console.error("Error fetching board:", error);
       throw error; // Rethrow the error to handle it where the function is called
     }
   };
+
   const shabatTimesToEdit: ShabatTimesToEdit[] = [
     { type: "weekday", name: "יום חול" },
     { type: "friday", name: " ערב שבת" },
@@ -595,7 +621,7 @@ function Kboard(props: Props) {
                           screen?.content && (
                             <div
                               dir="rtl"
-                              className="flex w-full items-center justify-center text-center text-6xl font-['David']"
+                              className="flex w-full items-center justify-center text-center text-8xl font-['David']"
                             >
                               {screen?.content}
                             </div>
