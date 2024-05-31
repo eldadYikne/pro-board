@@ -30,8 +30,8 @@ function Kboard(props: Props) {
   const [hebrewDate, setHebrewDate] = useState("");
   const [timeBetweenScreens, setTimeBetweenScreens] = useState<number>(
     // dbBoard?.timeScreenPass ? Number(dbBoard?.timeScreenPass) * 1000 : 10000
-    // 20000
-    10000
+    20000
+    // 10000
   );
 
   const { id } = useParams();
@@ -97,7 +97,7 @@ function Kboard(props: Props) {
       clearInterval(intervalId);
       clearInterval(intervalStep);
     };
-  }, [id, props.lastTimeDataUpdated, dbBoard?.theme, dbBoard?.screens]);
+  }, [id, props.lastTimeDataUpdated, dbBoard?.theme]);
 
   const hours = currentTime.getHours();
   const minutes = currentTime.getMinutes();
@@ -168,6 +168,10 @@ function Kboard(props: Props) {
           // Document exists, push its data into the array along with the ID
           const newBoard = { ...boardDoc.data(), id: boardDoc.id };
           boardDataArray.push(newBoard);
+          if (newBoard.id) {
+            setDbBoard(newBoard as Board);
+          }
+
           console.log(newBoard);
         } else {
           // Document does not exist
