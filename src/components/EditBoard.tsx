@@ -589,6 +589,10 @@ function EditBoard(props: Props) {
                       "13",
                       "14",
                       "15",
+                      "16",
+                      "17",
+                      "18",
+                      "19",
                     ].map((item, index) => (
                       <div
                         onClick={() =>
@@ -917,7 +921,7 @@ function EditBoard(props: Props) {
                             )}
                           {screenTypeEdit === "birthday" && editingScreen && (
                             <div className="flex gap-2 overflow-x-auto">
-                              {["1", "2", "3"].map((item) => {
+                              {["1", "2", "3", "4", "5"].map((item) => {
                                 return (
                                   <div
                                     onClick={() =>
