@@ -75,13 +75,13 @@ function Kboard(props: Props) {
 
       setStep((prevStep) => {
         const updatedStep = prevStep >= number ? 0 : prevStep + 1;
-        console.log("step after update", updatedStep);
+        // console.log("step after update", updatedStep);
         if (updatedStep < 2) {
           setScreenBackground("");
         } else {
           let backgroundScreen =
             dbBoard?.screens[updatedStep - 2].background ?? "";
-          console.log("backgroundScreen", backgroundScreen);
+          // console.log("backgroundScreen", backgroundScreen);
           setScreenBackground(backgroundScreen);
         }
 
@@ -97,7 +97,7 @@ function Kboard(props: Props) {
       clearInterval(intervalId);
       clearInterval(intervalStep);
     };
-  }, [id, props.lastTimeDataUpdated, dbBoard?.theme]);
+  }, [id, props.lastTimeDataUpdated, dbBoard?.theme, dbBoard?.screens.length]);
 
   const hours = currentTime.getHours();
   const minutes = currentTime.getMinutes();

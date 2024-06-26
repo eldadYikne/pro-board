@@ -33,6 +33,7 @@ import EditUsers from "./components/EditUsers";
 import { isTimeBetween0000And0130, checkIsPast24Hours } from "./utils/utils";
 import { TimeObj } from "./types/board";
 import { UploadWidget } from "./components/UploadWidget";
+import Kdashboard from "./components/Kdashboard";
 function App() {
   const [users, setUsers] = useState<any>();
   const [board, setBoard] = useState<any>();
@@ -56,7 +57,6 @@ function App() {
   myImage.resize(fill().width(250).height(250));
 
   console.log("location.pathname ", pathname);
-  const { id } = useParams();
 
   useEffect(() => {
     async function fetchData() {
@@ -476,6 +476,7 @@ function App() {
             element={<EditBoard zmanim={dayTimes} parasha={parasha} />}
           />
           <Route path="/users/:id" element={<EditUsers />} />
+          <Route path="/dashboard" element={<Kdashboard />} />
           <Route
             path="/board/:id"
             element={

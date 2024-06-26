@@ -366,6 +366,7 @@ function EditBoard(props: Props) {
   };
   const updateBoard = async (boardId: string, boardData: any) => {
     if (!boardId) return;
+    console.log(dbBoard);
     const boardRef = doc(collection(db, "boards"), boardId); // Get reference to the user document
     try {
       await updateDoc(boardRef, boardData); // Update the user document with new data
@@ -912,7 +913,8 @@ function EditBoard(props: Props) {
                                       text: editingScreen?.text,
                                       title: editingScreen?.title,
                                       type: editingScreen?.type,
-                                      background: editingScreen.background,
+                                      background:
+                                        editingScreen.background ?? "",
                                       content: e.target?.value,
                                     })
                                   }
