@@ -17,7 +17,7 @@ export interface Board {
   timesToShow: Array<keyof TranslationsZmanimKeys>;
   users?: User[];
   theme: Theme;
-  isMinchaSunset: { isActive: boolean; minBrforeSunSet: number };
+  isSetShabatTime: { isActive: boolean; enter: string; exit: string };
   screens: ScreenType[];
   backgroundToWhatsappImg: string;
   // password: string;

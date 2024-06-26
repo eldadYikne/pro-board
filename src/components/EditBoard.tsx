@@ -147,7 +147,7 @@ function EditBoard(props: Props) {
     { name: "timesToShow", placeholder: "זמנים להצגה" },
     { name: "users", placeholder: "משתמשים" },
     // { name: "theme", placeholder: "ערכת נושא" },
-    { name: "isMinchaSunset", placeholder: "הגדר מנחה לפני שקיעה" },
+    { name: "isSetShabatTime", placeholder: "הגדר עצמאית זמני שבת" },
   ];
   const thems: { name: Theme; title: string }[] = [
     { name: "modern", title: "מודרני" },
@@ -429,16 +429,16 @@ function EditBoard(props: Props) {
           inputsBoard.map(({ name, placeholder }) => {
             return (
               <div key={name} className="flex flex-col gap-1 p-2">
-                {name !== "users" && name !== "tfilaTimes" && (
-                  <span>{placeholder}:</span>
-                )}
+                {name !== "users" &&
+                  name !== "tfilaTimes" &&
+                  name !== "isSetShabatTime" && <span>{placeholder}:</span>}
                 {!Array.isArray(dbBoard[name]) &&
                   name !== "boardBackgroundImage" &&
                   name !== "mapBackgroundImage" &&
                   name !== "boardTextColor" &&
                   name !== "dateTypes" &&
                   name !== "screens" &&
-                  name !== "isMinchaSunset" &&
+                  name !== "isSetShabatTime" &&
                   name !== "theme" && (
                     <TextField
                       dir="rtl"
@@ -710,45 +710,68 @@ function EditBoard(props: Props) {
                     })}
                   </div>
                 )}
-                {name === "isMinchaSunset" && (
+                {name === "isSetShabatTime" && (
                   <div className="flex ">
-                    <div className="flex ">
-                      <div className="flex flex-col items-center justify-center">
-                        <span>הגדר</span>
+                    <div className="flex flex-col ">
+                      <div className="flex items-center ">
                         <Checkbox
                           onClick={(e) => {
                             setDbBoard({
                               ...dbBoard,
-                              isMinchaSunset: {
-                                isActive: !dbBoard.isMinchaSunset.isActive,
-                                minBrforeSunSet:
-                                  dbBoard.isMinchaSunset.minBrforeSunSet,
+                              isSetShabatTime: {
+                                isActive: !dbBoard.isSetShabatTime.isActive,
+                                enter: dbBoard.isSetShabatTime.enter,
+                                exit: dbBoard.isSetShabatTime.exit,
                               },
                             });
                           }}
-                          name={"isMinchaSunset"}
-                          checked={dbBoard.isMinchaSunset.isActive}
+                          name={"isSetShabatTime"}
+                          checked={dbBoard.isSetShabatTime.isActive}
                         />
+                        <span>הגדר עצמאית זמני שבת:</span>
                       </div>
-
-                      <TextField
-                        dir="rtl"
-                        id="filled-basic"
-                        label="דקות לפני שקיעה"
-                        name={""}
-                        value={dbBoard.isMinchaSunset.minBrforeSunSet}
-                        type="number"
-                        onChange={(e) =>
-                          setDbBoard({
-                            ...dbBoard,
-                            isMinchaSunset: {
-                              isActive: dbBoard.isMinchaSunset.isActive,
-                              minBrforeSunSet: Number(e.target.value),
-                            },
-                          })
-                        }
-                        variant="filled"
-                      />
+                      {dbBoard.isSetShabatTime.isActive && (
+                        <div className="flex flex-col justify-between w-full gap-3">
+                          <TextField
+                            dir="rtl"
+                            id="filled-basic"
+                            label="כניסת שבת"
+                            name={""}
+                            value={dbBoard.isSetShabatTime.enter}
+                            type="text"
+                            onChange={(e) =>
+                              setDbBoard({
+                                ...dbBoard,
+                                isSetShabatTime: {
+                                  isActive: dbBoard.isSetShabatTime.isActive,
+                                  enter: e.target.value,
+                                  exit: dbBoard.isSetShabatTime.exit,
+                                },
+                              })
+                            }
+                            variant="filled"
+                          />
+                          <TextField
+                            dir="rtl"
+                            id="filled-basic"
+                            label="יציאת שבת"
+                            name={""}
+                            value={dbBoard.isSetShabatTime.exit}
+                            type="text"
+                            onChange={(e) =>
+                              setDbBoard({
+                                ...dbBoard,
+                                isSetShabatTime: {
+                                  isActive: dbBoard.isSetShabatTime.isActive,
+                                  enter: dbBoard.isSetShabatTime.enter,
+                                  exit: e.target.value,
+                                },
+                              })
+                            }
+                            variant="filled"
+                          />
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
@@ -1077,8 +1100,9 @@ function EditBoard(props: Props) {
       </div> */}
 
       {/* MODAL TO DOWNLOAD IMG TO WHATSAPP */}
-      <div className="">
+      <div className="overflow-y-auto">
         <Modal
+          sx={{ overflowY: "scroll", overflowX: "hidden" }}
           open={downloadTimesImgIsOpen}
           onClose={() => setDownloadTimesImgIsOpen(false)}
           aria-labelledby="modal-modal-title"
@@ -1109,8 +1133,26 @@ function EditBoard(props: Props) {
                 >
                   <CardContent>
                     <div className="w-full font-['Comix'] flex flex-col items-center weekly-times ">
-                      <div className="w-full font-['Comix'] flex justify-center text-xl font-bold">
-                        {dbBoard.boardName}
+                      <div className="w-full font-['Comix'] flex justify-end text-xl font-bold">
+                        <div className=" text-[12px] absolute left-[104px] top-[85px]  w-24  flex flex-col p-1">
+                          <div className="w-full h-3  flex justify-between">
+                            <span>
+                              {dbBoard.isSetShabatTime.isActive
+                                ? dbBoard.isSetShabatTime.enter
+                                : props.shabatTimes.candles}
+                            </span>
+                            <span> :כניסת שבת </span>
+                          </div>
+                          <div className="w-full h-3 flex justify-between">
+                            <span>
+                              {dbBoard.isSetShabatTime.isActive
+                                ? dbBoard.isSetShabatTime.exit
+                                : props.shabatTimes.havdalah}
+                            </span>
+                            <span> :יציאת שבת</span>
+                          </div>
+                        </div>
+                        <span className="pr-[33px]">{dbBoard.boardName}</span>
                       </div>
                       <div className="flex flex-col items-center justify-center px-2 w-[85%]">
                         <table dir="rtl" className="">
@@ -1191,7 +1233,7 @@ function EditBoard(props: Props) {
                 </Card>
               </div>
             )}
-            {/* {dbBoard && (
+            {dbBoard && (
               <div className="flex gap-1 w-full overflow-x-auto">
                 {["1", "2", "3", "4", "5"].map((item, index) => (
                   <div
@@ -1218,7 +1260,7 @@ function EditBoard(props: Props) {
                   </div>
                 ))}
               </div>
-            )} */}
+            )}
             <Button onClick={onDownloadTimesImg} variant="contained">
               הורד
             </Button>
@@ -1255,6 +1297,7 @@ EditBoard.defaultProps = {
 interface Props {
   parasha: string;
   zmanim: Zman[] | undefined;
+  shabatTimes: { candles: string; havdalah: string };
 }
 const style = {
   position: "absolute" as "absolute",
@@ -1269,7 +1312,6 @@ const style = {
 };
 const styleDownloadImgBox = {
   display: "flex",
-  overflow: "auto",
   flexDirection: "column",
   alignItems: "center",
   gap: 2,
@@ -1281,6 +1323,6 @@ const styleDownloadImgBox = {
   bgcolor: "background.paper",
   border: "",
   boxShadow: 24,
-
+  overflowY: "scroll",
   p: 6,
 };

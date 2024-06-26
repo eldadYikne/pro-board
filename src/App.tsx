@@ -473,7 +473,13 @@ function App() {
           />
           <Route
             path="/edit/:id"
-            element={<EditBoard zmanim={dayTimes} parasha={parasha} />}
+            element={
+              <EditBoard
+                shabatTimes={{ candles: candles, havdalah: havdalah }}
+                zmanim={dayTimes}
+                parasha={parasha}
+              />
+            }
           />
           <Route path="/users/:id" element={<EditUsers />} />
           <Route path="/dashboard" element={<Kdashboard />} />
