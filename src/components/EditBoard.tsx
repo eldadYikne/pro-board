@@ -29,7 +29,7 @@ import {
   writeBatch,
 } from "firebase/firestore";
 import { db } from "..";
-import { Delete, Cancel } from "@mui/icons-material";
+import { Delete, Cancel, WhatsApp } from "@mui/icons-material";
 import { DateToShow, dateToShow, translationsZmanimKeys } from "../utils/const";
 import { TranslationsZmanimKeys, Zman } from "../types/zmanim";
 import { UploadWidget } from "./UploadWidget";
@@ -79,20 +79,7 @@ function EditBoard(props: Props) {
       throw error; // Rethrow the error to handle it where the function is called
     }
   };
-  // const board: Board = {
-  //   boardBackgroundImage: "",
-  //   city: "",
-  //   forMedicine: [""],
-  //   forUplifting: [""],
-  //   geoId: "",
-  //   mapBackgroundImage: "",
-  //   messages: [{ title: "", content: "", date: new Date() }],
-  //   tfilaTimes: [{ isSaturdayTfila: true, name: "מנחה", time: "" }],
-  //   theme: "regular",
-  //   timeScreenPass: "",
-  //   timesToShow: ["chatzot", "dusk"],
-  //   users: [],
-  // };
+
   const handleTimesChange = (time: keyof TranslationsZmanimKeys) => {
     let newArray;
     if (dbBoard?.timesToShow.includes(time)) {
@@ -143,7 +130,7 @@ function EditBoard(props: Props) {
     { name: "messages", placeholder: "הודעות לציבור " },
     { name: "boardTextColor", placeholder: "צבע טקסט" },
     { name: "boardBackgroundImage", placeholder: "תמונת רקע ללוח" },
-    { name: "mapBackgroundImage", placeholder: "תמונת רקע למפה" },
+    // { name: "mapBackgroundImage", placeholder: "תמונת רקע למפה" },
     { name: "timesToShow", placeholder: "זמנים להצגה" },
     { name: "users", placeholder: "משתמשים" },
     // { name: "theme", placeholder: "ערכת נושא" },
@@ -416,6 +403,25 @@ function EditBoard(props: Props) {
     { type: "friday", name: "זמני ערב שבת" },
     { type: "saturday", name: "זמני שבת" },
   ];
+  if (dbBoard?.isFreez) {
+    return (
+      <div className="flex justify-center items-center w-full h-full">
+        <div className="p-10 bg-yellow-400 text-3xl flex flex-col justify-center items-center gap-3 font-bold">
+          <span>מצטערים , משתמש זה הוקפא </span>
+          <a href="https://wa.me/+972526587480/?text=שלום%20מדוע%20המשתמש%20שלי%20הוקפא%20?">
+            <Button
+              className="flex gap-2 items-center"
+              color="success"
+              variant="contained"
+            >
+              <span>צרו קשר בווצאפ</span>
+              <WhatsApp />
+            </Button>
+          </a>
+        </div>
+      </div>
+    );
+  }
   return (
     <div
       style={{
@@ -1134,7 +1140,7 @@ function EditBoard(props: Props) {
                   <CardContent>
                     <div className="w-full font-['Comix'] flex flex-col items-center weekly-times ">
                       <div className="w-full font-['Comix'] flex justify-end text-xl font-bold">
-                        <div className=" text-[12px] absolute left-[104px] top-[85px]  w-24  flex flex-col p-1">
+                        <div className=" text-[12px] mb-2  w-24  flex flex-col p-1">
                           <div className="w-full h-3  flex justify-between">
                             <span>
                               {dbBoard.isSetShabatTime.isActive
@@ -1152,7 +1158,9 @@ function EditBoard(props: Props) {
                             <span> :יציאת שבת</span>
                           </div>
                         </div>
-                        <span className="pr-[33px]">{dbBoard.boardName}</span>
+                        <span className="pr-[33px] flex items-center">
+                          {dbBoard.boardName}
+                        </span>
                       </div>
                       <div className="flex flex-col items-center justify-center px-2 w-[85%]">
                         <table dir="rtl" className="">

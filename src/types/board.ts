@@ -20,7 +20,8 @@ export interface Board {
   isSetShabatTime: { isActive: boolean; enter: string; exit: string };
   screens: ScreenType[];
   backgroundToWhatsappImg: string;
-  // password: string;
+  isFreez: boolean;
+  // managers:string[]
 }
 
 export interface Tfila {
