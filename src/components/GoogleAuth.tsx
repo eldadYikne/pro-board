@@ -4,9 +4,7 @@ import {
   GoogleAuthProvider,
   User,
   createUserWithEmailAndPassword,
-  getRedirectResult,
   signInWithPopup,
-  signInWithRedirect,
   signOut,
 } from "firebase/auth";
 import { useEffect, useState } from "react";
@@ -28,48 +26,28 @@ function GoogleAuth(props: Props) {
   };
   const signInWithGoogle = async () => {
     //   const user = await signInWithPopup(auth, googleProvider);
-    // signInWithRedirect(auth, googleProvider)
-    //   .then((result) => {
-    //     setConnectedUser(result.user);
-    //     props.setUser(result.user);
-    //     // This gives you a Google Access Token. You can use it to access the Google API.
-    //     const credential = GoogleAuthProvider.credentialFromResult(result);
-    //     const token = credential?.accessToken;
-    //     // The signed-in user info.
-    //     const user = result.user;
-    //     // IdP data available using getAdditionalUserInfo(result)
-    //     // ...
-
-    //     console.log(user);
-    //   })
-    //   .catch((error) => {
-    //     // Handle Errors here.
-    //     const errorCode = error.code;
-    //     const errorMessage = error.message;
-    //     // The email of the user's account used.
-    //     const email = error.customData.email;
-    //     // The AuthCredential type that was used.
-    //     const credential = GoogleAuthProvider.credentialFromError(error);
-    //     // ...
-    //   });
-
-    signInWithRedirect(auth, googleProvider);
-    getRedirectResult(auth)
-      .then((result: any) => {
-        // This gives you the Google OAuth access token and user information.
-        // You can use them to access the Google API.
-        var user = result.user;
+    signInWithPopup(auth, googleProvider)
+      .then((result) => {
         setConnectedUser(result.user);
         props.setUser(result.user);
+        // This gives you a Google Access Token. You can use it to access the Google API.
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        const token = credential?.accessToken;
+        // The signed-in user info.
+        const user = result.user;
+        // IdP data available using getAdditionalUserInfo(result)
+        // ...
+
+        console.log(user);
       })
-      .catch(function (error) {
+      .catch((error) => {
         // Handle Errors here.
-        var errorCode = error.code;
-        var errorMessage = error.message;
+        const errorCode = error.code;
+        const errorMessage = error.message;
         // The email of the user's account used.
-        var email = error.email;
-        // The firebase.auth.AuthCredential type that was used.
-        var credential = error.credential;
+        const email = error.customData.email;
+        // The AuthCredential type that was used.
+        const credential = GoogleAuthProvider.credentialFromError(error);
         // ...
       });
   };

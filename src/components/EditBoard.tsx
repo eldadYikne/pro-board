@@ -64,6 +64,7 @@ function EditBoard(props: Props) {
         setConnectedUser(user);
         // ...
       } else {
+        console.log("USER FIRBASE NOT FOUND");
         // User is signed out
         // ...
       }

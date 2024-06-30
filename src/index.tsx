@@ -9,9 +9,10 @@ import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 
+// authDomain: "calaniot-159d1.firebaseapp.com",
 const firebaseConfig = {
   apiKey: "AIzaSyB0_l-bYxRBeKGR_t_jujHRRzQacqQcRXk",
-  authDomain: "calaniot-159d1.firebaseapp.com",
+  authDomain: "https://kodesh-board.onrender.com/__/auth/handler",
   databaseURL: "https://calaniot-159d1-default-rtdb.firebaseio.com",
   projectId: "calaniot-159d1",
   storageBucket: "calaniot-159d1.appspot.com",
