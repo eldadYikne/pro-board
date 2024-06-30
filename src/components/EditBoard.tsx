@@ -19,6 +19,7 @@ import {
   Modal,
   Snackbar,
   TextField,
+  CircularProgress,
 } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -35,6 +36,8 @@ import { TranslationsZmanimKeys, Zman } from "../types/zmanim";
 import { UploadWidget } from "./UploadWidget";
 import { generateRandomId } from "../utils/utils";
 import { toPng } from "html-to-image";
+import GoogleAuth from "./GoogleAuth";
+import { User, getAuth, onAuthStateChanged } from "firebase/auth";
 
 function EditBoard(props: Props) {
   const [dbBoard, setDbBoard] = useState<Board>();
@@ -46,10 +49,25 @@ function EditBoard(props: Props) {
   const [screenTypeEdit, setScreenTypeEdit] = useState<ScreenTypeTypes>();
   const [editingScreen, setEditingScreen] = useState<ScreenType>();
   const elementRef = useRef(null);
-
+  const [connectedUser, setConnectedUser] = useState<User>();
+  const auth = getAuth();
   const navigate = useNavigate();
   const { id } = useParams();
+
   useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // User is signed in, see docs for a list of available properties
+        // https://firebase.google.com/docs/reference/js/auth.user
+        const uid = user.uid;
+        console.log("connected user", user);
+        setConnectedUser(user);
+        // ...
+      } else {
+        // User is signed out
+        // ...
+      }
+    });
     async function fetchData() {
       if (id) {
         console.log("id", id);
@@ -403,6 +421,30 @@ function EditBoard(props: Props) {
     { type: "friday", name: "זמני ערב שבת" },
     { type: "saturday", name: "זמני שבת" },
   ];
+
+  if (
+    connectedUser?.email &&
+    dbBoard?.admins &&
+    !dbBoard?.admins.includes(connectedUser?.email)
+  ) {
+    return (
+      <Box sx={styleBoxNotAllowEdit}>
+        <div className="flex w-full flex-col justify-center items-center m-2">
+          {connectedUser && (
+            <div className="flex flex-col">
+              <span>שלום {connectedUser.displayName}</span>
+              <span>למשתמש {connectedUser.email} אין הרשאה לערוך לוח זה</span>
+            </div>
+          )}
+          <GoogleAuth
+            setUser={setConnectedUser}
+            userConnected={connectedUser?.email ?? ""}
+          />
+        </div>
+      </Box>
+    );
+  }
+
   if (dbBoard?.isFreez) {
     return (
       <div className="flex justify-center items-center w-full h-full">
@@ -430,203 +472,254 @@ function EditBoard(props: Props) {
       }}
       className=" flex flex-col gap-2 sm:justify-center sm:items-center sm:w-full "
     >
-      <div className=" sm:grid grid-cols-2 flex flex-col gap-2">
-        {dbBoard &&
-          inputsBoard.map(({ name, placeholder }) => {
-            return (
-              <div key={name} className="flex flex-col gap-1 p-2">
-                {name !== "users" &&
-                  name !== "tfilaTimes" &&
-                  name !== "isSetShabatTime" && <span>{placeholder}:</span>}
-                {!Array.isArray(dbBoard[name]) &&
-                  name !== "boardBackgroundImage" &&
-                  name !== "mapBackgroundImage" &&
-                  name !== "boardTextColor" &&
-                  name !== "dateTypes" &&
-                  name !== "screens" &&
-                  name !== "isSetShabatTime" &&
-                  name !== "theme" && (
-                    <TextField
-                      dir="rtl"
-                      id="filled-basic"
-                      label={placeholder}
-                      value={dbBoard[name]}
-                      name={name}
-                      onChange={(e) => handleChange(e)}
-                      variant="filled"
-                    />
-                  )}
-                {name === "tfilaTimes" && (
-                  <div className="flw flex-col">
-                    <div className="flex flex-col gap-2">
-                      {shabatTimesToEdit.map((time) => {
-                        return (
-                          <div className="flex flex-col gap-1">
-                            <span>{time.name} :</span>
-                            <div className="flex flex-col gap-1">
-                              {dbBoard.tfilaTimes.map(
-                                (tfila: Tfila, idx: number) => {
-                                  return (
-                                    time.type === tfila.day && (
-                                      <div className="flex  gap-1">
-                                        {Object.keys(tfila).map(
-                                          (key: string) => {
-                                            return (
-                                              key !== "day" && (
-                                                <div className="flex" key={key}>
-                                                  <TextField
-                                                    dir="rtl"
-                                                    id="filled-basic"
-                                                    label={
-                                                      dataKeysToHebrewName[key]
-                                                    }
-                                                    name={key}
-                                                    value={
-                                                      tfila[key as keyof Tfila]
-                                                    }
-                                                    onChange={(e) =>
-                                                      handleInputArrayChange(
-                                                        e,
-                                                        idx,
-                                                        name
+      <div>
+        {connectedUser ? (
+          <div className="flex flex-col justify-center items-center">
+            <div className="flex justify-between w-full p-2 items-center bg-slate-400">
+              <div>{dbBoard && dbBoard.boardName}</div>
+              <div className="flex gap-3 items-center">
+                {connectedUser && <div> {connectedUser.displayName}</div>}
+                <GoogleAuth
+                  setUser={setConnectedUser}
+                  userConnected={connectedUser?.email ?? ""}
+                />
+              </div>
+            </div>
+            {!dbBoard && (
+              <div className="flex">
+                <CircularProgress />
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="flex w-full  h-screen p-5 font-sans flex-col   my-10">
+            <div className="flex flex-col p-7 gap-4  rounded-xl">
+              <div className="text-blue-900 text-xl ">
+                {" "}
+                {dbBoard && dbBoard.boardName}
+              </div>
+              <span className="text-blue-300 text-6xl pb-10">
+                הכנס וערוך את הלוח שלך
+              </span>
+              <div className="flex w-full justify-end">
+                <GoogleAuth setUser={setConnectedUser} userConnected={""} />
+              </div>
+            </div>
+          </div>
+        )}
+        {connectedUser &&
+          dbBoard &&
+          connectedUser.email &&
+          dbBoard.admins.includes(connectedUser.email) && (
+            <div className=" sm:grid grid-cols-2 flex flex-col gap-2">
+              <div>
+                {inputsBoard.map(({ name, placeholder }) => {
+                  return (
+                    <div key={name} className="flex flex-col gap-1 p-2">
+                      {name !== "users" &&
+                        name !== "tfilaTimes" &&
+                        name !== "isSetShabatTime" && (
+                          <span>{placeholder}:</span>
+                        )}
+                      {!Array.isArray(dbBoard[name]) &&
+                        name !== "boardBackgroundImage" &&
+                        name !== "mapBackgroundImage" &&
+                        name !== "boardTextColor" &&
+                        name !== "dateTypes" &&
+                        name !== "screens" &&
+                        name !== "isSetShabatTime" &&
+                        name !== "theme" && (
+                          <TextField
+                            dir="rtl"
+                            id="filled-basic"
+                            label={placeholder}
+                            value={dbBoard[name]}
+                            name={name}
+                            onChange={(e) => handleChange(e)}
+                            variant="filled"
+                          />
+                        )}
+                      {name === "tfilaTimes" && (
+                        <div className="flw flex-col">
+                          <div className="flex flex-col gap-2">
+                            {shabatTimesToEdit.map((time) => {
+                              return (
+                                <div className="flex flex-col gap-1">
+                                  <span>{time.name} :</span>
+                                  <div className="flex flex-col gap-1">
+                                    {dbBoard.tfilaTimes.map(
+                                      (tfila: Tfila, idx: number) => {
+                                        return (
+                                          time.type === tfila.day && (
+                                            <div className="flex  gap-1">
+                                              {Object.keys(tfila).map(
+                                                (key: string) => {
+                                                  return (
+                                                    key !== "day" && (
+                                                      <div
+                                                        className="flex"
+                                                        key={key}
+                                                      >
+                                                        <TextField
+                                                          dir="rtl"
+                                                          id="filled-basic"
+                                                          label={
+                                                            dataKeysToHebrewName[
+                                                              key
+                                                            ]
+                                                          }
+                                                          name={key}
+                                                          value={
+                                                            tfila[
+                                                              key as keyof Tfila
+                                                            ]
+                                                          }
+                                                          onChange={(e) =>
+                                                            handleInputArrayChange(
+                                                              e,
+                                                              idx,
+                                                              name
+                                                            )
+                                                          }
+                                                          variant="filled"
+                                                        />
+                                                      </div>
+                                                    )
+                                                  );
+                                                }
+                                              )}
+                                              {
+                                                <div className="flex">
+                                                  <Button
+                                                    onClick={(e) =>
+                                                      removeObjectFromArray(
+                                                        name,
+                                                        idx
                                                       )
                                                     }
-                                                    variant="filled"
-                                                  />
+                                                    startIcon={<Delete />}
+                                                  >
+                                                    הסר
+                                                  </Button>
                                                 </div>
-                                              )
-                                            );
-                                          }
-                                        )}
-                                        {
-                                          <div className="flex">
-                                            <Button
-                                              onClick={(e) =>
-                                                removeObjectFromArray(name, idx)
                                               }
-                                              startIcon={<Delete />}
-                                            >
-                                              הסר
-                                            </Button>
-                                          </div>
-                                        }
-                                      </div>
-                                    )
-                                  );
-                                }
-                              )}
-                            </div>
+                                            </div>
+                                          )
+                                        );
+                                      }
+                                    )}
+                                  </div>
 
-                            <div>
-                              <Button
-                                onClick={() =>
-                                  addObjectToArray(name, time.type)
-                                }
-                                variant="contained"
-                              >
-                                הוסף
-                              </Button>
-                            </div>
+                                  <div>
+                                    <Button
+                                      onClick={() =>
+                                        addObjectToArray(name, time.type)
+                                      }
+                                      variant="contained"
+                                    >
+                                      הוסף
+                                    </Button>
+                                  </div>
+                                </div>
+                              );
+                            })}
                           </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-                {(name === "messages" ||
-                  name === "forMedicine" ||
-                  name === "forUplifting") &&
-                  dbBoard[name].map((tfila: Message, idx) => (
-                    <div key={idx} className="flex w-full  gap-1">
-                      {Object.keys(tfila).map((key: string) => {
-                        return (
-                          key !== "date" && (
-                            <div className="flex w-full" key={key}>
-                              <TextField
-                                dir="rtl"
-                                className="w-full"
-                                id="filled-basic"
-                                label={dataKeysToHebrewName[key]}
-                                name={key}
-                                value={tfila[key as keyof Message]}
-                                onChange={(e) =>
-                                  handleInputArrayChange(e, idx, name)
-                                }
-                                variant="filled"
+                        </div>
+                      )}
+                      {(name === "messages" ||
+                        name === "forMedicine" ||
+                        name === "forUplifting") &&
+                        dbBoard[name].map((tfila: Message, idx) => (
+                          <div key={idx} className="flex w-full  gap-1">
+                            {Object.keys(tfila).map((key: string) => {
+                              return (
+                                key !== "date" && (
+                                  <div className="flex w-full" key={key}>
+                                    <TextField
+                                      dir="rtl"
+                                      className="w-full"
+                                      id="filled-basic"
+                                      label={dataKeysToHebrewName[key]}
+                                      name={key}
+                                      value={tfila[key as keyof Message]}
+                                      onChange={(e) =>
+                                        handleInputArrayChange(e, idx, name)
+                                      }
+                                      variant="filled"
+                                    />
+                                  </div>
+                                )
+                              );
+                            })}
+                            <Button
+                              onClick={(e) => removeObjectFromArray(name, idx)}
+                              startIcon={<Delete />}
+                            >
+                              הסר
+                            </Button>
+                          </div>
+                        ))}
+                      {(name === "messages" ||
+                        name === "forMedicine" ||
+                        name === "forUplifting") && (
+                        <div>
+                          <Button
+                            onClick={() => addObjectToArray(name)}
+                            variant="contained"
+                          >
+                            הוסף
+                          </Button>
+                        </div>
+                      )}
+                      {name === "boardBackgroundImage" && (
+                        <div className="flex gap-1 w-full overflow-x-auto">
+                          {[
+                            "1",
+                            "2",
+                            "3",
+                            "4",
+                            "5",
+                            "6",
+                            "7",
+                            "8",
+                            "9",
+                            "10",
+                            "11",
+                            "12",
+                            "13",
+                            "14",
+                            "15",
+                            "16",
+                            "17",
+                            "18",
+                            "19",
+                          ].map((item, index) => (
+                            <div
+                              onClick={() =>
+                                setDbBoard({
+                                  ...dbBoard,
+                                  boardBackgroundImage: item,
+                                })
+                              }
+                              key={index}
+                              className="min-w-20 min-h-16"
+                            >
+                              <img
+                                src={require("../assets/board-backgrounds/" +
+                                  item +
+                                  ".jpg")}
+                                className={`min-w-20 min-h-16 rounded-md ${
+                                  item === dbBoard.boardBackgroundImage
+                                    ? "border-2 border-sky-500 border-spacing-1"
+                                    : ""
+                                }`}
+                                alt={item}
                               />
                             </div>
-                          )
-                        );
-                      })}
-                      <Button
-                        onClick={(e) => removeObjectFromArray(name, idx)}
-                        startIcon={<Delete />}
-                      >
-                        הסר
-                      </Button>
-                    </div>
-                  ))}
-                {(name === "messages" ||
-                  name === "forMedicine" ||
-                  name === "forUplifting") && (
-                  <div>
-                    <Button
-                      onClick={() => addObjectToArray(name)}
-                      variant="contained"
-                    >
-                      הוסף
-                    </Button>
-                  </div>
-                )}
-                {name === "boardBackgroundImage" && (
-                  <div className="flex gap-1 w-full overflow-x-auto">
-                    {[
-                      "1",
-                      "2",
-                      "3",
-                      "4",
-                      "5",
-                      "6",
-                      "7",
-                      "8",
-                      "9",
-                      "10",
-                      "11",
-                      "12",
-                      "13",
-                      "14",
-                      "15",
-                      "16",
-                      "17",
-                      "18",
-                      "19",
-                    ].map((item, index) => (
-                      <div
-                        onClick={() =>
-                          setDbBoard({
-                            ...dbBoard,
-                            boardBackgroundImage: item,
-                          })
-                        }
-                        key={index}
-                        className="min-w-20 min-h-16"
-                      >
-                        <img
-                          src={require("../assets/board-backgrounds/" +
-                            item +
-                            ".jpg")}
-                          className={`min-w-20 min-h-16 rounded-md ${
-                            item === dbBoard.boardBackgroundImage
-                              ? "border-2 border-sky-500 border-spacing-1"
-                              : ""
-                          }`}
-                          alt={item}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                )}
-                {/* {name === "mapBackgroundImage" && (
+                          ))}
+                        </div>
+                      )}
+                      {/* {name === "mapBackgroundImage" && (
                   <div className="flex gap-1 w-full overflow-x-auto">
                     {beautyColorsHex.map((item: string, index) => (
                       <div
@@ -643,467 +736,484 @@ function EditBoard(props: Props) {
                     ))}
                   </div>
                 )} */}
-                {name === "timesToShow" && (
-                  <div className="grid grid-cols-2">
-                    {Object.keys(translationsZmanimKeys).map((key: string) => {
-                      return (
-                        <div>
-                          {
-                            <div>
-                              <Checkbox
-                                onClick={(e) =>
-                                  handleTimesChange(
-                                    key as keyof TranslationsZmanimKeys
-                                  )
-                                }
-                                name={"isSaturdayTfila"}
-                                checked={dbBoard.timesToShow.includes(
-                                  key as keyof TranslationsZmanimKeys
-                                )}
-                              />
-                              {
-                                translationsZmanimKeys[
-                                  key as keyof TranslationsZmanimKeys
-                                ]
-                              }{" "}
-                            </div>
-                          }
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-                {name === "dateTypes" && (
-                  <div className="flex ">
-                    {Object.keys(dateToShow).map((key: string) => {
-                      return (
-                        <div>
-                          {
-                            <div>
-                              <Checkbox
-                                onClick={(e) => {
-                                  if (
-                                    dbBoard?.dateTypes.includes(
-                                      key as keyof DateToShow
-                                    )
-                                  ) {
-                                    let arr = dbBoard?.dateTypes.filter(
-                                      (date) => date !== key
-                                    );
-                                    setDbBoard({
-                                      ...dbBoard,
-                                      dateTypes: arr,
-                                    });
-                                  } else {
-                                    let arr = [...dbBoard?.dateTypes, key];
-
-                                    setDbBoard({
-                                      ...dbBoard,
-                                      dateTypes: arr,
-                                    });
+                      {name === "timesToShow" && (
+                        <div className="grid grid-cols-2">
+                          {Object.keys(translationsZmanimKeys).map(
+                            (key: string) => {
+                              return (
+                                <div>
+                                  {
+                                    <div>
+                                      <Checkbox
+                                        onClick={(e) =>
+                                          handleTimesChange(
+                                            key as keyof TranslationsZmanimKeys
+                                          )
+                                        }
+                                        name={"isSaturdayTfila"}
+                                        checked={dbBoard.timesToShow.includes(
+                                          key as keyof TranslationsZmanimKeys
+                                        )}
+                                      />
+                                      {
+                                        translationsZmanimKeys[
+                                          key as keyof TranslationsZmanimKeys
+                                        ]
+                                      }{" "}
+                                    </div>
                                   }
-                                }}
-                                name={"isSaturdayTfila"}
-                                checked={dbBoard.dateTypes.includes(
-                                  key as keyof DateToShow
-                                )}
-                              />
-                              {dateToShow[key as keyof DateToShow]}
-                            </div>
-                          }
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-                {name === "isSetShabatTime" && (
-                  <div className="flex ">
-                    <div className="flex flex-col ">
-                      <div className="flex items-center ">
-                        <Checkbox
-                          onClick={(e) => {
-                            setDbBoard({
-                              ...dbBoard,
-                              isSetShabatTime: {
-                                isActive: !dbBoard.isSetShabatTime.isActive,
-                                enter: dbBoard.isSetShabatTime.enter,
-                                exit: dbBoard.isSetShabatTime.exit,
-                              },
-                            });
-                          }}
-                          name={"isSetShabatTime"}
-                          checked={dbBoard.isSetShabatTime.isActive}
-                        />
-                        <span>הגדר עצמאית זמני שבת:</span>
-                      </div>
-                      {dbBoard.isSetShabatTime.isActive && (
-                        <div className="flex flex-col justify-between w-full gap-3">
-                          <TextField
-                            dir="rtl"
-                            id="filled-basic"
-                            label="כניסת שבת"
-                            name={""}
-                            value={dbBoard.isSetShabatTime.enter}
-                            type="text"
-                            onChange={(e) =>
-                              setDbBoard({
-                                ...dbBoard,
-                                isSetShabatTime: {
-                                  isActive: dbBoard.isSetShabatTime.isActive,
-                                  enter: e.target.value,
-                                  exit: dbBoard.isSetShabatTime.exit,
-                                },
-                              })
+                                </div>
+                              );
                             }
-                            variant="filled"
-                          />
-                          <TextField
-                            dir="rtl"
-                            id="filled-basic"
-                            label="יציאת שבת"
-                            name={""}
-                            value={dbBoard.isSetShabatTime.exit}
-                            type="text"
-                            onChange={(e) =>
-                              setDbBoard({
-                                ...dbBoard,
-                                isSetShabatTime: {
-                                  isActive: dbBoard.isSetShabatTime.isActive,
-                                  enter: dbBoard.isSetShabatTime.enter,
-                                  exit: e.target.value,
-                                },
-                              })
-                            }
-                            variant="filled"
-                          />
+                          )}
                         </div>
                       )}
-                    </div>
-                  </div>
-                )}
-                {name === "theme" && (
-                  <div className="flex gap-1 flex-1">
-                    {thems.map((them: { name: Theme; title: string }) => {
-                      return (
-                        <div
-                          className={`w-20 h-12 cursor-pointer border-2 rounded-md flex items-center justify-center ${
-                            dbBoard.theme === them.name
-                              ? "bg-sky-400 text-white border-sky-400"
-                              : "border-black"
-                          }`}
-                          onClick={() =>
-                            setDbBoard({ ...dbBoard, theme: them.name })
-                          }
-                        >
-                          {them.title}
+                      {name === "dateTypes" && (
+                        <div className="flex ">
+                          {Object.keys(dateToShow).map((key: string) => {
+                            return (
+                              <div>
+                                {
+                                  <div>
+                                    <Checkbox
+                                      onClick={(e) => {
+                                        if (
+                                          dbBoard?.dateTypes.includes(
+                                            key as keyof DateToShow
+                                          )
+                                        ) {
+                                          let arr = dbBoard?.dateTypes.filter(
+                                            (date) => date !== key
+                                          );
+                                          setDbBoard({
+                                            ...dbBoard,
+                                            dateTypes: arr,
+                                          });
+                                        } else {
+                                          let arr = [
+                                            ...dbBoard?.dateTypes,
+                                            key,
+                                          ];
+
+                                          setDbBoard({
+                                            ...dbBoard,
+                                            dateTypes: arr,
+                                          });
+                                        }
+                                      }}
+                                      name={"isSaturdayTfila"}
+                                      checked={dbBoard.dateTypes.includes(
+                                        key as keyof DateToShow
+                                      )}
+                                    />
+                                    {dateToShow[key as keyof DateToShow]}
+                                  </div>
+                                }
+                              </div>
+                            );
+                          })}
                         </div>
-                      );
-                    })}
-                  </div>
-                )}
-                {name === "boardTextColor" && (
-                  <div className="flex gap-1 flex-1">
-                    {boardTextColors.map(
-                      (them: { name: string; title: string }) => {
-                        return (
-                          <div
-                            className={`w-20 h-12 cursor-pointer border-2 rounded-md flex items-center justify-center ${
-                              dbBoard.boardTextColor === them.name
-                                ? "bg-sky-400 text-white border-sky-400"
-                                : "border-black"
-                            }`}
-                            onClick={() =>
-                              setDbBoard({
-                                ...dbBoard,
-                                boardTextColor: them.name,
-                              })
-                            }
-                          >
-                            {them.title}
-                          </div>
-                        );
-                      }
-                    )}
-                  </div>
-                )}
-                {name === "screens" && (
-                  <div className="flex flex-col">
-                    <div className="flex gap-2">
-                      {screenTypes.map((screen: ScreenType, index) => {
-                        return (
-                          <div
-                            className="shadow-lg text-center cursor-pointer bg-white rounded-lg flex items-center justify-center  w-20 h-16 "
-                            key={index}
-                            onClick={() => handleOpenModalScreen(screen.type)}
-                          >
-                            {screen.text}
-                          </div>
-                        );
-                      })}
-                    </div>
-                    <Modal
-                      open={screenEditorIsOpen}
-                      onClose={() => setScreenEditorIsOpen(false)}
-                      aria-labelledby="modal-modal-title"
-                      aria-describedby="modal-modal-description"
-                    >
-                      <Box sx={style}>
-                        <div className="w-full min-h-[320px]  flex flex-col gap-3">
-                          <span className="text-center"> כך זה יראה</span>
-                          <div
-                            style={{
-                              background: `url(${require(`../assets/board-backgrounds/${
-                                screenTypeEdit === "birthday"
-                                  ? `${editingScreen?.background}`
-                                  : dbBoard.boardBackgroundImage
-                              }.jpg`)}) no-repeat`,
-                              backgroundSize: "cover !importent",
-                            }}
-                            className="w-full min-h-[160px] !bg-cover flex justify-center items-center p-3  "
-                          >
-                            {screenTypeEdit === "image" &&
-                              editingScreen?.content && (
-                                <div
-                                  dir="rtl"
-                                  className="flex flex-col w-full items-center justify-center text-center text-2xl font-['David']"
-                                >
-                                  <span>{editingScreen?.title}</span>
-                                  <img
-                                    className="w-full h-3/4"
-                                    alt=""
-                                    src={editingScreen?.content}
-                                  />
-                                </div>
-                              )}
-                            {screenTypeEdit === "message" &&
-                              editingScreen?.content && (
-                                <div
-                                  dir="rtl"
-                                  className="flex w-full items-center justify-center text-center text-2xl font-['David']"
-                                >
-                                  {editingScreen?.content}
-                                </div>
-                              )}
-                            {screenTypeEdit === "birthday" &&
-                              editingScreen?.content && (
-                                <div
-                                  dir="rtl"
-                                  className="flex w-full items-center justify-center text-center text-2xl font-['David']"
-                                >
-                                  {editingScreen?.content}
-                                </div>
-                              )}
-                          </div>
-                          {screenTypeEdit === "image" && editingScreen && (
-                            <div className="w-full">
-                              <input
-                                dir="rtl"
-                                className="border border-black w-full h-8 px-3 mb-3 rounded-sm"
-                                placeholder="הוסף כותרת"
-                                type="text"
-                                value={editingScreen?.title}
-                                onChange={(e) =>
-                                  setEditingScreen({
-                                    id: editingScreen?.id,
-                                    text: editingScreen?.text,
-                                    title: e.target.value,
-                                    type: editingScreen?.type,
-                                    content: editingScreen.content,
-                                  })
-                                }
+                      )}
+                      {name === "isSetShabatTime" && (
+                        <div className="flex ">
+                          <div className="flex flex-col ">
+                            <div className="flex items-center ">
+                              <Checkbox
+                                onClick={(e) => {
+                                  setDbBoard({
+                                    ...dbBoard,
+                                    isSetShabatTime: {
+                                      isActive:
+                                        !dbBoard.isSetShabatTime.isActive,
+                                      enter: dbBoard.isSetShabatTime.enter,
+                                      exit: dbBoard.isSetShabatTime.exit,
+                                    },
+                                  });
+                                }}
+                                name={"isSetShabatTime"}
+                                checked={dbBoard.isSetShabatTime.isActive}
                               />
-                              <UploadWidget
-                                text={"הוסף תמונה"}
-                                onSetImageUrl={(e: string) =>
-                                  setEditingScreen({
-                                    id: editingScreen?.id,
-                                    text: editingScreen?.text,
-                                    title: editingScreen?.title,
-                                    type: editingScreen?.type,
-                                    content: e,
-                                  })
-                                }
-                              />
+                              <span>הגדר עצמאית זמני שבת:</span>
                             </div>
-                          )}
-                          {(screenTypeEdit === "message" ||
-                            screenTypeEdit === "birthday") &&
-                            editingScreen && (
-                              <div className="w-full">
-                                <input
+                            {dbBoard.isSetShabatTime.isActive && (
+                              <div className="flex flex-col justify-between w-full gap-3">
+                                <TextField
                                   dir="rtl"
-                                  className="border border-black w-full h-8 px-3 rounded-sm"
-                                  placeholder="הקלד הודעה"
+                                  id="filled-basic"
+                                  label="כניסת שבת"
+                                  name={""}
+                                  value={dbBoard.isSetShabatTime.enter}
                                   type="text"
-                                  value={editingScreen?.content}
                                   onChange={(e) =>
-                                    setEditingScreen({
-                                      id: editingScreen?.id,
-                                      text: editingScreen?.text,
-                                      title: editingScreen?.title,
-                                      type: editingScreen?.type,
-                                      background:
-                                        editingScreen.background ?? "",
-                                      content: e.target?.value,
+                                    setDbBoard({
+                                      ...dbBoard,
+                                      isSetShabatTime: {
+                                        isActive:
+                                          dbBoard.isSetShabatTime.isActive,
+                                        enter: e.target.value,
+                                        exit: dbBoard.isSetShabatTime.exit,
+                                      },
                                     })
                                   }
+                                  variant="filled"
+                                />
+                                <TextField
+                                  dir="rtl"
+                                  id="filled-basic"
+                                  label="יציאת שבת"
+                                  name={""}
+                                  value={dbBoard.isSetShabatTime.exit}
+                                  type="text"
+                                  onChange={(e) =>
+                                    setDbBoard({
+                                      ...dbBoard,
+                                      isSetShabatTime: {
+                                        isActive:
+                                          dbBoard.isSetShabatTime.isActive,
+                                        enter: dbBoard.isSetShabatTime.enter,
+                                        exit: e.target.value,
+                                      },
+                                    })
+                                  }
+                                  variant="filled"
                                 />
                               </div>
                             )}
-                          {screenTypeEdit === "birthday" && editingScreen && (
-                            <div className="flex gap-2 overflow-x-auto">
-                              {["1", "2", "3", "4", "5"].map((item) => {
-                                return (
-                                  <div
-                                    onClick={() =>
-                                      setEditingScreen({
-                                        id: editingScreen?.id,
-                                        text: editingScreen?.text,
-                                        title: editingScreen?.title,
-                                        type: editingScreen?.type,
-                                        background: `birthday${item}`,
-                                        content: editingScreen?.content,
-                                      })
-                                    }
-                                    key={item}
-                                    style={{
-                                      background: `url(${require(`../assets/board-backgrounds/birthday${item}.jpg`)}) no-repeat`,
-                                      backgroundSize: "cover !importent",
-                                    }}
-                                    className="h-16 w-24 !bg-cover flex justify-center items-center p-3  "
-                                  ></div>
-                                );
-                              })}
-                            </div>
-                          )}
-                          <Button
-                            onClick={() => handleAddScreen()}
-                            variant="contained"
-                          >
-                            אישור
-                          </Button>
+                          </div>
                         </div>
-                      </Box>
-                    </Modal>
-                    <div>
-                      {dbBoard.screens && (
-                        <div>
-                          <div> המסכים שלך :</div>
+                      )}
+                      {name === "theme" && (
+                        <div className="flex gap-1 flex-1">
+                          {thems.map((them: { name: Theme; title: string }) => {
+                            return (
+                              <div
+                                className={`w-20 h-12 cursor-pointer border-2 rounded-md flex items-center justify-center ${
+                                  dbBoard.theme === them.name
+                                    ? "bg-sky-400 text-white border-sky-400"
+                                    : "border-black"
+                                }`}
+                                onClick={() =>
+                                  setDbBoard({
+                                    ...dbBoard,
+                                    theme: them.name,
+                                  })
+                                }
+                              >
+                                {them.title}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                      {name === "boardTextColor" && (
+                        <div className="flex gap-1 flex-1">
+                          {boardTextColors.map(
+                            (them: { name: string; title: string }) => {
+                              return (
+                                <div
+                                  className={`w-20 h-12 cursor-pointer border-2 rounded-md flex items-center justify-center ${
+                                    dbBoard.boardTextColor === them.name
+                                      ? "bg-sky-400 text-white border-sky-400"
+                                      : "border-black"
+                                  }`}
+                                  onClick={() =>
+                                    setDbBoard({
+                                      ...dbBoard,
+                                      boardTextColor: them.name,
+                                    })
+                                  }
+                                >
+                                  {them.title}
+                                </div>
+                              );
+                            }
+                          )}
+                        </div>
+                      )}
+                      {name === "screens" && (
+                        <div className="flex flex-col">
                           <div className="flex gap-2">
-                            {dbBoard.screens.map(
-                              (screen: ScreenType, index) => {
-                                return (
-                                  <div
-                                    className="flex flex-col gap-2"
-                                    key={index}
-                                  >
-                                    <div
-                                      style={{
-                                        background: `url(${require(`../assets/board-backgrounds/${
-                                          screen.type === "birthday"
-                                            ? `${screen?.background}`
-                                            : dbBoard.boardBackgroundImage
-                                        }.jpg`)}) no-repeat`,
-                                        backgroundSize: "cover !importent",
-                                      }}
-                                      className="w-20 h-16 !bg-cover flex justify-center items-center p-3  "
-                                    >
-                                      {screen.type === "image" &&
-                                        screen?.content && (
-                                          <div
-                                            dir="rtl"
-                                            className="flex flex-col max-h-full w-full items-center justify-center text-center text-[10px] font-['David']"
-                                          >
-                                            <div>
-                                              {screen.title && (
-                                                <span className="">
-                                                  {screen.title}
-                                                </span>
-                                              )}
-                                              <img
-                                                className="w-full h-full"
-                                                src={screen?.content}
-                                                alt=""
-                                              />
-                                            </div>
-                                          </div>
-                                        )}
-                                      {(screen.type === "message" ||
-                                        screen.type === "birthday") &&
-                                        screen?.content && (
-                                          <div
-                                            dir="rtl"
-                                            className="flex w-full items-center justify-center text-center text-[10px] font-['David']"
-                                          >
-                                            {screen?.content}
-                                          </div>
-                                        )}
+                            {screenTypes.map((screen: ScreenType, index) => {
+                              return (
+                                <div
+                                  className="shadow-lg text-center cursor-pointer bg-white rounded-lg flex items-center justify-center  w-20 h-16 "
+                                  key={index}
+                                  onClick={() =>
+                                    handleOpenModalScreen(screen.type)
+                                  }
+                                >
+                                  {screen.text}
+                                </div>
+                              );
+                            })}
+                          </div>
+                          <Modal
+                            open={screenEditorIsOpen}
+                            onClose={() => setScreenEditorIsOpen(false)}
+                            aria-labelledby="modal-modal-title"
+                            aria-describedby="modal-modal-description"
+                          >
+                            <Box sx={style}>
+                              <div className="w-full min-h-[320px]  flex flex-col gap-3">
+                                <span className="text-center"> כך זה יראה</span>
+                                <div
+                                  style={{
+                                    background: `url(${require(`../assets/board-backgrounds/${
+                                      screenTypeEdit === "birthday"
+                                        ? `${editingScreen?.background}`
+                                        : dbBoard.boardBackgroundImage
+                                    }.jpg`)}) no-repeat`,
+                                    backgroundSize: "cover !importent",
+                                  }}
+                                  className="w-full min-h-[160px] !bg-cover flex justify-center items-center p-3  "
+                                >
+                                  {screenTypeEdit === "image" &&
+                                    editingScreen?.content && (
+                                      <div
+                                        dir="rtl"
+                                        className="flex flex-col w-full items-center justify-center text-center text-2xl font-['David']"
+                                      >
+                                        <span>{editingScreen?.title}</span>
+                                        <img
+                                          className="w-full h-3/4"
+                                          alt=""
+                                          src={editingScreen?.content}
+                                        />
+                                      </div>
+                                    )}
+                                  {screenTypeEdit === "message" &&
+                                    editingScreen?.content && (
+                                      <div
+                                        dir="rtl"
+                                        className="flex w-full items-center justify-center text-center text-2xl font-['David']"
+                                      >
+                                        {editingScreen?.content}
+                                      </div>
+                                    )}
+                                  {screenTypeEdit === "birthday" &&
+                                    editingScreen?.content && (
+                                      <div
+                                        dir="rtl"
+                                        className="flex w-full items-center justify-center text-center text-2xl font-['David']"
+                                      >
+                                        {editingScreen?.content}
+                                      </div>
+                                    )}
+                                </div>
+                                {screenTypeEdit === "image" &&
+                                  editingScreen && (
+                                    <div className="w-full">
+                                      <input
+                                        dir="rtl"
+                                        className="border border-black w-full h-8 px-3 mb-3 rounded-sm"
+                                        placeholder="הוסף כותרת"
+                                        type="text"
+                                        value={editingScreen?.title}
+                                        onChange={(e) =>
+                                          setEditingScreen({
+                                            id: editingScreen?.id,
+                                            text: editingScreen?.text,
+                                            title: e.target.value,
+                                            type: editingScreen?.type,
+                                            content: editingScreen.content,
+                                          })
+                                        }
+                                      />
+                                      <UploadWidget
+                                        text={"הוסף תמונה"}
+                                        onSetImageUrl={(e: string) =>
+                                          setEditingScreen({
+                                            id: editingScreen?.id,
+                                            text: editingScreen?.text,
+                                            title: editingScreen?.title,
+                                            type: editingScreen?.type,
+                                            content: e,
+                                          })
+                                        }
+                                      />
                                     </div>
-                                    <Button
-                                      onClick={() => {
-                                        setEditingScreen(screen);
-                                        setScreenEditorIsOpen(true);
-                                        setScreenTypeEdit(screen.type);
-                                      }}
-                                      variant="contained"
-                                    >
-                                      ערוך
-                                    </Button>
-                                    <Button
-                                      onClick={() => {
-                                        onDeleteScreen(screen);
-                                      }}
-                                      variant="contained"
-                                    >
-                                      הסר
-                                    </Button>
-                                  </div>
-                                );
-                              }
+                                  )}
+                                {(screenTypeEdit === "message" ||
+                                  screenTypeEdit === "birthday") &&
+                                  editingScreen && (
+                                    <div className="w-full">
+                                      <input
+                                        dir="rtl"
+                                        className="border border-black w-full h-8 px-3 rounded-sm"
+                                        placeholder="הקלד הודעה"
+                                        type="text"
+                                        value={editingScreen?.content}
+                                        onChange={(e) =>
+                                          setEditingScreen({
+                                            id: editingScreen?.id,
+                                            text: editingScreen?.text,
+                                            title: editingScreen?.title,
+                                            type: editingScreen?.type,
+                                            background:
+                                              editingScreen.background ?? "",
+                                            content: e.target?.value,
+                                          })
+                                        }
+                                      />
+                                    </div>
+                                  )}
+                                {screenTypeEdit === "birthday" &&
+                                  editingScreen && (
+                                    <div className="flex gap-2 overflow-x-auto">
+                                      {["1", "2", "3", "4", "5"].map((item) => {
+                                        return (
+                                          <div
+                                            onClick={() =>
+                                              setEditingScreen({
+                                                id: editingScreen?.id,
+                                                text: editingScreen?.text,
+                                                title: editingScreen?.title,
+                                                type: editingScreen?.type,
+                                                background: `birthday${item}`,
+                                                content: editingScreen?.content,
+                                              })
+                                            }
+                                            key={item}
+                                            style={{
+                                              background: `url(${require(`../assets/board-backgrounds/birthday${item}.jpg`)}) no-repeat`,
+                                              backgroundSize:
+                                                "cover !importent",
+                                            }}
+                                            className="h-16 w-24 !bg-cover flex justify-center items-center p-3  "
+                                          ></div>
+                                        );
+                                      })}
+                                    </div>
+                                  )}
+                                <Button
+                                  onClick={() => handleAddScreen()}
+                                  variant="contained"
+                                >
+                                  אישור
+                                </Button>
+                              </div>
+                            </Box>
+                          </Modal>
+                          <div>
+                            {dbBoard.screens && (
+                              <div>
+                                <div> המסכים שלך :</div>
+                                <div className="flex gap-2">
+                                  {dbBoard.screens.map(
+                                    (screen: ScreenType, index) => {
+                                      return (
+                                        <div
+                                          className="flex flex-col gap-2"
+                                          key={index}
+                                        >
+                                          <div
+                                            style={{
+                                              background: `url(${require(`../assets/board-backgrounds/${
+                                                screen.type === "birthday"
+                                                  ? `${screen?.background}`
+                                                  : dbBoard.boardBackgroundImage
+                                              }.jpg`)}) no-repeat`,
+                                              backgroundSize:
+                                                "cover !importent",
+                                            }}
+                                            className="w-20 h-16 !bg-cover flex justify-center items-center p-3  "
+                                          >
+                                            {screen.type === "image" &&
+                                              screen?.content && (
+                                                <div
+                                                  dir="rtl"
+                                                  className="flex flex-col max-h-full w-full items-center justify-center text-center text-[10px] font-['David']"
+                                                >
+                                                  <div>
+                                                    {screen.title && (
+                                                      <span className="">
+                                                        {screen.title}
+                                                      </span>
+                                                    )}
+                                                    <img
+                                                      className="w-full h-full"
+                                                      src={screen?.content}
+                                                      alt=""
+                                                    />
+                                                  </div>
+                                                </div>
+                                              )}
+                                            {(screen.type === "message" ||
+                                              screen.type === "birthday") &&
+                                              screen?.content && (
+                                                <div
+                                                  dir="rtl"
+                                                  className="flex w-full items-center justify-center text-center text-[10px] font-['David']"
+                                                >
+                                                  {screen?.content}
+                                                </div>
+                                              )}
+                                          </div>
+                                          <Button
+                                            onClick={() => {
+                                              setEditingScreen(screen);
+                                              setScreenEditorIsOpen(true);
+                                              setScreenTypeEdit(screen.type);
+                                            }}
+                                            variant="contained"
+                                          >
+                                            ערוך
+                                          </Button>
+                                          <Button
+                                            onClick={() => {
+                                              onDeleteScreen(screen);
+                                            }}
+                                            variant="contained"
+                                          >
+                                            הסר
+                                          </Button>
+                                        </div>
+                                      );
+                                    }
+                                  )}
+                                </div>
+                              </div>
                             )}
                           </div>
                         </div>
                       )}
                     </div>
-                  </div>
-                )}
-              </div>
-            );
-          })}
-      </div>
-      <div className="w-full flex flex-col justify-center gap-2 items-center my-3">
-        <Button
-          className="mobile-only:w-3/4 w-36"
-          variant="contained"
-          onClick={() => updateBoard(id ?? "", dbBoard)}
-        >
-          עדכן לוח
-        </Button>
-        <Button
-          className="mobile-only:w-3/4 w-36"
-          variant="contained"
-          onClick={() => showBoard(id ?? "")}
-        >
-          להצגת הלוח
-        </Button>
-        {/* <Button
+                  );
+                })}
+                <div className="w-full flex flex-col justify-center gap-2 items-center my-3">
+                  <Button
+                    className="mobile-only:w-3/4 w-36"
+                    variant="contained"
+                    onClick={() => updateBoard(id ?? "", dbBoard)}
+                  >
+                    עדכן לוח
+                  </Button>
+                  <Button
+                    className="mobile-only:w-3/4 w-36"
+                    variant="contained"
+                    onClick={() => showBoard(id ?? "")}
+                  >
+                    להצגת הלוח
+                  </Button>
+                  {/* <Button
           className="mobile-only:w-3/4 w-36"
           variant="contained"
           onClick={() => showUsers(id ?? "")}
         >
           מתפללים
         </Button> */}
-        <Button
-          className="mobile-only:w-3/4 w-36"
-          variant="contained"
-          onClick={() => setDownloadTimesImgIsOpen(true)}
-        >
-          יצא תמונה
-        </Button>
+                  <Button
+                    className="mobile-only:w-3/4 w-36"
+                    variant="contained"
+                    onClick={() => setDownloadTimesImgIsOpen(true)}
+                  >
+                    יצא פלאייר
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
       </div>
-      {/* <div className="w-full h-56">
-        <Kboard board={dbBoard} zmanim={props.zmanim} parasha={props.parasha} />
-      </div> */}
 
       {/* MODAL TO DOWNLOAD IMG TO WHATSAPP */}
       <div className="overflow-y-auto">
@@ -1115,12 +1225,6 @@ function EditBoard(props: Props) {
           aria-describedby="modal-modal-description"
         >
           <Box sx={styleDownloadImgBox}>
-            <span
-              className="absolute top-[40px] left-[45px]"
-              onClick={() => setDownloadTimesImgIsOpen(false)}
-            >
-              <Cancel />
-            </span>
             {dbBoard && (
               <div ref={elementRef}>
                 <Card
@@ -1269,9 +1373,17 @@ function EditBoard(props: Props) {
                 ))}
               </div>
             )}
-            <Button onClick={onDownloadTimesImg} variant="contained">
-              הורד
-            </Button>
+            <div dir="rtl" className="flex gap-3">
+              <Button onClick={onDownloadTimesImg} variant="contained">
+                הורד
+              </Button>
+              <Button
+                onClick={() => setDownloadTimesImgIsOpen(false)}
+                variant="contained"
+              >
+                ביטול
+              </Button>
+            </div>
           </Box>
         </Modal>
       </div>
@@ -1332,5 +1444,19 @@ const styleDownloadImgBox = {
   border: "",
   boxShadow: 24,
   overflowY: "scroll",
+  p: 6,
+};
+const styleBoxNotAllowEdit = {
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  gap: 2,
+  position: "absolute" as "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  bgcolor: "background.paper",
+  border: "",
+  boxShadow: 24,
   p: 6,
 };

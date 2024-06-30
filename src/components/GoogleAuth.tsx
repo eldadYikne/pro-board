@@ -71,13 +71,13 @@ function GoogleAuth(props: Props) {
       {/* <button onClick={signIn}> Signin</button> */}
       {!props.userConnected && (
         <Button
-          className=" "
+          sx={{ display: "flex", alignItems: "center" }}
           variant="contained"
           color="primary"
           onClick={signInWithGoogle}
         >
           הכנס באמצעות גוגל
-          <GoogleIcon />
+          <GoogleIcon sx={{ height: 17 }} />
         </Button>
       )}
       {props.userConnected && (

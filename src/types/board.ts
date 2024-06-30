@@ -21,7 +21,7 @@ export interface Board {
   screens: ScreenType[];
   backgroundToWhatsappImg: string;
   isFreez: boolean;
-  // managers:string[]
+  admins: string[];
 }
 
 export interface Tfila {

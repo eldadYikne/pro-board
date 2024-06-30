@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { User, getAuth, onAuthStateChanged } from "firebase/auth";
 import GoogleAuth from "./GoogleAuth";
-import { collection, getDocs, onSnapshot } from "firebase/firestore";
+import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "..";
 import { Board } from "../types/board";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
+import { Delete, Cancel } from "@mui/icons-material";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
@@ -16,7 +17,7 @@ import { postCollectionCoustumId, updateBoard } from "../service/serviceBoard";
 function Kdashboard(props: Props) {
   const [connectedUser, setConnectedUser] = useState<User>();
   const [boards, setBoards] = useState<Board[]>();
-  const [newBoard, setNewBoard] = useState<Board>({
+  const boardObj: Board = {
     id: "",
     boardName: "",
     geoId: "",
@@ -36,7 +37,9 @@ function Kdashboard(props: Props) {
     screens: [],
     backgroundToWhatsappImg: "background-frame5",
     isFreez: false,
-  });
+    admins: [],
+  };
+  const [newBoard, setNewBoard] = useState<Board>(boardObj);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [snackbarIsOpen, setSnackbarIsOpen] = useState<boolean>();
 
@@ -98,39 +101,43 @@ function Kdashboard(props: Props) {
     }
   };
   const onUpdateBoard = async (id: string, boardToUpdate: Board) => {
-    await updateBoard(id, boardToUpdate);
+    try {
+      await updateBoard(id, boardToUpdate);
+      setSnackbarIsOpen(true);
+      setTimeout(() => setSnackbarIsOpen(false), 2000);
+      setIsModalOpen(false);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  const onChangeAdminsInput = (email: string, idx: number) => {
+    const newAdmins = newBoard.admins;
+    newAdmins.splice(idx, 1, email);
+    setNewBoard({
+      ...newBoard,
+      admins: newAdmins,
+    });
+  };
+  const onDeleteAdminsInput = (idx: number) => {
+    const newAdmins = newBoard.admins;
+    newAdmins.splice(idx, 1);
+    setNewBoard({
+      ...newBoard,
+      admins: newAdmins,
+    });
   };
   // DATA
   const thTable = ["שם", "id", "קישור ללוח", "קישור לעריכה", "פעולות"];
-  let board: Board = {
-    id: "",
-    boardName: "",
-    geoId: "",
-    timeScreenPass: "20",
-    dateTypes: ["hebrew"],
-    tfilaTimes: [],
-    forUplifting: [],
-    forMedicine: [],
-    messages: [],
-    boardBackgroundImage: "1",
-    boardTextColor: "",
-    mapBackgroundImage: "",
-    timesToShow: [],
-    users: [],
-    theme: "column",
-    isSetShabatTime: { isActive: false, enter: "", exit: "" },
-    screens: [],
-    backgroundToWhatsappImg: "background-frame5",
-    isFreez: false,
-  };
+
   interface FieldToNewBoard {
     key: keyof Board;
-    text: "שם" | "id" | "מיקום";
+    text: "שם" | "id" | "מיקום" | "בעלי הרשאות";
   }
   const fieldsToNewBoard: FieldToNewBoard[] = [
     { key: "boardName", text: "שם" },
     { key: "id", text: "id" },
     { key: "geoId", text: "מיקום" },
+    { key: "admins", text: "בעלי הרשאות" },
   ];
   if (!connectedUser || connectedUser?.email !== "nmknv99@gmail.com") {
     return (
@@ -152,13 +159,17 @@ function Kdashboard(props: Props) {
     <div>
       <div className="flex gap-3 w-full p-2 items-center bg-slate-400">
         {connectedUser && <div> {connectedUser.displayName}</div>}
-
         <GoogleAuth
           setUser={setConnectedUser}
           userConnected={connectedUser?.email ?? ""}
         />
-
-        <Button onClick={() => setIsModalOpen(true)} variant="contained">
+        <Button
+          onClick={() => {
+            setIsModalOpen(true);
+            setNewBoard(boardObj);
+          }}
+          variant="contained"
+        >
           {" "}
           הוספת לוח +
         </Button>
@@ -205,7 +216,7 @@ function Kdashboard(props: Props) {
                         עריכה
                       </a>
                     </TableCell>
-                    <TableCell align="right">
+                    <TableCell sx={{ display: "flex", gap: 2 }} align="right">
                       <Button
                         onClick={() =>
                           onUpdateBoard(row.id ?? "", {
@@ -217,6 +228,16 @@ function Kdashboard(props: Props) {
                         color={row.isFreez ? "error" : "primary"}
                       >
                         {row.isFreez ? "שחרר" : "הקפאה"}
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          setIsModalOpen(true);
+                          setNewBoard(row);
+                        }}
+                        variant="contained"
+                        color="primary"
+                      >
+                        ערוך לוח
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -234,23 +255,77 @@ function Kdashboard(props: Props) {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          {fieldsToNewBoard.map((filed) => {
-            return (
-              <TextField
-                dir="rtl"
-                id="filled-basic"
-                label={filed.text}
-                value={newBoard[filed.key as keyof Board]}
-                onChange={(e) =>
-                  setNewBoard({ ...newBoard, [filed.key]: e.target.value })
-                }
-                variant="filled"
-              />
-            );
-          })}
-          <Button onClick={onPostNewBoard} variant="contained">
-            הוסף
-          </Button>
+          <div className="flex flex-col justify-center items-center gap-1">
+            <span className="text-lg  font-bold">
+              {newBoard.id ? "ערוך לוח" : "יצירת לוח חדש"}
+            </span>
+            {fieldsToNewBoard.map((filed) => {
+              return filed.key === "admins" ? (
+                <div className="flex flex-col gap-1">
+                  <span className="text-center"> : בעלי הרשאות </span>
+                  {newBoard.admins.length > 0 &&
+                    newBoard.admins?.map((admin, idx) => {
+                      return (
+                        <div className="flex gap-1 items-center justify-center">
+                          <Delete
+                            className="cursor-pointer"
+                            color="error"
+                            onClick={() => onDeleteAdminsInput(idx)}
+                          />
+                          <TextField
+                            dir="rtl"
+                            id="filled-basic"
+                            label={filed.text}
+                            value={newBoard.admins[idx]}
+                            onChange={(e) =>
+                              onChangeAdminsInput(e.target.value, idx)
+                            }
+                            variant="filled"
+                          />
+                        </div>
+                      );
+                    })}
+                  <Button
+                    className="m-2"
+                    onClick={() =>
+                      setNewBoard({
+                        ...newBoard,
+                        [filed.key]: [...newBoard.admins, ""],
+                      })
+                    }
+                    variant="contained"
+                  >
+                    הוסף מייל להרשאה
+                  </Button>
+                </div>
+              ) : (
+                <div>
+                  <TextField
+                    dir="rtl"
+                    id="filled-basic"
+                    label={filed.text}
+                    value={newBoard[filed.key as keyof Board]}
+                    onChange={(e) =>
+                      setNewBoard({ ...newBoard, [filed.key]: e.target.value })
+                    }
+                    variant="filled"
+                  />
+                </div>
+              );
+            })}
+            <Button
+              onClick={() => {
+                newBoard.id
+                  ? onUpdateBoard(newBoard.id ?? "", {
+                      ...newBoard,
+                    })
+                  : onPostNewBoard();
+              }}
+              variant="contained"
+            >
+              {newBoard.id ? "אישור" : " צור לוח"}
+            </Button>
+          </div>
         </Box>
       </Modal>
       <Snackbar
