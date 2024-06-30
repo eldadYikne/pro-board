@@ -7,12 +7,12 @@ import reportWebVitals from "./reportWebVitals";
 import { BrowserRouter } from "react-router-dom";
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
-import { getAuth, GoogleAuthProvider } from "firebase/auth";
+import { getAuth, getRedirectResult, GoogleAuthProvider } from "firebase/auth";
 
 // authDomain: "calaniot-159d1.firebaseapp.com",
 const firebaseConfig = {
   apiKey: "AIzaSyB0_l-bYxRBeKGR_t_jujHRRzQacqQcRXk",
-  authDomain: "https://kodesh-board.onrender.com/__/auth/handler",
+  authDomain: "calaniot-159d1.firebaseapp.com",
   databaseURL: "https://calaniot-159d1-default-rtdb.firebaseio.com",
   projectId: "calaniot-159d1",
   storageBucket: "calaniot-159d1.appspot.com",
@@ -22,7 +22,6 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-
 export const db = getFirestore(app);
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();

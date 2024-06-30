@@ -1,10 +1,11 @@
 import { Button } from "@mui/material";
 import { auth, googleProvider } from "../index";
 import {
-  GoogleAuthProvider,
   User,
-  createUserWithEmailAndPassword,
+  getRedirectResult,
+  onAuthStateChanged,
   signInWithPopup,
+  signInWithRedirect,
   signOut,
 } from "firebase/auth";
 import { useEffect, useState } from "react";
@@ -13,44 +14,68 @@ import GoogleIcon from "@mui/icons-material/Google";
 function GoogleAuth(props: Props) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
   const [connectedUser, setConnectedUser] = useState<User>();
 
   console.log(auth?.currentUser?.email);
-  useEffect(() => {}, [connectedUser]);
-  const signIn = async () => {
-    try {
-      await createUserWithEmailAndPassword(auth, email, password);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-  const signInWithGoogle = async () => {
-    //   const user = await signInWithPopup(auth, googleProvider);
-    signInWithPopup(auth, googleProvider)
-      .then((result) => {
-        setConnectedUser(result.user);
-        props.setUser(result.user);
-        // This gives you a Google Access Token. You can use it to access the Google API.
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        const token = credential?.accessToken;
-        // The signed-in user info.
-        const user = result.user;
-        // IdP data available using getAdditionalUserInfo(result)
-        // ...
 
-        console.log(user);
-      })
-      .catch((error) => {
-        // Handle Errors here.
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        // The email of the user's account used.
-        const email = error.customData.email;
-        // The AuthCredential type that was used.
-        const credential = GoogleAuthProvider.credentialFromError(error);
-        // ...
-      });
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // User is signed in, see docs for a list of available properties
+        // https://firebase.google.com/docs/reference/js/auth.user
+        const uid = user.uid;
+        console.log("connected user", user);
+        setConnectedUser(user);
+        props.setUser(user);
+      } else {
+        console.log("USER FIRBASE NOT FOUND");
+      }
+    });
+    return unsubscribe;
+  }, [connectedUser]);
+
+  // const signInWithGoogle = async () => {
+  //   signInWithPopup(auth, googleProvider)
+  //     .then((result) => {
+  //       setConnectedUser(result.user);
+  //       props.setUser(result.user);
+  //       // This gives you a Google Access Token. You can use it to access the Google API.
+  //       const credential = GoogleAuthProvider.credentialFromResult(result);
+  //       const token = credential?.accessToken;
+  //       // The signed-in user info.
+  //       const user = result.user;
+  //       // IdP data available using getAdditionalUserInfo(result)
+  //       // ...
+
+  //       console.log(user);
+  //     })
+  //     .catch((error) => {
+  //       // Handle Errors here.
+  //       const errorCode = error.code;
+  //       const errorMessage = error.message;
+  //       // The email of the user's account used.
+  //       const email = error.customData.email;
+  //       // The AuthCredential type that was used.
+  //       const credential = GoogleAuthProvider.credentialFromError(error);
+  //       // ...
+  //     });
+  // };
+
+  const signInWithGoogle = () => {
+    signInWithRedirect(auth, googleProvider);
   };
+
+  // getRedirectResult(auth)
+  //   .then((result: any) => {
+  //     // setConnectedUser(result.user);
+  //     // props.setUser(result.user);
+  //     console.log("result from googleAuth", result);
+  //   })
+  //   .catch((error) => {
+  //     console.log(error);
+  //     // ...
+  //   });
   const logOut = async () => {
     try {
       await signOut(auth);
@@ -60,6 +85,7 @@ function GoogleAuth(props: Props) {
       console.error(err);
     }
   };
+
   return (
     <div className="flex gap-3">
       {/* <input placeholder="Email.." onChange={(e) => setEmail(e.target.value)} />

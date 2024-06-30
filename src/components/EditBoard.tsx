@@ -55,7 +55,7 @@ function EditBoard(props: Props) {
   const { id } = useParams();
 
   useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         // User is signed in, see docs for a list of available properties
         // https://firebase.google.com/docs/reference/js/auth.user
@@ -71,11 +71,12 @@ function EditBoard(props: Props) {
     });
     async function fetchData() {
       if (id) {
-        console.log("id", id);
+        // console.log("id", id);
         await getBoardById(id);
       }
     }
     fetchData();
+    return unsubscribe;
   }, [id]);
 
   const getBoardById = async (boardId: string) => {
@@ -87,7 +88,7 @@ function EditBoard(props: Props) {
         if (newBoard) {
           setDbBoard(newBoard as Board);
         }
-        console.log(newBoard);
+        // console.log(newBoard);
       } else {
         // Document does not exist
         console.log("User not found");
@@ -172,11 +173,11 @@ function EditBoard(props: Props) {
     isBollean?: boolean
   ) => {
     const { name, value } = e.target;
-    console.log(
-      name,
-      ":",
-      (e as React.ChangeEvent<HTMLInputElement>).target.checked
-    );
+    // console.log(
+    //   name,
+    //   ":",
+    //   (e as React.ChangeEvent<HTMLInputElement>).target.checked
+    // );
     if (dbBoard && Array.isArray(dbBoard[arrayName])) {
       const updatedArray = dbBoard[arrayName]?.map(
         (item: Object, i: number) => {
@@ -195,7 +196,7 @@ function EditBoard(props: Props) {
         ...dbBoard,
         [arrayName]: updatedArray,
       });
-      console.log(dbBoard[arrayName]);
+      // console.log(dbBoard[arrayName]);
     }
   };
   const onDeleteScreen = (screenToDelete: ScreenType) => {
@@ -233,7 +234,7 @@ function EditBoard(props: Props) {
             screens: [...(dbBoard.screens ?? []), newScreen],
           });
         }
-        console.log(dbBoard?.screens);
+        // console.log(dbBoard?.screens);
       } else {
       }
     } else if (screenTypeEdit === "image") {
@@ -279,8 +280,8 @@ function EditBoard(props: Props) {
     setScreenEditorIsOpen(true);
   };
   const handleEditScreen = (screenToEdit: ScreenType) => {
-    console.log("screenToEdit", screenToEdit);
-    console.log("dbBoard.screens", dbBoard?.screens);
+    // console.log("screenToEdit", screenToEdit);
+    // console.log("dbBoard.screens", dbBoard?.screens);
     const filterScreens = dbBoard?.screens.filter(
       (screen) => screen.id !== screenToEdit.id
     );
@@ -327,7 +328,7 @@ function EditBoard(props: Props) {
       const removeObjectToArray = (
         dbBoard[arrayName] as (Message | Tfila)[]
       ).filter((item: Message | Tfila, index: number) => idx !== index);
-      console.log("addObjectToArray", removeObjectToArray);
+      // console.log("addObjectToArray", removeObjectToArray);
       setDbBoard({
         ...dbBoard,
         [arrayName]: removeObjectToArray,
@@ -336,7 +337,7 @@ function EditBoard(props: Props) {
   };
   const onDownloadTimesImg = () => {
     if (elementRef.current) {
-      console.log("download img");
+      // console.log("download img");
       toPng(elementRef.current, {
         // cacheBust: false,
         // backgroundColor: "#f2d4b0",
@@ -358,21 +359,20 @@ function EditBoard(props: Props) {
   ) => {
     e.preventDefault();
     const { name, value } = e.target;
-    console.log(name, ":", value);
+    // console.log(name, ":", value);
     if (dbBoard) {
       setDbBoard({
         ...dbBoard,
         [name]: value,
       });
     }
-    console.log(e.target.value);
 
     // const newBoard={...dbBoard}
     // setDbBoard()
   };
   const updateBoard = async (boardId: string, boardData: any) => {
     if (!boardId) return;
-    console.log(dbBoard);
+    // console.log(dbBoard);
     const boardRef = doc(collection(db, "boards"), boardId); // Get reference to the user document
     try {
       await updateDoc(boardRef, boardData); // Update the user document with new data
@@ -473,9 +473,9 @@ function EditBoard(props: Props) {
       }}
       className=" flex flex-col gap-2 sm:justify-center sm:items-center sm:w-full "
     >
-      <div>
+      <div className="w-full flex justify-center">
         {connectedUser ? (
-          <div className="flex flex-col justify-center items-center">
+          <div className="flex flex-col w-full justify-center items-center">
             <div className="flex justify-between w-full p-2 items-center bg-slate-400">
               <div>{dbBoard && dbBoard.boardName}</div>
               <div className="flex gap-3 items-center">
@@ -487,7 +487,7 @@ function EditBoard(props: Props) {
               </div>
             </div>
             {!dbBoard && (
-              <div className="flex">
+              <div className="flex ">
                 <CircularProgress />
               </div>
             )}

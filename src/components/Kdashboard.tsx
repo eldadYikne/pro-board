@@ -50,7 +50,7 @@ function Kdashboard(props: Props) {
       let newBoards = await getCollectionByName("boards");
     }
     getBoards();
-    onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         // User is signed in, see docs for a list of available properties
         // https://firebase.google.com/docs/reference/js/auth.user
@@ -63,6 +63,7 @@ function Kdashboard(props: Props) {
         // ...
       }
     });
+    return unsubscribe;
   }, [connectedUser?.email]);
 
   const getCollectionByName = (collectionName: string) => {
