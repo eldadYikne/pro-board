@@ -71,7 +71,7 @@ function EditBoard(props: Props) {
     });
     async function fetchData() {
       if (id) {
-        // console.log("id", id);
+        console.log("id", id);
         await getBoardById(id);
       }
     }
@@ -88,7 +88,7 @@ function EditBoard(props: Props) {
         if (newBoard) {
           setDbBoard(newBoard as Board);
         }
-        // console.log(newBoard);
+        console.log("newBoard", newBoard);
       } else {
         // Document does not exist
         console.log("User not found");
@@ -473,7 +473,7 @@ function EditBoard(props: Props) {
       }}
       className=" flex flex-col gap-2 sm:justify-center sm:items-center sm:w-full "
     >
-      <div className="w-full flex justify-center">
+      <div className="w-full flex flex-col justify-center">
         {connectedUser ? (
           <div className="flex flex-col w-full justify-center items-center">
             <div className="flex justify-between w-full p-2 items-center bg-slate-400">
