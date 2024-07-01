@@ -1,7 +1,9 @@
 import { Button } from "@mui/material";
-import { auth, googleProvider } from "../index";
+import { googleProvider } from "../index";
 import {
+  GoogleAuthProvider,
   User,
+  getAuth,
   getRedirectResult,
   onAuthStateChanged,
   signInWithPopup,
@@ -16,9 +18,9 @@ function GoogleAuth(props: Props) {
   const [password, setPassword] = useState("");
 
   const [connectedUser, setConnectedUser] = useState<User>();
+  const auth = getAuth();
 
   console.log(auth?.currentUser?.email);
-
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -63,7 +65,8 @@ function GoogleAuth(props: Props) {
   // };
 
   const signInWithGoogle = () => {
-    signInWithRedirect(auth, googleProvider);
+    const provider = new GoogleAuthProvider();
+    signInWithRedirect(auth, provider);
   };
 
   // getRedirectResult(auth)
