@@ -66,7 +66,7 @@ function GoogleAuth(props: Props) {
 
   const signInWithGoogle = () => {
     const provider = new GoogleAuthProvider();
-    signInWithRedirect(auth, provider);
+    signInWithPopup(auth, provider);
   };
 
   // getRedirectResult(auth)
