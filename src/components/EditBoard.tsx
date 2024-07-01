@@ -30,7 +30,7 @@ import {
   writeBatch,
 } from "firebase/firestore";
 import { db } from "..";
-import { Delete, Cancel, WhatsApp } from "@mui/icons-material";
+import { Delete, Cancel, WhatsApp, Menu } from "@mui/icons-material";
 import { DateToShow, dateToShow, translationsZmanimKeys } from "../utils/const";
 import { TranslationsZmanimKeys, Zman } from "../types/zmanim";
 import { UploadWidget } from "./UploadWidget";
@@ -468,7 +468,11 @@ function EditBoard(props: Props) {
   return (
     <div
       style={{
-        background: `url(${require("../assets/edit-bg1.png")}) `,
+        background: connectedUser
+          ? "antiquewhite"
+          : `url(${require(`../assets/edit-bg${
+              connectedUser ? "1" : "3"
+            }.jpg`)})`,
         backgroundSize: "cover !importent",
       }}
       className=" flex flex-col gap-2 sm:justify-center sm:items-center sm:w-full "
@@ -493,16 +497,20 @@ function EditBoard(props: Props) {
             )}
           </div>
         ) : (
-          <div className="flex w-full  h-screen p-5 font-sans flex-col   my-10">
-            <div className="flex flex-col p-7 gap-4  rounded-xl">
-              <div className="text-blue-900 text-xl ">
-                {" "}
-                {dbBoard && dbBoard.boardName}
+          <div className="flex w-full h-screen justify-center items-center p-5 font-sans flex-col bg-gradient-to-r from-blue-200 to-blue-100">
+            <div className="flex flex-col p-7 max-w-96 bg-white shadow-md rounded-xl">
+              <div>
+                <span className="text-green-300 text-xl font-bold">
+                  ברוך הבא ללוח שלך!
+                </span>
+                <div className="text-blue-900 text-3xl font-black">
+                  {dbBoard && dbBoard.boardName}
+                </div>
               </div>
-              <span className="text-blue-300 text-6xl pb-10">
+              <span className="text-blue-300 text-2xl pt-4 pb-6">
                 הכנס וערוך את הלוח שלך
               </span>
-              <div className="flex w-full justify-end">
+              <div className="flex justify-end">
                 <GoogleAuth setUser={setConnectedUser} userConnected={""} />
               </div>
             </div>
@@ -512,7 +520,7 @@ function EditBoard(props: Props) {
           dbBoard &&
           connectedUser.email &&
           dbBoard.admins.includes(connectedUser.email) && (
-            <div className=" sm:grid grid-cols-2 flex flex-col gap-2">
+            <div className=" sm:grid pb-14 grid-cols-2 flex flex-col gap-2">
               <div>
                 {inputsBoard.map(({ name, placeholder }) => {
                   return (
@@ -520,7 +528,7 @@ function EditBoard(props: Props) {
                       {name !== "users" &&
                         name !== "tfilaTimes" &&
                         name !== "isSetShabatTime" && (
-                          <span>{placeholder}:</span>
+                          <span className="">{placeholder}:</span>
                         )}
                       {!Array.isArray(dbBoard[name]) &&
                         name !== "boardBackgroundImage" &&
@@ -1096,7 +1104,7 @@ function EditBoard(props: Props) {
                             </Box>
                           </Modal>
                           <div>
-                            {dbBoard.screens && (
+                            {dbBoard.screens && dbBoard.screens.length > 0 && (
                               <div>
                                 <div> המסכים שלך :</div>
                                 <div className="flex gap-2">
@@ -1181,7 +1189,7 @@ function EditBoard(props: Props) {
                     </div>
                   );
                 })}
-                <div className="w-full flex flex-col justify-center gap-2 items-center my-3">
+                <div className="w-full fixed  bottom-0 flex h-14 px-1 z-10  bg-white he justify-center gap-2 items-center ">
                   <Button
                     className="mobile-only:w-3/4 w-36"
                     variant="contained"

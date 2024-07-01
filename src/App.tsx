@@ -440,7 +440,9 @@ function App() {
   return (
     <div dir="rtl" className="site-container">
       <div className="content-wrap">
-        {!pathname.includes("board") && <Navbar setNewUser={setNewUser} />}
+        {!pathname.includes("board") && !pathname.includes("edit") && (
+          <Navbar setNewUser={setNewUser} />
+        )}
         {/* <AdvancedImage cldImg={myImage} /> */}
         {/* <button onClick={getUsers}>לחץ כאן להביא משתמשים</button> */}
         {/* <button onClick={() => postCollectionCoustumId("boards", [dbBoard],'calaniot')}>
