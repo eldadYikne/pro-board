@@ -12,6 +12,7 @@ import {
 } from "firebase/auth";
 import { useEffect, useState } from "react";
 import GoogleIcon from "@mui/icons-material/Google";
+import { ReactComponent as GoogleSvg } from "../assets/google.svg";
 
 function GoogleAuth(props: Props) {
   const [email, setEmail] = useState("");
@@ -24,8 +25,6 @@ function GoogleAuth(props: Props) {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        // User is signed in, see docs for a list of available properties
-        // https://firebase.google.com/docs/reference/js/auth.user
         const uid = user.uid;
         console.log("connected user", user);
         setConnectedUser(user);
@@ -37,48 +36,11 @@ function GoogleAuth(props: Props) {
     return unsubscribe;
   }, [connectedUser]);
 
-  // const signInWithGoogle = async () => {
-  //   signInWithPopup(auth, googleProvider)
-  //     .then((result) => {
-  //       setConnectedUser(result.user);
-  //       props.setUser(result.user);
-  //       // This gives you a Google Access Token. You can use it to access the Google API.
-  //       const credential = GoogleAuthProvider.credentialFromResult(result);
-  //       const token = credential?.accessToken;
-  //       // The signed-in user info.
-  //       const user = result.user;
-  //       // IdP data available using getAdditionalUserInfo(result)
-  //       // ...
-
-  //       console.log(user);
-  //     })
-  //     .catch((error) => {
-  //       // Handle Errors here.
-  //       const errorCode = error.code;
-  //       const errorMessage = error.message;
-  //       // The email of the user's account used.
-  //       const email = error.customData.email;
-  //       // The AuthCredential type that was used.
-  //       const credential = GoogleAuthProvider.credentialFromError(error);
-  //       // ...
-  //     });
-  // };
-
   const signInWithGoogle = () => {
     const provider = new GoogleAuthProvider();
     signInWithPopup(auth, provider);
   };
 
-  // getRedirectResult(auth)
-  //   .then((result: any) => {
-  //     // setConnectedUser(result.user);
-  //     // props.setUser(result.user);
-  //     console.log("result from googleAuth", result);
-  //   })
-  //   .catch((error) => {
-  //     console.log(error);
-  //     // ...
-  //   });
   const logOut = async () => {
     try {
       await signOut(auth);
@@ -106,7 +68,10 @@ function GoogleAuth(props: Props) {
           onClick={signInWithGoogle}
         >
           הכנס באמצעות גוגל
-          <GoogleIcon sx={{ height: 17 }} />
+          {/* <GoogleIcon sx={{ height: 17 }} /> */}
+          <span className="h-4 w-4 px-1">
+            <GoogleSvg />
+          </span>
         </Button>
       )}
       {props.userConnected && (
