@@ -2,7 +2,8 @@ export default interface User {
   name: string;
   seats: string[];
   present: boolean;
-  id?: string;
+  id: string;
+  debts: Debt[];
 }
 export interface SeatUser {
   name: string;
@@ -14,3 +15,9 @@ export interface SeatNumber {
   present: boolean;
   seatNumber: string;
 }
+export interface Debt {
+  sum: number;
+  date: string;
+  reason: string;
+}
+export type DebtReason = "עלייה לתורה" | "תרומה" | "לרפואה" | "לעילוי נשמת";

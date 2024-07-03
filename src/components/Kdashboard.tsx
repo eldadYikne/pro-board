@@ -42,7 +42,7 @@ function Kdashboard(props: Props) {
   const [newBoard, setNewBoard] = useState<Board>(boardObj);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [snackbarIsOpen, setSnackbarIsOpen] = useState<boolean>();
-
+  const [isEditBoardActive, setIsEditBoardActive] = useState<boolean>();
   const auth = getAuth();
 
   useEffect(() => {
@@ -93,6 +93,7 @@ function Kdashboard(props: Props) {
     try {
       if (newBoard.id) {
         await postCollectionCoustumId("boards", newBoard, newBoard.id);
+
         setSnackbarIsOpen(true);
         setTimeout(() => setSnackbarIsOpen(false), 2000);
         setIsModalOpen(false);
@@ -168,6 +169,7 @@ function Kdashboard(props: Props) {
           onClick={() => {
             setIsModalOpen(true);
             setNewBoard(boardObj);
+            setIsEditBoardActive(false);
           }}
           variant="contained"
         >
@@ -234,6 +236,7 @@ function Kdashboard(props: Props) {
                         onClick={() => {
                           setIsModalOpen(true);
                           setNewBoard(row);
+                          setIsEditBoardActive(true);
                         }}
                         variant="contained"
                         color="primary"
@@ -251,7 +254,10 @@ function Kdashboard(props: Props) {
       <Modal
         sx={{ overflowY: "scroll", overflowX: "hidden" }}
         open={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => {
+          setIsEditBoardActive(false);
+          setIsModalOpen(false);
+        }}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
@@ -316,7 +322,7 @@ function Kdashboard(props: Props) {
             })}
             <Button
               onClick={() => {
-                newBoard.id
+                isEditBoardActive
                   ? onUpdateBoard(newBoard.id ?? "", {
                       ...newBoard,
                     })
@@ -324,7 +330,7 @@ function Kdashboard(props: Props) {
               }}
               variant="contained"
             >
-              {newBoard.id ? "אישור" : " צור לוח"}
+              {isEditBoardActive ? "אישור" : " צור לוח"}
             </Button>
           </div>
         </Box>

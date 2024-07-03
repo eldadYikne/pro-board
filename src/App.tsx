@@ -483,7 +483,7 @@ function App() {
               />
             }
           />
-          <Route path="/users/:id" element={<EditUsers />} />
+          <Route path="/edit/:id/users" element={<EditUsers />} />
           <Route path="/dashboard" element={<Kdashboard />} />
           <Route
             path="/board/:id"

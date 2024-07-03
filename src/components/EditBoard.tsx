@@ -29,8 +29,9 @@ import {
   updateDoc,
   writeBatch,
 } from "firebase/firestore";
+
 import { db } from "..";
-import { Delete, Cancel, WhatsApp, Menu } from "@mui/icons-material";
+import { Delete, Close, WhatsApp, Menu } from "@mui/icons-material";
 import { DateToShow, dateToShow, translationsZmanimKeys } from "../utils/const";
 import { TranslationsZmanimKeys, Zman } from "../types/zmanim";
 import { UploadWidget } from "./UploadWidget";
@@ -42,6 +43,7 @@ import { User, getAuth, onAuthStateChanged } from "firebase/auth";
 function EditBoard(props: Props) {
   const [dbBoard, setDbBoard] = useState<Board>();
   const [snackbarIsOpen, setSnackbarIsOpen] = useState<boolean>();
+  const [menuIsOpen, setMenuIsOpen] = useState<boolean>(false);
   const [imageUrl, setImageUrl] = useState("");
   const [screenEditorIsOpen, setScreenEditorIsOpen] = useState<boolean>(false);
   const [downloadTimesImgIsOpen, setDownloadTimesImgIsOpen] =
@@ -79,6 +81,16 @@ function EditBoard(props: Props) {
     return unsubscribe;
   }, [id]);
 
+  // const setIdToUsers = () => {
+  //   const newUsersIds = dbBoard?.users?.map((user) => ({
+  //     id: generateRandomId(),
+  //     ...user,
+  //     debts: [],
+  //   }));
+  //   if (dbBoard) {
+  //     setDbBoard({ ...dbBoard, users: newUsersIds });
+  //   }
+  // };
   const getBoardById = async (boardId: string) => {
     try {
       const boardDoc = await getDoc(doc(db, "boards", boardId));
@@ -173,11 +185,6 @@ function EditBoard(props: Props) {
     isBollean?: boolean
   ) => {
     const { name, value } = e.target;
-    // console.log(
-    //   name,
-    //   ":",
-    //   (e as React.ChangeEvent<HTMLInputElement>).target.checked
-    // );
     if (dbBoard && Array.isArray(dbBoard[arrayName])) {
       const updatedArray = dbBoard[arrayName]?.map(
         (item: Object, i: number) => {
@@ -196,7 +203,6 @@ function EditBoard(props: Props) {
         ...dbBoard,
         [arrayName]: updatedArray,
       });
-      // console.log(dbBoard[arrayName]);
     }
   };
   const onDeleteScreen = (screenToDelete: ScreenType) => {
@@ -422,7 +428,14 @@ function EditBoard(props: Props) {
     { type: "friday", name: "זמני ערב שבת" },
     { type: "saturday", name: "זמני שבת" },
   ];
-
+  interface MenuLink {
+    link: string;
+    text: string;
+  }
+  const menuLinks: MenuLink[] = [
+    { link: `/edit/${id}/users`, text: "מתפללים" },
+    { link: `/board/${id}`, text: "לוח" },
+  ];
   if (
     connectedUser?.email &&
     dbBoard?.admins &&
@@ -446,7 +459,12 @@ function EditBoard(props: Props) {
     );
   }
 
-  if (dbBoard?.isFreez) {
+  if (
+    connectedUser &&
+    connectedUser.email &&
+    dbBoard?.admins.includes(connectedUser?.email) &&
+    dbBoard?.isFreez
+  ) {
     return (
       <div className="flex justify-center items-center w-full h-full">
         <div className="p-10 bg-yellow-400 text-3xl flex flex-col justify-center items-center gap-3 font-bold">
@@ -470,9 +488,7 @@ function EditBoard(props: Props) {
       style={{
         background: connectedUser
           ? "antiquewhite"
-          : `url(${require(`../assets/edit-bg${
-              connectedUser ? "1" : "3"
-            }.jpg`)})`,
+          : `url(${require(`../assets/edit-bg1.jpg`)})`,
         backgroundSize: "cover !importent",
       }}
       className=" flex flex-col gap-2 sm:justify-center sm:items-center sm:w-full "
@@ -481,7 +497,10 @@ function EditBoard(props: Props) {
         {connectedUser ? (
           <div className="flex flex-col w-full justify-center items-center">
             <div className="flex justify-between w-full p-2 items-center bg-slate-400">
-              <div>{dbBoard && dbBoard.boardName}</div>
+              <div>
+                <Menu onClick={() => setMenuIsOpen(true)} sx={{}} />
+                {dbBoard && dbBoard.boardName}
+              </div>
               <div className="flex gap-3 items-center">
                 {connectedUser && <div> {connectedUser.displayName}</div>}
                 <GoogleAuth
@@ -500,7 +519,7 @@ function EditBoard(props: Props) {
           <div className="flex w-full h-screen justify-center items-center p-5 font-sans flex-col bg-gradient-to-r from-blue-200 to-blue-100">
             <div className="flex flex-col p-7 max-w-96 bg-white shadow-md rounded-xl">
               <div>
-                <span className="text-green-300 text-xl font-bold">
+                <span className="text-purple-400 text-xl font-bold">
                   ברוך הבא ללוח שלך!
                 </span>
                 <div className="text-blue-900 text-3xl font-black">
@@ -516,6 +535,30 @@ function EditBoard(props: Props) {
             </div>
           </div>
         )}
+        {/* sidebar MENU */}
+
+        <div
+          className="sidebar"
+          style={{ width: menuIsOpen ? "250px" : "0px" }}
+        >
+          {menuIsOpen && (
+            <div className="flex flex-col p-5 gap-3 text-xl font-sans text-white">
+              <span className="closebtn">
+                <Close onClick={() => setMenuIsOpen(false)} />
+              </span>
+              {menuLinks.map((link) => {
+                return (
+                  <span
+                    className="!hover:shadow-xl !active:bg-['#485e82'] z-20 rounded-xl p-3 cursor-pointer sidebar-link"
+                    onClick={() => navigate(link.link)}
+                  >
+                    {link.text}
+                  </span>
+                );
+              })}
+            </div>
+          )}
+        </div>
         {connectedUser &&
           dbBoard &&
           connectedUser.email &&

@@ -31,3 +31,68 @@ body {
   padding: 0;
   margin: 0;
 }
+
+.sidebar {
+  height: 100%;
+  width: 0;
+  position: fixed;
+  z-index: 10;
+  top: 0;
+  right: 0;
+  background-color: #273d60;
+
+  overflow-x: hidden;
+  transition: 0.5s;
+  padding-top: 60px;
+}
+.sidebar-link {
+}
+.sidebar-link:active,
+.sidebar-link:hover {
+  background-color: #485e82;
+}
+
+.closebtn {
+  color: white;
+  position: absolute;
+  top: 0;
+  left: 0;
+  font-size: 36px;
+  margin-left: 15px;
+  margin-top: 15px;
+}
+
+@media screen and (max-width: 600px) {
+  /* CSS styles here */
+  .table {
+    table-layout: fixed;
+  }
+  .table-cell-debt {
+    width: 115px !important;
+    display: inline-block !important;
+  }
+  .table-cell-debt-sum {
+    width: 70px !important;
+    display: inline-block !important;
+  }
+
+  .table-cell-mobile {
+    width: 80px !important;
+    /* display: inline-block !important; */
+  }
+}
+
+.table-row {
+  background-color: #e3d8d854 !important;
+  padding: 0 !important;
+}
+.kdropdown {
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 0.875rem;
+  box-sizing: border-box;
+  min-width: 80%;
+  padding: 1px 17px;
+  border-radius: 8px;
+  text-align: right;
+  line-height: 1.5;
+}
