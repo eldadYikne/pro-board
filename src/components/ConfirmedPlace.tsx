@@ -6,6 +6,7 @@ import {
   doc,
   getDoc,
   getDocs,
+  onSnapshot,
   updateDoc,
 } from "firebase/firestore";
 import { db } from "..";
@@ -60,28 +61,50 @@ function ConfirmedPlace(props: Props) {
     async function fetchData() {
       if (id) {
         console.log("id", id);
-        await getBoardById(id);
+        await getBoardByIdSnap(id);
       }
     }
     fetchData();
-  }, [user, id]);
-  const getBoardById = async (boardId: string) => {
+  }, [id]);
+  useEffect(() => {}, [user]);
+  const getBoardByIdSnap = async (boardId: string) => {
     try {
-      const boardDoc = await getDoc(doc(db, "boards", boardId));
-      if (boardDoc.exists()) {
-        // Document exists, return its data along with the ID
-        const newBoard = { ...boardDoc.data(), id: boardDoc.id };
-        if (newBoard) {
-          setDbBoard(newBoard as Board);
+      const boardRef = doc(db, "boards", boardId);
+      const boardDataArray: any = []; // Array to store board data
+
+      // Listen to changes in the board document
+      const unsubscribe = onSnapshot(boardRef, (boardDoc) => {
+        if (boardDoc.exists()) {
+          // Document exists, push its data into the array along with the ID
+          const newBoard: Board = {
+            ...(boardDoc.data() as Board),
+            id: boardDoc.id,
+          };
+          boardDataArray.push(newBoard);
+          if (newBoard.id) {
+            setDbBoard(newBoard as Board);
+          }
+          console.log("user", user);
+          if (user && newBoard?.users && newBoard?.users.length > 0) {
+            const updateUser = newBoard?.users.find(
+              (newUser) => newUser.id === user.id
+            );
+            if (updateUser) {
+              setUser(updateUser);
+              console.log("updatedUser", updateUser);
+            }
+          }
+          console.log(newBoard);
+        } else {
+          // Document does not exist
+          console.log("Board not found");
         }
-        console.log(newBoard);
-      } else {
-        // Document does not exist
-        console.log("User not found");
-        return null;
-      }
+      });
+
+      // Return the array and the unsubscribe function
+      return { boardDataArray, unsubscribe };
     } catch (error) {
-      console.error("Error fetching user:", error);
+      console.error("Error fetching board:", error);
       throw error; // Rethrow the error to handle it where the function is called
     }
   };
