@@ -22,6 +22,7 @@ export interface Board {
   backgroundToWhatsappImg: string;
   isFreez: boolean;
   admins: string[];
+  payboxLink: string;
 }
 
 export interface Tfila {

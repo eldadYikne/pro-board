@@ -497,10 +497,8 @@ function EditBoard(props: Props) {
         {connectedUser ? (
           <div className="flex flex-col w-full justify-center items-center">
             <div className="flex justify-between w-full p-2 items-center bg-slate-400">
-              <div>
-                <Menu onClick={() => setMenuIsOpen(true)} sx={{}} />
-                {dbBoard && dbBoard.boardName}
-              </div>
+              <Menu onClick={() => setMenuIsOpen(true)} sx={{}} />
+              <div>{dbBoard && dbBoard.boardName}</div>
               <div className="flex gap-3 items-center">
                 {connectedUser && <div> {connectedUser.displayName}</div>}
                 <GoogleAuth
@@ -535,8 +533,8 @@ function EditBoard(props: Props) {
             </div>
           </div>
         )}
-        {/* sidebar MENU */}
 
+        {/* sidebar MENU */}
         <div
           className="sidebar"
           style={{ width: menuIsOpen ? "250px" : "0px" }}
@@ -549,7 +547,7 @@ function EditBoard(props: Props) {
               {menuLinks.map((link) => {
                 return (
                   <span
-                    className="!hover:shadow-xl !active:bg-['#485e82'] z-20 rounded-xl p-3 cursor-pointer sidebar-link"
+                    className="!hover:shadow-xl active:bg-[#485e82] z-20 rounded-xl p-3 cursor-pointer sidebar-link"
                     onClick={() => navigate(link.link)}
                   >
                     {link.text}

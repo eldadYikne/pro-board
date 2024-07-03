@@ -28,6 +28,7 @@ import { getCurrentDate } from "../utils/utils";
 import { getCurrentDateDayFirstByGetDate } from "../utils/const";
 import KdropDown from "./KdropDown";
 import { KdropDownOption } from "../types/dropDown";
+import { updateUser } from "../service/serviceUser";
 function EditUsers(props: Props) {
   const { id } = useParams();
   const [dbBoard, setDbBoard] = useState<Board>();
@@ -153,16 +154,17 @@ function EditUsers(props: Props) {
         }
         console.log("userToEdit", userToEdit);
         const newUserToEdit = { ...userToEdit, debts: [...newDebts] };
-        const newUsers = dbBoard.users;
-        newUsers.splice(userIdx, 1, newUserToEdit);
-        setDbBoard({
-          ...dbBoard,
-          users: newUsers,
-        });
+        // const newUsers = dbBoard.users;
+        // newUsers.splice(userIdx, 1, newUserToEdit);
+        // setDbBoard({
+        //   ...dbBoard,
+        //   users: newUsers,
+        // });
         setEditModalIsOpen(false);
         try {
           if (id) {
-            await updateBoard(id, dbBoard);
+            await updateUser(id, newUserToEdit);
+
             setSnackbarIsOpen(true);
             setTimeout(() => setSnackbarIsOpen(false), 2000);
           }
@@ -172,6 +174,7 @@ function EditUsers(props: Props) {
       }
     }
   };
+
   const removeDebt = async (debtIdx: number) => {
     const newDebts = openCollapseUser?.debts;
     let userIdx: number = NaN;
@@ -201,13 +204,14 @@ function EditUsers(props: Props) {
           const newUserToEdit = { ...openCollapseUser, debts: [...newDebts] };
           const newUsers = dbBoard.users;
           newUsers.splice(userIdx, 1, newUserToEdit);
-          setDbBoard({
-            ...dbBoard,
-            users: newUsers,
-          });
+
           try {
             if (id) {
-              await updateBoard(id, dbBoard);
+              await updateUser(id, newUserToEdit);
+              // setDbBoard({
+              //   ...dbBoard,
+              //   users: newUsers,
+              // });
               setSnackbarIsOpen(true);
               setTimeout(() => setSnackbarIsOpen(false), 2000);
             }
@@ -276,7 +280,7 @@ function EditUsers(props: Props) {
                       </TableCell>
 
                       <TableCell
-                        className="table-cell-mobile"
+                        className="table-cell-mobile-button"
                         sx={{ display: "flex", gap: 2 }}
                         align="right"
                       >
@@ -287,7 +291,7 @@ function EditUsers(props: Props) {
                               setEditModalIsOpen(true);
                               setNewDebt({
                                 date: getCurrentDate(),
-                                reason: "",
+                                reason: "עלייה לתורה",
                                 sum: 0,
                               });
                             }}
@@ -314,58 +318,67 @@ function EditUsers(props: Props) {
                           timeout="auto"
                           unmountOnExit
                         >
-                          <Table align="right" style={{ tableLayout: "auto" }}>
-                            <TableBody>
-                              {user.debts.length > 0 &&
-                                user.debts.map((debt, debtidx: number) => {
-                                  return (
-                                    <TableRow className="!bg-['#e3d8d854'] table-row">
-                                      <TableCell
-                                        size="small"
-                                        className="table-cell-debt"
-                                        align="right"
-                                        component="th"
-                                        scope="row"
-                                      >
-                                        {debt.reason}
-                                      </TableCell>
-                                      <TableCell
-                                        size="small"
-                                        className="table-cell-debt-sum"
-                                        align="right"
-                                        component="th"
-                                        scope="row"
-                                      >
-                                        {debt.sum}
-                                      </TableCell>
-                                      <TableCell
-                                        size="small"
-                                        className="table-cell-debt"
-                                        align="right"
-                                        component="th"
-                                        scope="row"
-                                      >
-                                        {getCurrentDateDayFirstByGetDate(
-                                          debt.date
-                                        )}
-                                      </TableCell>
-                                      <TableCell
-                                        size="small"
-                                        className="table-cell-debt"
-                                        align="right"
-                                        component="th"
-                                        scope="row"
-                                      >
-                                        <Delete
-                                          onClick={() =>
-                                            removeDebt(Number(debtidx))
-                                          }
-                                        />
-                                      </TableCell>
-                                    </TableRow>
-                                  );
-                                })}
-                            </TableBody>
+                          <Table
+                            dir="rtl"
+                            align="right"
+                            sx={{
+                              tableLayout: "fixed",
+                              width: "100%",
+                              display: "flex",
+                              flexDirection: "column",
+                              justifyContent: "start",
+                              alignItems: "start",
+                            }}
+                          >
+                            {user.debts.length > 0 &&
+                              user.debts.map((debt, debtidx: number) => {
+                                return (
+                                  <TableRow className="bg-[#e3d8d854]  table-row ">
+                                    <TableCell
+                                      size="small"
+                                      className="table-cell-debt"
+                                      align="right"
+                                      component="th"
+                                      scope="row"
+                                    >
+                                      {debt.reason}
+                                    </TableCell>
+                                    <TableCell
+                                      size="small"
+                                      className="table-cell-debt-sum"
+                                      align="right"
+                                      component="th"
+                                      scope="row"
+                                    >
+                                      {debt.sum}
+                                    </TableCell>
+                                    <TableCell
+                                      size="small"
+                                      className="table-cell-debt"
+                                      align="right"
+                                      component="th"
+                                      scope="row"
+                                    >
+                                      {getCurrentDateDayFirstByGetDate(
+                                        debt.date
+                                      )}
+                                    </TableCell>
+                                    <TableCell
+                                      size="small"
+                                      className="table-cell-debt"
+                                      align="right"
+                                      component="th"
+                                      scope="row"
+                                    >
+                                      <Delete
+                                        onClick={() =>
+                                          removeDebt(Number(debtidx))
+                                        }
+                                      />
+                                    </TableCell>
+                                  </TableRow>
+                                );
+                              })}
                           </Table>
                         </Collapse>
                       </TableCell>

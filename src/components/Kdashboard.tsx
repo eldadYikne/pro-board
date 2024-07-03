@@ -38,6 +38,7 @@ function Kdashboard(props: Props) {
     backgroundToWhatsappImg: "background-frame5",
     isFreez: false,
     admins: [],
+    payboxLink: "",
   };
   const [newBoard, setNewBoard] = useState<Board>(boardObj);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -133,12 +134,13 @@ function Kdashboard(props: Props) {
 
   interface FieldToNewBoard {
     key: keyof Board;
-    text: "שם" | "id" | "מיקום" | "בעלי הרשאות";
+    text: "שם" | "id" | "מיקום" | "בעלי הרשאות" | "קישור לעמוד פייבוקס";
   }
   const fieldsToNewBoard: FieldToNewBoard[] = [
     { key: "boardName", text: "שם" },
     { key: "id", text: "id" },
     { key: "geoId", text: "מיקום" },
+    { key: "payboxLink", text: "קישור לעמוד פייבוקס" },
     { key: "admins", text: "בעלי הרשאות" },
   ];
   if (!connectedUser || connectedUser?.email !== "nmknv99@gmail.com") {

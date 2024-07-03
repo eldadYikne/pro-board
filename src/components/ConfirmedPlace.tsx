@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import User from "../types/user";
-import Switch from "@mui/material/Switch";
 import "firebase/compat/firestore";
 import {
   collection,
@@ -16,17 +15,31 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
+import PayBox from "../assets/paybox.png";
 import Img1 from "../assets/img1.jpg";
-import { Alert, Checkbox, FormControlLabel, Snackbar } from "@mui/material";
+import {
+  Alert,
+  Checkbox,
+  FormControlLabel,
+  Snackbar,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+} from "@mui/material";
 import { Zman } from "../types/zmanim";
 import EditBoard from "./EditBoard";
 import { useParams } from "react-router-dom";
 import { Board, Message, ShabatTimesToEdit, Tfila } from "../types/board";
 import { getCurrentDateDayFirstByGetDate } from "../utils/const";
 import { ReactComponent as Decorative1 } from "../assets/decorative-1.svg";
+import Navbar from "./Navbar";
+import { updateUser } from "../service/serviceUser";
+
 function ConfirmedPlace(props: Props) {
   const [user, setUser] = useState<User>();
-  const [checked, setChecked] = useState(!!props.user.present);
+  const [checked, setChecked] = useState(false);
   const [users, setUsers] = useState<User[]>();
   const [snackbarIsOpen, setSnackbarIsOpen] = useState<boolean>();
   const [dbBoard, setDbBoard] = useState<Board>();
@@ -39,10 +52,10 @@ function ConfirmedPlace(props: Props) {
 
   useEffect(() => {
     console.log("board id", id);
-    if (props.user.name) {
+    if (user?.name) {
       // let userToSet = JSON.parse(user);
-      setUser(props.user);
-      setChecked(props.user.present);
+      setUser(user);
+      setChecked(user?.present);
     }
     async function fetchData() {
       if (id) {
@@ -51,7 +64,7 @@ function ConfirmedPlace(props: Props) {
       }
     }
     fetchData();
-  }, [props.user, id]);
+  }, [user, id]);
   const getBoardById = async (boardId: string) => {
     try {
       const boardDoc = await getDoc(doc(db, "boards", boardId));
@@ -72,48 +85,33 @@ function ConfirmedPlace(props: Props) {
       throw error; // Rethrow the error to handle it where the function is called
     }
   };
+
   const handleChange = async (isPresent: boolean) => {
     setChecked(isPresent);
-    const newUserToUse: any = props.user;
-    console.log("newUserToUse", newUserToUse);
-    if (!user?.id) {
-      const userWithId = users?.find(
-        (currUser) => user?.name === currUser.name
-      );
-      if (userWithId) {
-        setUser(userWithId);
-      }
-    }
-    try {
-      let newUser: any = {
-        id: newUserToUse?.id,
-        seats: newUserToUse?.seats,
-        name: newUserToUse?.name ?? "",
-        present: !checked,
-      };
-      if (newUser?.name) {
-        localStorage.setItem("user", JSON.stringify(newUser));
-        setUser(newUser);
-        await updateUser(newUser?.id!, {
-          name: newUser?.name,
+    if (user) {
+      try {
+        let newUser: User = {
+          ...user,
           present: !checked,
-        });
-        setSnackbarIsOpen(true);
-        setTimeout(() => setSnackbarIsOpen(false), 2000);
-      }
-    } catch (err) {
-      console.log(err);
-    }
-    console.log(isPresent);
-  };
-  const updateUser = async (userId: string, userData: any) => {
-    const userRef = doc(collection(db, "users"), userId); // Get reference to the user document
+        };
+        if (newUser?.name) {
+          localStorage.setItem("user", JSON.stringify(newUser));
+          setUser(newUser);
 
-    try {
-      await updateDoc(userRef, userData); // Update the user document with new data
-      console.log("User updated successfully!");
-    } catch (error) {
-      console.error("Error updating user:", error);
+          await updateNewUser(newUser?.id!, newUser);
+          setSnackbarIsOpen(true);
+          setTimeout(() => setSnackbarIsOpen(false), 2000);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+      console.log(isPresent);
+    }
+  };
+
+  const updateNewUser = async (userId: string, userData: User) => {
+    if (id && user) {
+      await updateUser(id, userData);
     }
   };
   const handleClose = (
@@ -123,7 +121,6 @@ function ConfirmedPlace(props: Props) {
     if (reason === "clickaway") {
       return;
     }
-
     setSnackbarIsOpen(false);
   };
   const shabatTimesToEdit: ShabatTimesToEdit[] = [
@@ -131,8 +128,11 @@ function ConfirmedPlace(props: Props) {
     { type: "friday", name: " ערב שבת" },
     { type: "saturday", name: " שבת" },
   ];
+  const thTable = ["עבור", "סכום", "תאריך"];
+
   return (
-    <div className="flex flex-col justify-center items-center w-full gap-3 p-2">
+    <div className="flex flex-col pb-8 justify-center items-center w-full gap-3 ">
+      <Navbar users={dbBoard?.users} setNewUser={setUser} />
       <Card sx={{ maxWidth: 345 }}>
         <CardMedia
           component="img"
@@ -155,7 +155,7 @@ function ConfirmedPlace(props: Props) {
               </div>
             </div>
           </Typography>
-          {props.user.name && (
+          {user?.name && (
             <div className="text-black  transition-all flex items-center justify-center">
               {/* {checked ? "נמצא" : "לא נמצא"} */}
               {/* <Switch
@@ -227,7 +227,7 @@ function ConfirmedPlace(props: Props) {
           </CardContent>
         </Card>
       )}
-      {dbBoard && (
+      {dbBoard && dbBoard.messages.length > 0 && (
         <Card
           sx={{
             width: 345,
@@ -256,7 +256,86 @@ function ConfirmedPlace(props: Props) {
           </CardContent>
         </Card>
       )}
-
+      {user && user.debts.length > 0 && (
+        <div className=" w-full flex flex-col gap-1 px-4">
+          <Table
+            align="right"
+            style={{
+              tableLayout: "auto",
+              border: "1px solid gray",
+              width: "100%",
+            }}
+          >
+            <TableHead>
+              <TableRow className="bg-[#f7e4c7f7]">
+                {thTable.map((th) => {
+                  return (
+                    <TableCell
+                      className="table-cell-mobile"
+                      sx={{ fontWeight: 800 }}
+                      align="right"
+                    >
+                      {th}
+                    </TableCell>
+                  );
+                })}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {user.debts.length > 0 &&
+                user.debts.map((debt, debtidx: number) => {
+                  return (
+                    <TableRow className="!bg-[#e3d8d854'] table-row">
+                      <TableCell
+                        size="small"
+                        align="right"
+                        component="th"
+                        scope="row"
+                      >
+                        {debt.reason}
+                      </TableCell>
+                      <TableCell
+                        size="small"
+                        align="right"
+                        component="th"
+                        scope="row"
+                      >
+                        {debt.sum}
+                      </TableCell>
+                      <TableCell
+                        size="small"
+                        align="right"
+                        component="th"
+                        scope="row"
+                      >
+                        {getCurrentDateDayFirstByGetDate(debt.date)}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+            </TableBody>
+          </Table>
+          {dbBoard?.payboxLink && (
+            <div className="flex w-full justify-center">
+              <span className="flex gap-1 p-1 bg-[#039BE6] rounded-lg text-white">
+                <a target="_blank" href={dbBoard?.payboxLink}>
+                  <img
+                    className=" w-24 "
+                    src={
+                      "https://www.payboxapp.com/wp-content/uploads/2020/04/site-logo-white.png"
+                    }
+                  />
+                </a>
+              </span>
+            </div>
+          )}
+        </div>
+      )}
+      {user && user.debts.length > 0 && (
+        <div className="w-full fixed bg-[#e75757] text-white font-medium text-xl font-serif bottom-0 flex h-8 px-1 z-10   justify-center gap-2 items-center ">
+          הוועד מזכיר לך לשלם על נדר שלא שולם
+        </div>
+      )}
       <div>
         <Snackbar
           className="flex flex-row-reverse"
@@ -281,7 +360,6 @@ function ConfirmedPlace(props: Props) {
 
 export default ConfirmedPlace;
 ConfirmedPlace.defaultProps = {
-  user: {},
   havdalah: "",
   candles: "",
   parasha: "",
@@ -289,7 +367,6 @@ ConfirmedPlace.defaultProps = {
 };
 
 interface Props {
-  user: User;
   havdalah: string;
   candles: string;
   parasha: string;
