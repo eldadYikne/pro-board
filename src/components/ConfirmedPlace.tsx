@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import User from "../types/user";
+import Kuser from "../types/user";
 import "firebase/compat/firestore";
 import {
   collection,
@@ -39,9 +39,9 @@ import Navbar from "./Navbar";
 import { updateUser } from "../service/serviceUser";
 
 function ConfirmedPlace(props: Props) {
-  const [user, setUser] = useState<User>();
+  const [user, setUser] = useState<Kuser>();
   const [checked, setChecked] = useState(false);
-  const [users, setUsers] = useState<User[]>();
+  const [users, setUsers] = useState<Kuser[]>();
   const [snackbarIsOpen, setSnackbarIsOpen] = useState<boolean>();
   const [dbBoard, setDbBoard] = useState<Board>();
 
@@ -91,6 +91,7 @@ function ConfirmedPlace(props: Props) {
             );
             if (updateUser) {
               setUser(updateUser);
+              localStorage.setItem("user", JSON.stringify(user));
               console.log("updatedUser", updateUser);
             }
           }
@@ -113,7 +114,7 @@ function ConfirmedPlace(props: Props) {
     setChecked(isPresent);
     if (user) {
       try {
-        let newUser: User = {
+        let newUser: Kuser = {
           ...user,
           present: !checked,
         };
@@ -132,7 +133,7 @@ function ConfirmedPlace(props: Props) {
     }
   };
 
-  const updateNewUser = async (userId: string, userData: User) => {
+  const updateNewUser = async (userId: string, userData: Kuser) => {
     if (id && user) {
       await updateUser(id, userData);
     }

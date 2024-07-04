@@ -1,4 +1,4 @@
-import User from "./user";
+import Kuser from "./user";
 import { TranslationsZmanimKeys } from "./zmanim";
 
 export interface Board {
@@ -15,7 +15,7 @@ export interface Board {
   boardTextColor: string;
   mapBackgroundImage: string;
   timesToShow: Array<keyof TranslationsZmanimKeys>;
-  users?: User[];
+  users?: Kuser[];
   theme: Theme;
   isSetShabatTime: { isActive: boolean; enter: string; exit: string };
   screens: ScreenType[];
@@ -71,4 +71,9 @@ export type Theme = "modern" | "column" | "gold";
 export interface TimeObj {
   seconds: number;
   nanoseconds: number;
+}
+export interface MenuLink {
+  link: string;
+  text: string;
+  icon: string;
 }

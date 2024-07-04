@@ -1,4 +1,4 @@
-export default interface User {
+export default interface Kuser {
   name: string;
   seats: SeatNumber[];
   present: boolean;

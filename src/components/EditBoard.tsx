@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import {
   Board,
+  MenuLink,
   Message,
   ScreenType,
   ScreenTypeTypes,
@@ -39,6 +40,7 @@ import { generateRandomId } from "../utils/utils";
 import { toPng } from "html-to-image";
 import GoogleAuth from "./GoogleAuth";
 import { User, getAuth, onAuthStateChanged } from "firebase/auth";
+import AdminNavbar from "./AdminNavbar";
 
 function EditBoard(props: Props) {
   const [dbBoard, setDbBoard] = useState<Board>();
@@ -428,14 +430,7 @@ function EditBoard(props: Props) {
     { type: "friday", name: "זמני ערב שבת" },
     { type: "saturday", name: "זמני שבת" },
   ];
-  interface MenuLink {
-    link: string;
-    text: string;
-  }
-  const menuLinks: MenuLink[] = [
-    { link: `/edit/${id}/users`, text: "מתפללים" },
-    { link: `/board/${id}`, text: "לוח" },
-  ];
+
   if (
     connectedUser?.email &&
     dbBoard?.admins &&
@@ -495,24 +490,25 @@ function EditBoard(props: Props) {
     >
       <div className="w-full flex flex-col justify-center">
         {connectedUser ? (
-          <div className="flex flex-col w-full justify-center items-center">
-            <div className="flex justify-between w-full p-2 items-center bg-slate-400">
-              <Menu onClick={() => setMenuIsOpen(true)} sx={{}} />
-              <div>{dbBoard && dbBoard.boardName}</div>
-              <div className="flex gap-3 items-center">
-                {connectedUser && <div> {connectedUser.displayName}</div>}
-                <GoogleAuth
-                  setUser={setConnectedUser}
-                  userConnected={connectedUser?.email ?? ""}
-                />
-              </div>
-            </div>
-            {!dbBoard && (
-              <div className="flex ">
-                <CircularProgress />
-              </div>
-            )}
-          </div>
+          // <div className="flex flex-col w-full justify-center items-center">
+          //   <div className="flex justify-between w-full p-2 items-center bg-slate-400">
+          //     <Menu onClick={() => setMenuIsOpen(true)} sx={{}} />
+          //     <div>{dbBoard && dbBoard.boardName}</div>
+          //     <div className="flex gap-3 items-center">
+          //       {connectedUser && <div> {connectedUser.displayName}</div>}
+          //       <GoogleAuth
+          //         setUser={setConnectedUser}
+          //         userConnected={connectedUser?.email ?? ""}
+          //       />
+          //     </div>
+          //   </div>
+          //   {!dbBoard && (
+          //     <div className="flex ">
+          //       <CircularProgress />
+          //     </div>
+          //   )}
+          // </div>
+          <AdminNavbar />
         ) : (
           <div className="flex w-full h-screen justify-center items-center p-5 font-sans flex-col bg-gradient-to-r from-blue-200 to-blue-100">
             <div className="flex flex-col p-7 max-w-96 bg-white shadow-md rounded-xl">
@@ -535,7 +531,7 @@ function EditBoard(props: Props) {
         )}
 
         {/* sidebar MENU */}
-        <div
+        {/* <div
           className="sidebar"
           style={{ width: menuIsOpen ? "250px" : "0px" }}
         >
@@ -556,7 +552,7 @@ function EditBoard(props: Props) {
               })}
             </div>
           )}
-        </div>
+        </div> */}
         {connectedUser &&
           dbBoard &&
           connectedUser.email &&

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { User, getAuth, onAuthStateChanged } from "firebase/auth";
 import GoogleAuth from "./GoogleAuth";
 import { collection, onSnapshot } from "firebase/firestore";

@@ -1,8 +1,8 @@
 import { collection, doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "..";
-import User from "../types/user";
+import Kuser from "../types/user";
 
-export const updateUser = (boardId: string, updatedUser: User) => {
+export const updateUser = (boardId: string, updatedUser: Kuser) => {
   const boardRef = doc(collection(db, "boards"), boardId);
   console.log("TRY UPDATE USER", updatedUser);
   getDoc(boardRef)
@@ -15,7 +15,7 @@ export const updateUser = (boardId: string, updatedUser: User) => {
           // Find the index of the user to update
 
           const userIndex = boardData.users.findIndex(
-            (user: User) => user.id === updatedUser.id
+            (user: Kuser) => user.id === updatedUser.id
           );
 
           if (userIndex !== -1) {
@@ -44,7 +44,7 @@ export const updateUser = (boardId: string, updatedUser: User) => {
       console.error("Error fetching document: ", error);
     });
 };
-export const updateManyUsers = (boardId: string, updatedUsers: User[]) => {
+export const updateManyUsers = (boardId: string, updatedUsers: Kuser[]) => {
   const boardRef = doc(collection(db, "boards"), boardId);
 
   return getDoc(boardRef)
@@ -59,7 +59,7 @@ export const updateManyUsers = (boardId: string, updatedUsers: User[]) => {
           );
 
           // Update each user in the users array
-          const updatedUsersArray = boardData.users.map((user: User) => {
+          const updatedUsersArray = boardData.users.map((user: Kuser) => {
             const updatedUser = updatedUsersMap.get(user.id);
             return updatedUser ? { ...user, ...updatedUser } : user;
           });

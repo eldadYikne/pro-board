@@ -1,5 +1,5 @@
 import { TranslationsZmanimKeys, Zman } from "../types/zmanim";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { doc, getDoc, onSnapshot } from "firebase/firestore";
 import { db } from "..";

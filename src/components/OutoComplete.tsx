@@ -1,17 +1,17 @@
 import * as React from "react";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
-import User from "../types/user";
+import Kuser from "../types/user";
 import { useState, useEffect } from "react";
 
 export default function OutoComplete(props: Props) {
   const defaultProps = {
-    options: props.options?.map((user: User) => ({ label: user.name })),
+    options: props.options?.map((user: Kuser) => ({ label: user.name })),
   };
   const onSetUser = (newValue: Option) => {
     if (newValue) {
       const userToSet = props.options.find(
-        (user: User) => user.name === newValue.label
+        (user: Kuser) => user.name === newValue.label
       );
       console.log("newValue", newValue);
       props.onPickUsername(userToSet);
@@ -43,7 +43,7 @@ interface Option {
   label: string;
 }
 interface Props {
-  options: User[];
+  options: Kuser[];
   onPickUsername: Function;
   // options: Option[];
 }

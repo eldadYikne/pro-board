@@ -18,7 +18,7 @@ import {
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { db } from ".";
-import User from "./types/user";
+import Kuser from "./types/user";
 
 import {
   getCurrentDate,
@@ -34,6 +34,7 @@ import { isTimeBetween0000And0130, checkIsPast24Hours } from "./utils/utils";
 import { TimeObj } from "./types/board";
 import { UploadWidget } from "./components/UploadWidget";
 import Kdashboard from "./components/Kdashboard";
+import AdminNavbar from "./components/AdminNavbar";
 function App() {
   const [users, setUsers] = useState<any>();
   const [board, setBoard] = useState<any>();
@@ -51,6 +52,7 @@ function App() {
   const { hash, pathname, search } = location;
   const cld = new Cloudinary({ cloud: { cloudName: "dwdpgwxqv" } });
   const myImage = cld.image("docs/models");
+  const [showNavbar, setShowNavbar] = useState(true);
 
   // Resize to 250 x 250 pixels using the 'fill' crop mode.
   myImage.resize(fill().width(250).height(250));
@@ -331,7 +333,7 @@ function App() {
   };
   const postDataByNumberSeats = async () => {
     let array: any[] = [];
-    users?.forEach((user: User) => {
+    users?.forEach((user: Kuser) => {
       array.push({
         name: user.name,
         present: user.present,
@@ -439,21 +441,7 @@ function App() {
   return (
     <div dir="rtl" className="site-container">
       <div className="content-wrap">
-        {/* <AdvancedImage cldImg={myImage} /> */}
-        {/* <button onClick={getUsers}>לחץ כאן להביא משתמשים</button> */}
-        {/* <button onClick={() => postCollectionCoustumId("boards", [dbBoard],'calaniot')}>
-          לחץ כאן להעלות
-        </button> 
-          
-          <button
-            onClick={() =>
-              postCollectionCoustumId("boards", dbBoard, "calaniot")
-            }
-          >
-            לחץ כאן להעלות
-          </button>
-     
-        */}
+        {/* {showNavbar && <AdminNavbar />} */}
         <Routes>
           <Route path="/" element={<div>עמוד לא נמצא</div>} />
           <Route path="/map/:id" element={<Map parasha={parasha} />} />

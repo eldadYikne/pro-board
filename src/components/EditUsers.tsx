@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Board } from "../types/board";
 import { db } from "..";
-import User, { Debt, DebtReason, SeatUser } from "../types/user";
+import Kuser, { Debt, DebtReason, SeatUser } from "../types/user";
 import {
   Box,
   Button,
@@ -29,11 +29,12 @@ import { getCurrentDateDayFirstByGetDate } from "../utils/const";
 import KdropDown from "./KdropDown";
 import { KdropDownOption } from "../types/dropDown";
 import { updateUser } from "../service/serviceUser";
+import AdminNavbar from "./AdminNavbar";
 function EditUsers(props: Props) {
   const { id } = useParams();
   const [dbBoard, setDbBoard] = useState<Board>();
-  const [userToEdit, setUserToEdit] = useState<User>();
-  const [openCollapseUser, setOpenCollapseUser] = useState<User | undefined>(
+  const [userToEdit, setUserToEdit] = useState<Kuser>();
+  const [openCollapseUser, setOpenCollapseUser] = useState<Kuser | undefined>(
     undefined
   );
   const [newDebt, setNewDebt] = useState<Debt>();
@@ -130,8 +131,8 @@ function EditUsers(props: Props) {
   const addDebt = async () => {
     let userIdx: number = NaN;
     if (dbBoard?.users && userToEdit) {
-      const user: User | undefined = dbBoard?.users.find(
-        (user: User, idx: number) => {
+      const user: Kuser | undefined = dbBoard?.users.find(
+        (user: Kuser, idx: number) => {
           if (user.id === userToEdit?.id) {
             userIdx = idx;
             return true;
@@ -181,8 +182,8 @@ function EditUsers(props: Props) {
     console.log("openCollapseUser", openCollapseUser);
 
     if (dbBoard?.users && openCollapseUser) {
-      const user: User | undefined = dbBoard?.users.find(
-        (user: User, idx: number) => {
+      const user: Kuser | undefined = dbBoard?.users.find(
+        (user: Kuser, idx: number) => {
           if (user.id === openCollapseUser?.id) {
             userIdx = idx;
             return true;
@@ -223,7 +224,8 @@ function EditUsers(props: Props) {
     }
   };
   return (
-    <div>
+    <div className="flex flex-col">
+      <AdminNavbar />
       {dbBoard?.users && (
         <TableContainer
           component={Paper}
@@ -251,7 +253,7 @@ function EditUsers(props: Props) {
             </TableHead>
             <TableBody>
               {dbBoard.users &&
-                dbBoard.users.map((user: User) => (
+                dbBoard.users.map((user: Kuser) => (
                   <React.Fragment>
                     <TableRow
                       key={user.id}
