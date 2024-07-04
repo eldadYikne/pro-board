@@ -1,6 +1,6 @@
 export default interface User {
   name: string;
-  seats: string[];
+  seats: SeatNumber[];
   present: boolean;
   id: string;
   debts: Debt[];

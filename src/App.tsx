@@ -456,7 +456,7 @@ function App() {
         */}
         <Routes>
           <Route path="/" element={<div>עמוד לא נמצא</div>} />
-          <Route path="/map" element={<Map parasha={parasha} />} />
+          <Route path="/map/:id" element={<Map parasha={parasha} />} />
           <Route
             path="/confirm/:id"
             element={

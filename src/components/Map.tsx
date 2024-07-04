@@ -1,52 +1,91 @@
 import React, { useEffect, useRef, useState } from "react";
-import User from "../types/user";
+import User, { SeatNumber } from "../types/user";
 import chair from "../assets/chair.svg";
 import man from "../assets/man.svg";
-import { collection } from "firebase/firestore";
+import { collection, doc } from "firebase/firestore";
 import { db } from "..";
 import { onSnapshot } from "firebase/firestore";
-import { Button } from "@mui/material";
+import {
+  Box,
+  Button,
+  Checkbox,
+  CircularProgress,
+  FormControlLabel,
+  Modal,
+} from "@mui/material";
 import { toPng } from "html-to-image";
+import { Board } from "../types/board";
+import { useParams } from "react-router-dom";
+import OutoComplete from "./OutoComplete";
+import { updateManyUsers, updateUser } from "../service/serviceUser";
 function Map(props: Props) {
   const seat = [8, 18];
   const allSeats: any = [];
-  const [seats, setSeats] = useState<any>();
+  const [seats, setSeats] = useState<User[]>();
+  const [editingUser, setEditingUser] = useState<User>();
+  const [editingSeatNumber, setEditingSeatNumber] = useState<string>();
+  const [showName, setShowName] = useState<boolean>(false);
+  const [userToUpdateSeat, setUserToUpdateSeat] = useState<User>();
   const elementRef = useRef(null);
+  const [dbBoard, setDbBoard] = useState<Board>();
+  const { id } = useParams();
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   useEffect(() => {
     async function fetchData() {
       // await getUsers();
+      if (id) {
+        await getBoardByIdSnap(id);
+      }
     }
     fetchData();
-  }, [seats]);
+  }, []);
+  // useEffect(() => {}, [seats?.length]);
+  const getBoardByIdSnap = async (boardId: string) => {
+    try {
+      const boardRef = doc(db, "boards", boardId);
 
-  const getUsers = async () => {
-    let updatedUsers: User[] = [];
-    const unsub = await onSnapshot(collection(db, "users"), (querySnapshot) => {
-      querySnapshot.forEach((doc) => {
-        let updatedUser: any = { id: String(doc.id), ...doc.data() };
-        if (doc.data().name === "הלוי") {
-          console.log("Document ID: ", doc.id);
-          console.log("Document data: ", doc.data());
+      // Listen to changes in the board document
+      const unsubscribe = onSnapshot(boardRef, (boardDoc) => {
+        if (boardDoc.exists()) {
+          // Document exists, push its data into the array along with the ID
+          const newBoard: Board = {
+            ...(boardDoc.data() as Board),
+            id: boardDoc.id,
+          };
+          console.log("newBoard.users", newBoard.users);
+          console.log("dbBoard.users", dbBoard?.users);
+          console.log(
+            "newBoard.users === dbBoard.users",
+            JSON.stringify(newBoard.users) !== JSON.stringify(dbBoard?.users)
+          );
+
+          if (
+            newBoard.id &&
+            JSON.stringify(newBoard.users) !== JSON.stringify(dbBoard?.users)
+          ) {
+            setTimeout(() => {
+              setDbBoard(newBoard as Board);
+              getSeats(JSON.parse(JSON.stringify(newBoard.users)));
+              // console.log("users", newBoard.users);
+            }, 1500);
+          }
+        } else {
+          // Document does not exist
+          console.log("Board not found");
         }
-        updatedUsers.push(updatedUser);
       });
-      getSeats(JSON.parse(JSON.stringify(updatedUsers)));
-      updatedUsers = [];
-    });
 
-    // await getDocs(collection(db, "users"))
-    //   .then((shot) => {
-    //     const news = shot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
-    //     // setUsers(news);
-    //     console.log("news", news);
-    //     getSeats(news as User[]);
-    //   })
-    //   .catch((error) => console.log(error));
+      // Return the array and the unsubscribe function
+      return { unsubscribe };
+    } catch (error) {
+      console.error("Error fetching board:", error);
+      throw error; // Rethrow the error to handle it where the function is called
+    }
   };
 
   const getSeats = (users: User[]) => {
     try {
-      console.log("users", users);
+      // console.log("users", users);
       for (var i = 0; i < seat[0]; i++) {
         allSeats[i] = [];
         for (var j = 0; j < seat[1]; j++) {
@@ -56,13 +95,15 @@ function Map(props: Props) {
             let currentSeat = `${i}${j}`;
             allSeats[i][j] =
               users.find((user: User) =>
-                user.seats?.find((seat: string) => seat === currentSeat)
+                user.seats?.find(
+                  (seat: SeatNumber) => seat.seatNumber === currentSeat
+                )
               ) ?? currentSeat;
           }
         }
       }
       setSeats(JSON.parse(JSON.stringify(allSeats)));
-      console.table(allSeats);
+      // console.table(allSeats);
     } catch (err) {
       console.log(err);
     }
@@ -84,37 +125,102 @@ function Map(props: Props) {
         });
     }
   };
+
+  const updateSeat = async () => {
+    setIsModalOpen(false);
+    if (editingUser && userToUpdateSeat && editingSeatNumber) {
+      const seatIsExistInUser = userToUpdateSeat.seats.find(
+        (seat) => seat.seatNumber === editingSeatNumber
+      );
+      if (!seatIsExistInUser) {
+        const newUserToUpdateSeat: User = {
+          ...userToUpdateSeat,
+          seats: [
+            ...(userToUpdateSeat?.seats ?? []),
+            {
+              present: !!userToUpdateSeat.present,
+              seatNumber: editingSeatNumber,
+            },
+          ],
+        };
+        const newEditingUserToRemoveSeat: User = {
+          ...editingUser,
+          seats: editingUser?.seats.filter(
+            (seat: SeatNumber) => seat.seatNumber !== editingSeatNumber
+          ),
+        };
+        console.log("newEditingUserToRemoveSeat", newEditingUserToRemoveSeat);
+        console.log("newUserToUpdateSeat", newUserToUpdateSeat);
+        try {
+          if (id && newUserToUpdateSeat.id && newEditingUserToRemoveSeat.id) {
+            await updateManyUsers(id, [
+              newEditingUserToRemoveSeat,
+              newUserToUpdateSeat,
+            ]);
+          }
+        } catch (err) {
+          console.log(err);
+        }
+      }
+    }
+  };
   return (
     <div
       dir="ltr"
       className="bg-[#f2d4b0]  flex flex-col items-center overflow-x-auto justify-center text-black"
     >
-      {seats?.length > 1 && (
-        <div className="bg-white m-2 ">
-          <Button onClick={htmlToImageConvert} color="primary">
+      {seats && seats?.length > 1 && (
+        <div className="m-2 w-full flex justify-center gap-6 items-center ">
+          <Button
+            onClick={htmlToImageConvert}
+            variant="contained"
+            color="primary"
+          >
             הורדת תמונה{" "}
           </Button>
+
+          <FormControlLabel
+            dir="rtl"
+            control={
+              <Checkbox
+                onChange={(e) => setShowName(!!e.target.checked)}
+                defaultChecked
+                checked={showName}
+              />
+            }
+            label="הצג שמות"
+          />
         </div>
       )}
       {!seats && (
-        <div className="bg-white m-2 ">
-          <Button onClick={getUsers} color="primary">
-            הצג מפה
-          </Button>
+        // <div className="bg-white m-2 ">
+        //   <Button onClick={getBoardByIdSnap} color="primary">
+        //     הצג מפה
+        //   </Button>
+        // </div>
+        <div className="flex ">
+          <CircularProgress />
         </div>
       )}
       <div className="flex flex-col items-center" ref={elementRef}>
         <table>
           <tbody>
-            {seats?.length > 1 &&
+            {seats &&
+              seats?.length > 1 &&
               seats?.map((row: any, rowIndex: number) => (
                 <tr className="py-2 flex" key={rowIndex}>
-                  {row.map((seatData: any, columnIndex: number) => {
+                  {row.map((seatData: User, columnIndex: number) => {
                     let currentSeatNumber = `${rowIndex}${columnIndex}`;
                     return seatData.name ? (
                       <td
                         className="px-2 w-14 h-14 flex flex-col items-center justify-center relative td-table-seat"
                         key={columnIndex}
+                        onClick={() => {
+                          setUserToUpdateSeat(seatData);
+                          setIsModalOpen(true);
+                          setEditingUser(seatData);
+                          setEditingSeatNumber(currentSeatNumber);
+                        }}
                         style={{
                           marginLeft:
                             (currentSeatNumber?.length === 3 &&
@@ -152,9 +258,10 @@ function Map(props: Props) {
                                 : "12px",
                           }}
                         >
-                          {/* {typeof seatData === "object"
-                          ? seatData.name
-                          : seatData} */}
+                          {showName &&
+                            (typeof seatData === "object"
+                              ? seatData.name
+                              : seatData)}
                           {/* {currentSeatNumber} */}
                         </span>
                       </td>
@@ -187,12 +294,49 @@ function Map(props: Props) {
               ))}
           </tbody>
         </table>
-        {seats?.length > 1 && (
+        {seats && seats?.length > 1 && (
           <div className=" border-2 flex justify-center items-center p-2 mb-2  border-black h-32 w-3/4 left-[-18px] text-black ">
             ארון
           </div>
         )}
       </div>
+      <Modal
+        sx={{ overflowY: "scroll", overflowX: "hidden" }}
+        open={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+        }}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          {dbBoard?.users && dbBoard.users.length > 0 && (
+            <div className="w-full h-full flex flex-col gap-3">
+              <span className="text-center"> {userToUpdateSeat?.name}</span>
+
+              <span className="text-center">בחר שם מהרשימה</span>
+              <OutoComplete
+                options={dbBoard?.users}
+                onPickUsername={(e: User) => setUserToUpdateSeat(e)}
+              />
+              <Button onClick={updateSeat} variant="contained">
+                אישור
+              </Button>
+              <Button
+                onClick={() => {
+                  setIsModalOpen(false);
+                  setUserToUpdateSeat(undefined);
+                  setEditingUser(undefined);
+                  setEditingSeatNumber("");
+                }}
+                variant="contained"
+              >
+                ביטול
+              </Button>
+            </div>
+          )}
+        </Box>
+      </Modal>
     </div>
   );
 }
@@ -206,3 +350,14 @@ Map.defaultProps = {
 interface Props {
   parasha?: string;
 }
+const style = {
+  position: "absolute" as "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 350,
+  bgcolor: "background.paper",
+  border: "",
+  boxShadow: 24,
+  p: 6,
+};

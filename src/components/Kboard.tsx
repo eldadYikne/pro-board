@@ -129,14 +129,12 @@ function Kboard(props: Props) {
   const getBoardByIdSnap = async (boardId: string) => {
     try {
       const boardRef = doc(db, "boards", boardId);
-      const boardDataArray: any = []; // Array to store board data
 
       // Listen to changes in the board document
       const unsubscribe = onSnapshot(boardRef, (boardDoc) => {
         if (boardDoc.exists()) {
           // Document exists, push its data into the array along with the ID
           const newBoard = { ...boardDoc.data(), id: boardDoc.id };
-          boardDataArray.push(newBoard);
           if (newBoard.id) {
             setDbBoard(newBoard as Board);
           }
@@ -149,7 +147,7 @@ function Kboard(props: Props) {
       });
 
       // Return the array and the unsubscribe function
-      return { boardDataArray, unsubscribe };
+      return { unsubscribe };
     } catch (error) {
       console.error("Error fetching board:", error);
       throw error; // Rethrow the error to handle it where the function is called
