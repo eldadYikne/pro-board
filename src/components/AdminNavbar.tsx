@@ -66,12 +66,13 @@ function AdminNavbar(props: Props) {
     { link: `/edit/${id}/users`, text: "מתפללים", icon: "users" },
     { link: `/map/${id}`, text: "מפת בית הכנסת", icon: "map" },
     { link: `/board/${id}`, text: "לוח", icon: "tv" },
+    // { link: `/kidush/${id}`, text: "קידוש", icon: "cup" },
   ];
   return (
     <div className="flex flex-col w-full justify-center items-center">
       <div className="flex justify-between w-full p-2 items-center bg-slate-400">
         <Menu onClick={() => setMenuIsOpen(true)} sx={{}} />
-        <div>{dbBoard && dbBoard.boardName}</div>
+        <div className="font-sans text-xl ">{dbBoard && dbBoard.boardName}</div>
         <div className="flex gap-3 items-center">
           {connectedUser && <div> {connectedUser.displayName}</div>}
           <GoogleAuth

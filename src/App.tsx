@@ -35,6 +35,7 @@ import { TimeObj } from "./types/board";
 import { UploadWidget } from "./components/UploadWidget";
 import Kdashboard from "./components/Kdashboard";
 import AdminNavbar from "./components/AdminNavbar";
+import EditKidush from "./components/EditKidush";
 function App() {
   const [users, setUsers] = useState<any>();
   const [board, setBoard] = useState<any>();
@@ -445,6 +446,10 @@ function App() {
         <Routes>
           <Route path="/" element={<div>עמוד לא נמצא</div>} />
           <Route path="/map/:id" element={<Map parasha={parasha} />} />
+          <Route
+            path="/kidush/:id"
+            element={<EditKidush parasha={parasha} />}
+          />
           <Route
             path="/confirm/:id"
             element={

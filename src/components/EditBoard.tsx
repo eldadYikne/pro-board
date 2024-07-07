@@ -41,6 +41,7 @@ import { toPng } from "html-to-image";
 import GoogleAuth from "./GoogleAuth";
 import { User, getAuth, onAuthStateChanged } from "firebase/auth";
 import AdminNavbar from "./AdminNavbar";
+import { updateBoardExceptUsers } from "../service/serviceBoard";
 
 function EditBoard(props: Props) {
   const [dbBoard, setDbBoard] = useState<Board>();
@@ -381,9 +382,8 @@ function EditBoard(props: Props) {
   const updateBoard = async (boardId: string, boardData: any) => {
     if (!boardId) return;
     // console.log(dbBoard);
-    const boardRef = doc(collection(db, "boards"), boardId); // Get reference to the user document
     try {
-      await updateDoc(boardRef, boardData); // Update the user document with new data
+      await updateBoardExceptUsers(boardId, boardData); // Update the user document with new data
       console.log("BOARD updated successfully from editBoard!");
       setSnackbarIsOpen(true);
       setTimeout(() => setSnackbarIsOpen(false), 2000);
@@ -1226,7 +1226,7 @@ function EditBoard(props: Props) {
                     </div>
                   );
                 })}
-                <div className="w-full fixed  bottom-0 flex h-14 px-1 z-10  bg-white he justify-center gap-2 items-center ">
+                <div className="w-full fixed  bottom-0 flex h-14 px-1 z-10  bg-white he justify-center gap-2 shadow-md items-center ">
                   <Button
                     className="mobile-only:w-3/4 w-36"
                     variant="contained"
@@ -1234,20 +1234,7 @@ function EditBoard(props: Props) {
                   >
                     עדכן לוח
                   </Button>
-                  <Button
-                    className="mobile-only:w-3/4 w-36"
-                    variant="contained"
-                    onClick={() => showBoard(id ?? "")}
-                  >
-                    להצגת הלוח
-                  </Button>
-                  {/* <Button
-          className="mobile-only:w-3/4 w-36"
-          variant="contained"
-          onClick={() => showUsers(id ?? "")}
-        >
-          מתפללים
-        </Button> */}
+
                   <Button
                     className="mobile-only:w-3/4 w-36"
                     variant="contained"

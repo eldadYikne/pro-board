@@ -66,6 +66,7 @@ function ConfirmedPlace(props: Props) {
     }
     fetchData();
   }, [id]);
+
   useEffect(() => {}, [user]);
   const getBoardByIdSnap = async (boardId: string) => {
     try {
@@ -229,14 +230,14 @@ function ConfirmedPlace(props: Props) {
             <div className="w-full flex justify-center text-xl font-bold">
               זמני תפילות
             </div>
-            {shabatTimesToEdit.map((time) => {
+            {shabatTimesToEdit.map((time, idx) => {
               return (
-                <div className="flex flex-col gap-1 w-full text-base">
+                <div key={idx} className="flex flex-col gap-1 w-full text-base">
                   <div className="underline w-full font-bold">{time.name}</div>
-                  {dbBoard.tfilaTimes.map((tfila: Tfila) => {
+                  {dbBoard.tfilaTimes.map((tfila: Tfila, idx) => {
                     return (
                       time.type === tfila.day && (
-                        <div className="flex w-full flex-col">
+                        <div key={idx} className="flex w-full flex-col">
                           <div className="flex w-full justify-between gap-1">
                             <span>{tfila.name}:</span>
                             <span>{tfila.time} </span>
@@ -268,9 +269,9 @@ function ConfirmedPlace(props: Props) {
               הודעות לציבור
             </div>
             <div className="flex flex-col gap-4 text-base">
-              {dbBoard.messages.map((message: Message) => {
+              {dbBoard.messages.map((message: Message, idx) => {
                 return (
-                  <div className="flex flex-col">
+                  <div key={idx} className="flex flex-col">
                     {/* <span>{String(message.date)}:</span> */}
                     <span>-{message.content} </span>
                   </div>
@@ -292,9 +293,10 @@ function ConfirmedPlace(props: Props) {
           >
             <TableHead>
               <TableRow className="bg-[#f7e4c7f7]">
-                {thTable.map((th) => {
+                {thTable.map((th, idx) => {
                   return (
                     <TableCell
+                      key={idx}
                       className="table-cell-mobile"
                       sx={{ fontWeight: 800 }}
                       align="right"
@@ -309,7 +311,10 @@ function ConfirmedPlace(props: Props) {
               {user.debts.length > 0 &&
                 user.debts.map((debt, debtidx: number) => {
                   return (
-                    <TableRow className="!bg-[#e3d8d854'] table-row">
+                    <TableRow
+                      key={debtidx}
+                      className="!bg-[#e3d8d854'] table-row"
+                    >
                       <TableCell
                         size="small"
                         align="right"
