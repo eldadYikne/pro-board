@@ -19,16 +19,18 @@ import {
   TextField,
   Snackbar,
   Alert,
+  Checkbox,
+  FormControlLabel,
 } from "@mui/material";
 import { ExpandLess, ExpandMore, Payment } from "@mui/icons-material";
 import { updateBoard } from "../service/serviceBoard";
 import { Delete, Cancel } from "@mui/icons-material";
 import TableRow from "@mui/material/TableRow";
-import { getCurrentDate } from "../utils/utils";
+import { generateRandomId, getCurrentDate } from "../utils/utils";
 import { getCurrentDateDayFirstByGetDate } from "../utils/const";
 import KdropDown from "./KdropDown";
 import { KdropDownOption } from "../types/dropDown";
-import { updateUser } from "../service/serviceUser";
+import { addNewUser, updateUser } from "../service/serviceUser";
 import AdminNavbar from "./AdminNavbar";
 function EditUsers(props: Props) {
   const { id } = useParams();
@@ -37,8 +39,10 @@ function EditUsers(props: Props) {
   const [openCollapseUser, setOpenCollapseUser] = useState<Kuser | undefined>(
     undefined
   );
+  const [filters, setFilters] = useState<Filters>({ name: "", debt: false });
   const [newDebt, setNewDebt] = useState<Debt>();
   const [editModalIsOpen, setEditModalIsOpen] = useState<boolean>(false);
+  const [addUserModalIsOpen, setAddUserModalIsOpen] = useState<boolean>(false);
   const [snackbarIsOpen, setSnackbarIsOpen] = useState<boolean>();
 
   useEffect(() => {
@@ -78,7 +82,13 @@ function EditUsers(props: Props) {
       throw error; // Rethrow the error to handle it where the function is called
     }
   };
-
+  const newUser: Kuser = {
+    id: generateRandomId(),
+    name: "",
+    debts: [],
+    present: false,
+    seats: [],
+  };
   const debtInput: {
     key: keyof Debt;
     text: string;
@@ -100,16 +110,20 @@ function EditUsers(props: Props) {
     { key: "date", text: "תאריך", type: "date" },
   ];
   const thTable = ["שם", "מקומות", "חובות", "פעולות"];
+  interface Filter {
+    key: keyof Filters;
+    text: string;
+    type: "text" | "checkBox";
+  }
+  interface Filters {
+    name: string;
+    debt: boolean;
+  }
+  const filtersKeys: Filter[] = [
+    { key: "name", text: "חיפוש לפי שם", type: "text" },
+    { key: "debt", text: "בעלי חוב", type: "checkBox" },
+  ];
 
-  const onChangeUserToEdit = (debtKey: keyof Debt, idx: number) => {
-    const newDebts = userToEdit?.debts ?? [];
-
-    // newDebts.splice(idx, 1, email);
-    // setUserToEdit({
-    //   ...userToEdit,
-    //   debts:newDebts
-    //  })
-  };
   const onChangeDebt = (debtKey: keyof Debt, value: number | string | Date) => {
     if (debtKey && newDebt) {
       setNewDebt({
@@ -139,10 +153,6 @@ function EditUsers(props: Props) {
           }
         }
       );
-      // console.log("userIdx", userIdx);
-      // console.log("user", user);
-      // console.log("newDebt", newDebt);
-      // console.log("dbBoard?.users", dbBoard?.users);
 
       if (userIdx && user && user.debts && newDebt) {
         const newDebts: Debt[] = [...user.debts, newDebt];
@@ -201,7 +211,6 @@ function EditUsers(props: Props) {
             ...openCollapseUser,
             debts: newDebts,
           });
-
           const newUserToEdit = { ...openCollapseUser, debts: [...newDebts] };
           const newUsers = dbBoard.users;
           newUsers.splice(userIdx, 1, newUserToEdit);
@@ -223,9 +232,61 @@ function EditUsers(props: Props) {
       }
     }
   };
+  const addUser = async () => {
+    try {
+      if (id && userToEdit) {
+        await addNewUser(id, userToEdit);
+        setAddUserModalIsOpen(false);
+        setSnackbarIsOpen(true);
+        setTimeout(() => setSnackbarIsOpen(false), 2000);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  const openAddUserModal = () => {
+    setAddUserModalIsOpen(true);
+    setUserToEdit(newUser);
+  };
   return (
     <div className="flex flex-col">
-      <AdminNavbar />
+      <AdminNavbar isUsersPage={true} setAddUserModal={openAddUserModal} />
+      <div className="w-full flex items-center  gap-2">
+        {filters &&
+          filtersKeys.map((filter: Filter) => {
+            return filter.type === "text" ? (
+              <TextField
+                sx={{ width: "50%" }}
+                dir="rtl"
+                id="filled-basic"
+                label={filter.text}
+                name={""}
+                value={filters[filter.key]}
+                type={filter.type}
+                onChange={(e) =>
+                  setFilters({ ...filters, [filter.key]: e.target.value })
+                }
+                variant="filled"
+              />
+            ) : (
+              <div className="text-black  transition-all  items-center justify-center">
+                <Checkbox
+                  onChange={(e) =>
+                    setFilters({
+                      ...filters,
+                      [filter.key]: e.target.checked,
+                    })
+                  }
+                  defaultChecked
+                  checked={filters.debt}
+                />
+                <span className="font-sans  whitespace-nowrap">
+                  {filter.text}
+                </span>
+              </div>
+            );
+          })}
+      </div>
       {dbBoard?.users && (
         <TableContainer
           component={Paper}
@@ -253,140 +314,153 @@ function EditUsers(props: Props) {
             </TableHead>
             <TableBody>
               {dbBoard.users &&
-                dbBoard.users.map((user: Kuser) => (
-                  <React.Fragment>
-                    <TableRow
-                      key={user.id}
-                      sx={{
-                        "&:last-child td, &:last-child th": { border: 0 },
-                      }}
-                      onClick={() =>
-                        setOpenCollapseUser(
-                          user.id === openCollapseUser?.id ? undefined : user
-                        )
-                      }
-                    >
-                      <TableCell
-                        className="table-cell-mobile"
-                        align="right"
-                        component="th"
-                        scope="row"
+                dbBoard.users
+                  .filter((user: Kuser) =>
+                    filters.debt
+                      ? user.name.includes(filters.name) &&
+                        user.debts.length > 0
+                      : user.name.includes(filters.name)
+                  )
+                  .map((user: Kuser) => (
+                    <React.Fragment>
+                      <TableRow
+                        key={user.id}
+                        sx={{
+                          "&:last-child td, &:last-child th": { border: 0 },
+                        }}
+                        onClick={() =>
+                          setOpenCollapseUser(
+                            user.id === openCollapseUser?.id ? undefined : user
+                          )
+                        }
                       >
-                        {user.name}
-                      </TableCell>
-                      <TableCell className="table-cell-mobile" align="right">
-                        {user.seats.length}
-                      </TableCell>
-                      <TableCell className="table-cell-mobile" align="right">
-                        {user.debts.length}
-                      </TableCell>
-
-                      <TableCell
-                        className="table-cell-mobile-button"
-                        sx={{ display: "flex", gap: 2 }}
-                        align="right"
-                      >
-                        <div className="flex  gap-1">
-                          <Button
-                            onClick={() => {
-                              setUserToEdit(user);
-                              setEditModalIsOpen(true);
-                              setNewDebt({
-                                date: getCurrentDate(),
-                                reason: "עלייה לתורה",
-                                sum: 0,
-                              });
+                        <TableCell
+                          className="table-cell-mobile"
+                          align="right"
+                          component="th"
+                          scope="row"
+                        >
+                          {user.name}
+                        </TableCell>
+                        <TableCell className="table-cell-mobile" align="right">
+                          {user.seats.length}
+                        </TableCell>
+                        <TableCell className="table-cell-mobile" align="right">
+                          <span
+                            style={{
+                              color: user.debts.length > 0 ? "red" : "black",
                             }}
-                            variant="contained"
-                            startIcon={<Payment />}
                           >
-                            <span className="mx-1">הוסף חוב</span>
-                          </Button>
-                        </div>
-                      </TableCell>
-                      {/* {openCollapseUser.id === user.id ? (
+                            {user.debts.length}
+                          </span>
+                        </TableCell>
+
+                        <TableCell
+                          className="table-cell-mobile-button"
+                          sx={{ display: "flex", gap: 2 }}
+                          align="right"
+                        >
+                          <div className="flex  gap-1">
+                            <Button
+                              onClick={() => {
+                                setUserToEdit(user);
+                                setEditModalIsOpen(true);
+                                setNewDebt({
+                                  date: getCurrentDate(),
+                                  reason: "עלייה לתורה",
+                                  sum: 0,
+                                });
+                              }}
+                              variant="contained"
+                              startIcon={<Payment />}
+                            >
+                              <span className="mx-1">הוסף חוב</span>
+                            </Button>
+                          </div>
+                        </TableCell>
+                        {/* {openCollapseUser.id === user.id ? (
                         <ExpandLess />
                       ) : (
                         <ExpandMore />
                       )} */}
-                    </TableRow>
-                    <TableRow>
-                      <TableCell
-                        style={{ paddingBottom: 0, padding: 0 }}
-                        colSpan={6}
-                      >
-                        <Collapse
-                          in={user.id === openCollapseUser?.id}
-                          timeout="auto"
-                          unmountOnExit
+                      </TableRow>
+                      <TableRow>
+                        <TableCell
+                          style={{ paddingBottom: 0, padding: 0 }}
+                          colSpan={6}
                         >
-                          <Table
-                            dir="rtl"
-                            align="right"
-                            sx={{
-                              tableLayout: "fixed",
-                              width: "100%",
-                              display: "flex",
-                              flexDirection: "column",
-                              justifyContent: "start",
-                              alignItems: "start",
-                            }}
+                          <Collapse
+                            in={user.id === openCollapseUser?.id}
+                            timeout="auto"
+                            unmountOnExit
                           >
-                            {user.debts.length > 0 &&
-                              user.debts.map((debt, debtidx: number) => {
-                                return (
-                                  <TableRow className="bg-[#e3d8d854]  table-row ">
-                                    <TableCell
-                                      size="small"
-                                      className="table-cell-debt"
-                                      align="right"
-                                      component="th"
-                                      scope="row"
-                                    >
-                                      {debt.reason}
-                                    </TableCell>
-                                    <TableCell
-                                      size="small"
-                                      className="table-cell-debt-sum"
-                                      align="right"
-                                      component="th"
-                                      scope="row"
-                                    >
-                                      {debt.sum}
-                                    </TableCell>
-                                    <TableCell
-                                      size="small"
-                                      className="table-cell-debt"
-                                      align="right"
-                                      component="th"
-                                      scope="row"
-                                    >
-                                      {getCurrentDateDayFirstByGetDate(
-                                        debt.date
-                                      )}
-                                    </TableCell>
-                                    <TableCell
-                                      size="small"
-                                      className="table-cell-debt"
-                                      align="right"
-                                      component="th"
-                                      scope="row"
-                                    >
-                                      <Delete
-                                        onClick={() =>
-                                          removeDebt(Number(debtidx))
-                                        }
-                                      />
-                                    </TableCell>
-                                  </TableRow>
-                                );
-                              })}
-                          </Table>
-                        </Collapse>
-                      </TableCell>
-                    </TableRow>
-                  </React.Fragment>
-                ))}
+                            <Table
+                              dir="rtl"
+                              align="right"
+                              sx={{
+                                tableLayout: "fixed",
+                                width: "100%",
+                                display: "flex",
+                                flexDirection: "column",
+                                justifyContent: "start",
+                                alignItems: "start",
+                              }}
+                            >
+                              {user.debts.length > 0 &&
+                                user.debts.map((debt, debtidx: number) => {
+                                  return (
+                                    <TableRow className="bg-[#e3d8d854]  table-row ">
+                                      <TableCell
+                                        size="small"
+                                        className="table-cell-debt"
+                                        align="right"
+                                        component="th"
+                                        scope="row"
+                                      >
+                                        {debt.reason}
+                                      </TableCell>
+                                      <TableCell
+                                        size="small"
+                                        className="table-cell-debt-sum"
+                                        align="right"
+                                        component="th"
+                                        scope="row"
+                                      >
+                                        {debt.sum}
+                                      </TableCell>
+                                      <TableCell
+                                        size="small"
+                                        className="table-cell-debt"
+                                        align="right"
+                                        component="th"
+                                        scope="row"
+                                      >
+                                        {getCurrentDateDayFirstByGetDate(
+                                          debt.date
+                                        )}
+                                      </TableCell>
+                                      <TableCell
+                                        size="small"
+                                        className="table-cell-debt"
+                                        align="right"
+                                        component="th"
+                                        scope="row"
+                                      >
+                                        <Delete
+                                          onClick={() =>
+                                            removeDebt(Number(debtidx))
+                                          }
+                                        />
+                                      </TableCell>
+                                    </TableRow>
+                                  );
+                                })}
+                            </Table>
+                          </Collapse>
+                        </TableCell>
+                      </TableRow>
+                    </React.Fragment>
+                  ))}
             </TableBody>
           </Table>
         </TableContainer>
@@ -394,48 +468,93 @@ function EditUsers(props: Props) {
       <Modal
         sx={{ overflowY: "scroll", overflowX: "hidden" }}
         className="mx-2 px-3"
-        open={editModalIsOpen}
-        onClose={() => setEditModalIsOpen(false)}
+        open={editModalIsOpen || addUserModalIsOpen}
+        onClose={() => {
+          setEditModalIsOpen(false);
+          setAddUserModalIsOpen(false);
+        }}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
         <Box sx={styleDownloadImgBox}>
-          <span className="text-2xl">{userToEdit?.name}</span>
-          {newDebt &&
-            debtInput.map((input) => {
-              return input.options ? (
-                <KdropDown
-                  setItem={(e: KdropDownOption) =>
-                    onChangeDebt(input.key, e.text)
-                  }
-                  options={input.options ?? []}
-                />
-              ) : (
-                <TextField
-                  sx={{ width: "80%" }}
-                  dir="rtl"
-                  id="filled-basic"
-                  label={input.text}
-                  name={""}
-                  value={newDebt[input.key]}
-                  type={input.type}
-                  onChange={(e) => onChangeDebt(input.key, e.target.value)}
-                  variant="filled"
-                />
-              );
-            })}
+          {editModalIsOpen ? (
+            <div className="flex flex-col gap-4 justify-center items-center w-full">
+              <span className="text-2xl">{userToEdit?.name}</span>
+              {newDebt &&
+                debtInput.map((input) => {
+                  return input.options ? (
+                    <KdropDown
+                      setItem={(e: KdropDownOption) =>
+                        onChangeDebt(input.key, e.text)
+                      }
+                      options={input.options ?? []}
+                    />
+                  ) : (
+                    <TextField
+                      sx={{ width: "80%" }}
+                      dir="rtl"
+                      id="filled-basic"
+                      label={input.text}
+                      name={""}
+                      value={newDebt[input.key]}
+                      type={input.type}
+                      onChange={(e) => onChangeDebt(input.key, e.target.value)}
+                      variant="filled"
+                    />
+                  );
+                })}
+            </div>
+          ) : (
+            <div className="flex flex-col gap-4 justify-center items-center w-full">
+              <span className="text-2xl">הוסף מתפלל</span>
+              {userToEdit &&
+                Object.keys(newUser).map((key: string) => {
+                  return (
+                    <div>
+                      {!Array.isArray(userToEdit[key as keyof Kuser]) &&
+                        key !== "id" &&
+                        key !== "present" && (
+                          <TextField
+                            sx={{ width: "100%%" }}
+                            dir="rtl"
+                            id="filled-basic"
+                            label={key}
+                            name={""}
+                            value={userToEdit[key as keyof Kuser]}
+                            type="text"
+                            onChange={(e) =>
+                              setUserToEdit({
+                                ...userToEdit,
+                                [key]: e.target.value, // Update the correct property in userToEdit
+                              })
+                            }
+                            variant="filled"
+                          />
+                        )}
+                    </div>
+                  );
+                })}
+            </div>
+          )}
 
           <div className="flex gap-3">
             <Button
-              onClick={addDebt}
-              disabled={!!!newDebt?.reason}
+              onClick={() => {
+                editModalIsOpen ? addDebt() : addUser();
+              }}
+              disabled={
+                editModalIsOpen ? !!!newDebt?.reason : !!!userToEdit?.name
+              }
               variant="contained"
             >
               אישור
             </Button>
 
             <Button
-              onClick={() => setEditModalIsOpen(false)}
+              onClick={() => {
+                setEditModalIsOpen(false);
+                setAddUserModalIsOpen(false);
+              }}
               variant="contained"
             >
               ביטול

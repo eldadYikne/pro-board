@@ -6,7 +6,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Board, MenuLink } from "../types/board";
 import { db } from "..";
 import GoogleAuth from "./GoogleAuth";
-import { CircularProgress } from "@mui/material";
+import { Button, CircularProgress } from "@mui/material";
 function AdminNavbar(props: Props) {
   const { id } = useParams();
 
@@ -68,17 +68,31 @@ function AdminNavbar(props: Props) {
     { link: `/board/${id}`, text: "לוח", icon: "tv" },
     // { link: `/kidush/${id}`, text: "קידוש", icon: "cup" },
   ];
+
   return (
     <div className="flex flex-col w-full justify-center items-center">
       <div className="flex justify-between w-full p-2 items-center bg-slate-400">
         <Menu onClick={() => setMenuIsOpen(true)} sx={{}} />
         <div className="font-sans text-xl ">{dbBoard && dbBoard.boardName}</div>
-        <div className="flex gap-3 items-center">
-          {connectedUser && <div> {connectedUser.displayName}</div>}
-          <GoogleAuth
-            setUser={setConnectedUser}
-            userConnected={connectedUser?.email ?? ""}
-          />
+        <div className="flex gap-5 items-center">
+          {props.isUsersPage && (
+            <div className="flex gap-3 items-center">
+              <Button
+                size="small"
+                onClick={() => props.setAddUserModal()}
+                variant="contained"
+              >
+                מתפלל חדש +{" "}
+              </Button>
+            </div>
+          )}
+          <div className="flex gap-2 items-center">
+            {connectedUser && <div> {connectedUser.displayName}</div>}
+            <GoogleAuth
+              setUser={setConnectedUser}
+              userConnected={connectedUser?.email ?? ""}
+            />
+          </div>
         </div>
       </div>
       {!dbBoard && (
@@ -120,6 +134,12 @@ function AdminNavbar(props: Props) {
 
 export default AdminNavbar;
 
-AdminNavbar.defaultProps = {};
+AdminNavbar.defaultProps = {
+  isUsersPage: false,
+  setAddUserModal: () => {},
+};
 
-interface Props {}
+interface Props {
+  setAddUserModal: Function;
+  isUsersPage: boolean;
+}

@@ -83,3 +83,44 @@ export const updateManyUsers = (boardId: string, updatedUsers: Kuser[]) => {
       console.error("Error fetching document: ", error);
     });
 };
+export const addNewUser = (boardId: string, newUser: Kuser) => {
+  const boardRef = doc(collection(db, "boards"), boardId);
+  // Get the current document snapshot
+  getDoc(boardRef)
+    .then((docSnapshot) => {
+      if (docSnapshot.exists()) {
+        const boardData = docSnapshot.data();
+        if (boardData) {
+          // Assuming 'users' is an array of objects with 'id' and 'present' fields
+
+          // Check if the user already exists
+          const userExists = boardData.users.some(
+            (user: Kuser) => user.id === newUser.id
+          );
+
+          if (!userExists) {
+            // Add the new user to the array
+            const updatedUsers = [...boardData.users, newUser];
+
+            // Update the document in Firestore with the new users array
+            return updateDoc(boardRef, { users: updatedUsers })
+              .then(() => {
+                console.log("User added successfully!");
+              })
+              .catch((error) => {
+                console.error("Error updating document: ", error);
+              });
+          } else {
+            console.error("User already exists in the users array.");
+          }
+        } else {
+          console.error("No data found for the board document.");
+        }
+      } else {
+        console.error("Board document does not exist.");
+      }
+    })
+    .catch((error) => {
+      console.error("Error fetching document: ", error);
+    });
+};

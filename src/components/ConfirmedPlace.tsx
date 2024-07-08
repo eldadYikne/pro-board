@@ -67,7 +67,13 @@ function ConfirmedPlace(props: Props) {
     fetchData();
   }, [id]);
 
-  useEffect(() => {}, [user]);
+  useEffect(() => {
+    if (user?.name) {
+      // let userToSet = JSON.parse(user);
+      setUser(user);
+      setChecked(user?.present);
+    }
+  }, [user]);
   const getBoardByIdSnap = async (boardId: string) => {
     try {
       const boardRef = doc(db, "boards", boardId);

@@ -1168,9 +1168,9 @@ function EditBoard(props: Props) {
                                               screen?.content && (
                                                 <div
                                                   dir="rtl"
-                                                  className="flex flex-col max-h-full w-full items-center justify-center text-center text-[10px] font-['David']"
+                                                  className="flex flex-col max-h-full h-full w-full items-center justify-center text-center text-[10px] font-['David']"
                                                 >
-                                                  <div>
+                                                  <div className="h-full">
                                                     {screen.title && (
                                                       <span className="">
                                                         {screen.title}
