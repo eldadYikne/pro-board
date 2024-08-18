@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { createContext, useEffect, useRef, useState } from "react";
 import {
   Board,
   MenuLink,
@@ -57,6 +57,7 @@ function EditBoard(props: Props) {
   const auth = getAuth();
   const navigate = useNavigate();
   const { id } = useParams();
+  // const ThemeContext = createContext('modern');
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -287,8 +288,6 @@ function EditBoard(props: Props) {
     setScreenEditorIsOpen(true);
   };
   const handleEditScreen = (screenToEdit: ScreenType) => {
-    // console.log("screenToEdit", screenToEdit);
-    // console.log("dbBoard.screens", dbBoard?.screens);
     const filterScreens = dbBoard?.screens.filter(
       (screen) => screen.id !== screenToEdit.id
     );
@@ -373,9 +372,6 @@ function EditBoard(props: Props) {
         [name]: value,
       });
     }
-
-    // const newBoard={...dbBoard}
-    // setDbBoard()
   };
   const updateBoard = async (boardId: string, boardData: any) => {
     if (!boardId) return;
@@ -399,7 +395,6 @@ function EditBoard(props: Props) {
 
     setSnackbarIsOpen(false);
   };
- 
 
   const shabatTimesToEdit: ShabatTimesToEdit[] = [
     { type: "weekday", name: " זמני יום חול" },
@@ -465,9 +460,9 @@ function EditBoard(props: Props) {
       className=" flex flex-col gap-2 sm:justify-center sm:items-center sm:w-full "
     >
       <div className="w-full flex flex-col justify-center">
-        {connectedUser ? 
+        {connectedUser ? (
           <AdminNavbar />
-        : (
+        ) : (
           <div className="flex w-full h-screen justify-center items-center p-5 font-sans flex-col bg-gradient-to-r from-blue-200 to-blue-100">
             <div className="flex flex-col p-7 max-w-96 bg-white shadow-md rounded-xl">
               <div>
@@ -489,7 +484,7 @@ function EditBoard(props: Props) {
         )}
 
         {/* sidebar MENU */}
-      
+
         {connectedUser &&
           dbBoard &&
           connectedUser.email &&

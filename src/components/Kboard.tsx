@@ -1,5 +1,5 @@
 import { TranslationsZmanimKeys, Zman } from "../types/zmanim";
-import React, { useEffect, useState } from "react";
+import React, { createContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { doc, getDoc, onSnapshot } from "firebase/firestore";
 import { db } from "..";
@@ -15,10 +15,13 @@ import Color, { Palette } from "color-thief-react";
 import KboardTimes from "./KboardTimes";
 import { checkIsPast24Hours } from "../utils/utils";
 
+export const BackgroundIsBlurContext = createContext<boolean>(false);
+
 function Kboard(props: Props) {
   const [dbBoard, setDbBoard] = useState<Board>();
   const [colors, setColors] = useState<string[]>([]);
   const [step, setStep] = useState(0);
+  const [isBgBlur, setIsBgBlur] = useState<boolean>(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [screenBackground, setScreenBackground] = useState<string>("");
   const [timeBetweenScreens, setTimeBetweenScreens] = useState<number>(20000);
@@ -236,22 +239,23 @@ function Kboard(props: Props) {
                       )}
                     </div>
                   }
-
-                  <KboardTimes
-                    board={dbBoard}
-                    formattedMinutes={formattedMinutes}
-                    hours={hours}
-                    colors={colors}
-                    hebrewDate={props.hebrewDate}
-                    isMoridHatal={props.isMoridHatal}
-                    parasha={props.parasha}
-                    zmanim={props.zmanim}
-                    omerDays={props.omerDays}
-                    roshChodesh={props.roshChodesh}
-                    holiday={props.holiday}
-                    boardTextColor={dbBoard.boardTextColor}
-                    dateTypes={dbBoard.dateTypes}
-                  />
+                  <BackgroundIsBlurContext.Provider value={isBgBlur}>
+                    <KboardTimes
+                      board={dbBoard}
+                      formattedMinutes={formattedMinutes}
+                      hours={hours}
+                      colors={colors}
+                      hebrewDate={props.hebrewDate}
+                      isMoridHatal={props.isMoridHatal}
+                      parasha={props.parasha}
+                      zmanim={props.zmanim}
+                      omerDays={props.omerDays}
+                      roshChodesh={props.roshChodesh}
+                      holiday={props.holiday}
+                      boardTextColor={dbBoard.boardTextColor}
+                      dateTypes={dbBoard.dateTypes}
+                    />
+                  </BackgroundIsBlurContext.Provider>
 
                   <div className="backdrop-opacity-10 rounded-md backdrop-invert bg-white/50 h-full sm:min-w-[33%] w-full  flex flex-col p-6 ">
                     <div

@@ -290,6 +290,7 @@ function App() {
             path="/confirm/:id"
             element={
               <ConfirmedPlace
+                // TASK 21: CREATE ONE OBJ TO ALL PROPS
                 havdalah={havdalah}
                 candles={candles}
                 parasha={parasha}

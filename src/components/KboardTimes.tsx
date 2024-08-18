@@ -1,21 +1,23 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Board } from "../types/board";
 import { Zman } from "../types/zmanim";
 import { getCurrentDateDayFirst } from "../utils/const";
+import { BackgroundIsBlurContext } from "./Kboard";
 
 function KboardTimes(props: Props) {
-  const [dbBoard, setDbBoard] = useState<Board>(props.board);
   useEffect(() => {}, [
     props.colors,
     props.board,
     props.colors,
     props.boardTextColor,
   ]);
+  const isBgBlur = useContext(BackgroundIsBlurContext);
   return (
     <div className="flex flex-col justify-between gap-3 h-full  w-full ">
       <div
         style={{
           color: props.boardTextColor === "auto" ? props.colors[1] : "black",
+          filter: isBgBlur ? "" : "blur(5px)",
         }}
         className="backdrop-opacity-10 text-center rounded-md backdrop-invert bg-white/50 px-3 py-4 h-full w-full   flex items-center justify-center shadow-sm font-['Yiddish'] sm:text-7xl  text-amber-600-600/75"
       >
