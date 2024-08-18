@@ -49,6 +49,8 @@ function App() {
     }
     fetchData();
   }, []);
+  // TASK 7: CREATE ONE OBJ TO ALL TIMES
+
   const getTimesFromApi = async () => {
     console.log("getParasha");
     let shabatData;

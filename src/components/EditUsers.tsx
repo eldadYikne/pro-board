@@ -50,6 +50,9 @@ function EditUsers(props: Props) {
   const [editModalIsOpen, setEditModalIsOpen] = useState<boolean>(false);
   const [addUserModalIsOpen, setAddUserModalIsOpen] = useState<boolean>(false);
   const [snackbarIsOpen, setSnackbarIsOpen] = useState<boolean>();
+  // TASK 9: EDIT USER - DONE
+  // TASK 7: ADD SOCKET IN EDIT - DONE
+  // TASK 12: CREATE MODAL TO EDIT MODE -  DONE
 
   useEffect(() => {
     async function fetchData() {

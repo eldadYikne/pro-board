@@ -15,6 +15,7 @@ function AdminNavbar(props: Props) {
   const [dbBoard, setDbBoard] = useState<Board>();
   const [menuIsOpen, setMenuIsOpen] = useState<boolean>(false);
   const navigate = useNavigate();
+  // TASK 1: CRATE GAURD TO ADMIN PAGE
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {

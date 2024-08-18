@@ -10,6 +10,8 @@ import { getFirestore } from "firebase/firestore";
 import { getAuth, getRedirectResult, GoogleAuthProvider } from "firebase/auth";
 
 // authDomain: "calaniot-159d1.firebaseapp.com",
+
+// TASK 13: PASS TO ENV FILE ! ! !
 const firebaseConfig = {
   apiKey: "AIzaSyB0_l-bYxRBeKGR_t_jujHRRzQacqQcRXk",
   authDomain: "calaniot-159d1.firebaseapp.com",
