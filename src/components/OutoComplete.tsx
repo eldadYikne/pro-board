@@ -45,5 +45,4 @@ interface Option {
 interface Props {
   options: Kuser[];
   onPickUsername: Function;
-  // options: Option[];
 }

@@ -53,13 +53,6 @@ function GoogleAuth(props: Props) {
 
   return (
     <div className="flex gap-3">
-      {/* <input placeholder="Email.." onChange={(e) => setEmail(e.target.value)} />
-      <input
-        type="password"
-        placeholder="Password.."
-        onChange={(e) => setPassword(e.target.value)}
-      /> */}
-      {/* <button onClick={signIn}> Signin</button> */}
       {!props.userConnected && (
         <Button
           sx={{ display: "flex", alignItems: "center" }}
@@ -68,7 +61,6 @@ function GoogleAuth(props: Props) {
           onClick={signInWithGoogle}
         >
           הכנס באמצעות גוגל
-          {/* <GoogleIcon sx={{ height: 17 }} /> */}
           <span className="h-4 w-4 px-1">
             <GoogleSvg />
           </span>

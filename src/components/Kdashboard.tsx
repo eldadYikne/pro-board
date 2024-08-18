@@ -14,6 +14,7 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { Alert, Box, Button, Modal, Snackbar, TextField } from "@mui/material";
 import { postCollectionCoustumId, updateBoard } from "../service/serviceBoard";
+import { FieldToNewBoard } from "../types/dashboard";
 function Kdashboard(props: Props) {
   const [connectedUser, setConnectedUser] = useState<User>();
   const [boards, setBoards] = useState<Board[]>();
@@ -132,10 +133,6 @@ function Kdashboard(props: Props) {
   // DATA
   const thTable = ["שם", "id", "קישור ללוח", "קישור לעריכה", "פעולות"];
 
-  interface FieldToNewBoard {
-    key: keyof Board;
-    text: "שם" | "id" | "מיקום" | "בעלי הרשאות" | "קישור לעמוד פייבוקס";
-  }
   const fieldsToNewBoard: FieldToNewBoard[] = [
     { key: "boardName", text: "שם" },
     { key: "id", text: "id" },

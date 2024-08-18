@@ -3,7 +3,13 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Board } from "../types/board";
 import { db } from "..";
-import Kuser, { Debt, DebtReason, SeatUser } from "../types/user";
+import Kuser, {
+  Debt,
+  DebtReason,
+  Filter,
+  Filters,
+  SeatUser,
+} from "../types/user";
 import {
   Box,
   Button,
@@ -110,15 +116,7 @@ function EditUsers(props: Props) {
     { key: "date", text: "תאריך", type: "date" },
   ];
   const thTable = ["שם", "מקומות", "חובות", "פעולות"];
-  interface Filter {
-    key: keyof Filters;
-    text: string;
-    type: "text" | "checkBox";
-  }
-  interface Filters {
-    name: string;
-    debt: boolean;
-  }
+
   const filtersKeys: Filter[] = [
     { key: "name", text: "חיפוש לפי שם", type: "text" },
     { key: "debt", text: "בעלי חוב", type: "checkBox" },

@@ -1,24 +1,12 @@
 import "./App.css";
-import Navbar from "./components/Navbar";
 import ConfirmedPlace from "./components/ConfirmedPlace";
 import { Route, Routes, useLocation, useParams } from "react-router-dom";
 import Map from "./components/Map";
-import React from "react";
 import { Cloudinary } from "@cloudinary/url-gen";
-import { AdvancedImage, placeholder, lazyload } from "@cloudinary/react";
 import { fill } from "@cloudinary/url-gen/actions/resize";
-import {
-  addDoc,
-  collection,
-  getDocs,
-  writeBatch,
-  doc,
-  updateDoc,
-  getDoc,
-} from "firebase/firestore";
+import { collection, doc, updateDoc, getDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { db } from ".";
-import Kuser from "./types/user";
 
 import {
   getCurrentDate,
@@ -30,15 +18,11 @@ import { TimesDataScheme, TranslationsZmanimKeys, Zman } from "./types/zmanim";
 import EditBoard from "./components/EditBoard";
 import Kboard from "./components/Kboard";
 import EditUsers from "./components/EditUsers";
-import { isTimeBetween0000And0130, checkIsPast24Hours } from "./utils/utils";
-import { TimeObj } from "./types/board";
-import { UploadWidget } from "./components/UploadWidget";
+import { checkIsPast24Hours } from "./utils/utils";
 import Kdashboard from "./components/Kdashboard";
-import AdminNavbar from "./components/AdminNavbar";
 import EditKidush from "./components/EditKidush";
+import { updateCollectionById } from "./service/serviceBoard";
 function App() {
-  const [users, setUsers] = useState<any>();
-  const [board, setBoard] = useState<any>();
   const [hebrewDate, setHebrewDate] = useState<string>();
   const [parasha, setParasha] = useState("");
   const [candles, setCandles] = useState("");
@@ -53,7 +37,6 @@ function App() {
   const { hash, pathname, search } = location;
   const cld = new Cloudinary({ cloud: { cloudName: "dwdpgwxqv" } });
   const myImage = cld.image("docs/models");
-  const [showNavbar, setShowNavbar] = useState(true);
 
   // Resize to 250 x 250 pixels using the 'fill' crop mode.
   myImage.resize(fill().width(250).height(250));
@@ -63,7 +46,6 @@ function App() {
   useEffect(() => {
     async function fetchData() {
       await getTimesFromDb();
-      // await getTimesFromApi();
     }
     fetchData();
   }, []);
@@ -212,7 +194,6 @@ function App() {
         setHavdalah(currentHavdalahDate);
         setCandles(currentCandlesDate);
         setParasha(currentParasha.hebrew);
-
         updateCollectionById(
           "times",
           {
@@ -273,143 +254,7 @@ function App() {
       console.log("fetchDataFromAPI!", timesCollection);
     }
   };
-  const getZmanimAndParasha = async () => {
-    await getDocs(collection(db, "zmanim"))
-      .then((shot) => {
-        const news = shot.docs.map((doc) => ({ ...doc.data() }));
-        if (news) {
-          setDayTimes(news as Zman[]);
-        }
-        console.log("zmanim from db", news);
-      })
-      .catch((error) => console.log(error));
-  };
-  const postCollection = async (
-    collectionName: string,
-    collectionValues: any[]
-  ) => {
-    const batch = writeBatch(db);
-    const usersCollectionRef = collection(db, collectionName);
 
-    // Iterate through the array of user objects
-    collectionValues.forEach((value) => {
-      // Create a new document reference for each user
-      const newDocRef = doc(usersCollectionRef);
-
-      // Set the data for the document
-      batch.set(newDocRef, value);
-    });
-
-    // Commit the batch write
-    await batch.commit();
-    console.log(collectionName, "new collection is upload!");
-  };
-  const postCollectionCoustumId = async (
-    collectionName: string,
-    collectionValues: any,
-    idNameCollection: string
-  ) => {
-    const batch = writeBatch(db);
-    const boardRef = doc(collection(db, collectionName), idNameCollection); // Using 'calaniot' as the board ID
-
-    // Set the data for the board document
-    batch.set(boardRef, collectionValues);
-
-    // Commit the batch write
-    await batch.commit();
-  };
-  const postCollectionCoustumIdWithArrayObjects = async (
-    collectionName: string,
-    collectionValues: any[],
-    idNameCollection: string
-  ) => {
-    const batch = writeBatch(db);
-    const boardRef = doc(collection(db, collectionName), idNameCollection); // Using 'calaniot' as the board ID
-
-    // Set the data for the board document
-    batch.set(boardRef, { [idNameCollection]: collectionValues });
-
-    // Commit the batch write
-    await batch.commit();
-  };
-  const postDataByNumberSeats = async () => {
-    let array: any[] = [];
-    users?.forEach((user: Kuser) => {
-      array.push({
-        name: user.name,
-        present: user.present,
-      });
-    });
-
-    // await postCollection("seats", array);
-    console.log("array", users);
-  };
-  const updateUser = async (userId: string, userData: any) => {
-    const userRef = doc(collection(db, "users"), userId); // Get reference to the user document
-
-    try {
-      await updateDoc(userRef, userData); // Update the user document with new data
-      console.log("User updated successfully!");
-    } catch (error) {
-      console.error("Error updating user:", error);
-    }
-  };
-  const updateCollectionById = async (
-    cellectionName: string,
-    userData: any,
-    userId: string
-  ) => {
-    const userRef = doc(collection(db, cellectionName), userId); // Get reference to the user document
-
-    try {
-      await updateDoc(userRef, userData); // Update the user document with new data
-      console.log("User updated successfully!");
-    } catch (error) {
-      console.error("Error updating user:", error);
-    }
-  };
-  const updateBoard = async (boardId: string, boardData: any) => {
-    const boardRef = doc(collection(db, "boards"), boardId); // Get reference to the user document
-    try {
-      await updateDoc(boardRef, boardData); // Update the user document with new data
-      console.log("User updated successfully!");
-    } catch (error) {
-      console.error("Error updating user:", error);
-    }
-  };
-  const postUser = async () => {
-    const docRef = await addDoc(collection(db, "users"), {
-      user: { name: "יעקב כהן", seats: ["1"], present: false },
-    });
-    console.log("doc !!!", docRef);
-  };
-  const getUsers = async () => {
-    await getDocs(collection(db, "users"))
-      .then((shot) => {
-        const news = shot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
-        setUsers(news);
-        console.log("news", news);
-      })
-      .catch((error) => console.log(error));
-  };
-  const getBoardById = async (boardId: string) => {
-    try {
-      const boardDoc = await getDoc(doc(db, "boards", boardId));
-      if (boardDoc.exists()) {
-        // Document exists, return its data along with the ID
-        const dbBoard = { ...boardDoc.data(), id: boardDoc.id };
-        setBoard(dbBoard);
-        console.log(dbBoard);
-      } else {
-        // Document does not exist
-        console.log("User not found");
-        return null;
-      }
-    } catch (error) {
-      console.error("Error fetching user:", error);
-      throw error; // Rethrow the error to handle it where the function is called
-    }
-  };
   const getTimes = async () => {
     try {
       const timesDoc = await getDoc(doc(db, "times", "times"));
@@ -429,20 +274,9 @@ function App() {
     }
   };
 
-  const getCollectionByName = async (collectionName: string) => {
-    await getDocs(collection(db, collectionName))
-      .then((shot) => {
-        const news = shot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
-        console.log(collectionName, news);
-        return news;
-      })
-      .catch((error) => console.log(error));
-  };
-
   return (
     <div dir="rtl" className="site-container">
       <div className="content-wrap">
-        {/* {showNavbar && <AdminNavbar />} */}
         <Routes>
           <Route path="/" element={<div>עמוד לא נמצא</div>} />
           <Route path="/map/:id" element={<Map parasha={parasha} />} />

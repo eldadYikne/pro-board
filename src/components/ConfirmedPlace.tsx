@@ -161,6 +161,9 @@ function ConfirmedPlace(props: Props) {
   ];
   const thTable = ["עבור", "סכום", "תאריך"];
 
+  if (!dbBoard) {
+    return <div></div>;
+  }
   return (
     <div className="flex flex-col pb-8 justify-center items-center w-full gap-3 ">
       <Navbar users={dbBoard?.users} setNewUser={setUser} />
@@ -287,7 +290,7 @@ function ConfirmedPlace(props: Props) {
           </CardContent>
         </Card>
       )}
-      {user && user.debts.length > 0 && (
+      {user && user?.debts.length > 0 && (
         <div className=" w-full flex flex-col gap-1 px-4">
           <Table
             align="right"
@@ -314,8 +317,8 @@ function ConfirmedPlace(props: Props) {
               </TableRow>
             </TableHead>
             <TableBody>
-              {user.debts.length > 0 &&
-                user.debts.map((debt, debtidx: number) => {
+              {user?.debts.length > 0 &&
+                user?.debts.map((debt, debtidx: number) => {
                   return (
                     <TableRow
                       key={debtidx}
@@ -366,7 +369,7 @@ function ConfirmedPlace(props: Props) {
           )}
         </div>
       )}
-      {user && user.debts.length > 0 && (
+      {user && user?.debts?.length > 0 && (
         <div className="w-full fixed bg-[#e75757] text-white font-medium text-xl font-serif bottom-0 flex h-8 px-1 z-10   justify-center gap-2 items-center ">
           הוועד מזכיר לך לשלם על נדר שלא שולם
         </div>

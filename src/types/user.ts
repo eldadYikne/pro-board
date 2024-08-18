@@ -21,3 +21,12 @@ export interface Debt {
   reason: string;
 }
 export type DebtReason = "עלייה לתורה" | "תרומה" | "לרפואה" | "לעילוי נשמת";
+export interface Filter {
+  key: keyof Filters;
+  text: string;
+  type: "text" | "checkBox";
+}
+export interface Filters {
+  name: string;
+  debt: boolean;
+}

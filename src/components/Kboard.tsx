@@ -3,13 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { doc, getDoc, onSnapshot } from "firebase/firestore";
 import { db } from "..";
-import {
-  Board,
-  ScreenType,
-  ShabatTimesToEdit,
-  Tfila,
-  TimeObj,
-} from "../types/board";
+import { Board, ScreenType, ShabatTimesToEdit, Tfila } from "../types/board";
 import {
   OmerDay,
   getCurrentDate,
@@ -27,12 +21,7 @@ function Kboard(props: Props) {
   const [step, setStep] = useState(0);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [screenBackground, setScreenBackground] = useState<string>("");
-  const [hebrewDate, setHebrewDate] = useState("");
-  const [timeBetweenScreens, setTimeBetweenScreens] = useState<number>(
-    // dbBoard?.timeScreenPass ? Number(dbBoard?.timeScreenPass) * 1000 : 10000
-    20000
-    // 10000
-  );
+  const [timeBetweenScreens, setTimeBetweenScreens] = useState<number>(20000);
 
   const { id } = useParams();
   useEffect(() => {
@@ -47,9 +36,6 @@ function Kboard(props: Props) {
 
     const hourlyInterval = setInterval(async () => {
       props.getTimesFromDb();
-
-      // const { seconds, nanoseconds } = props.lastTimeDataUpdated;
-      // const milliseconds = seconds * 1000 + nanoseconds / 1000000;
       const date = new Date(props.lastTimeDataUpdated);
       const isPast24Hours = checkIsPast24Hours(String(date));
       console.log(
@@ -93,7 +79,6 @@ function Kboard(props: Props) {
     fetchData();
     return () => {
       clearInterval(hourlyInterval);
-
       clearInterval(intervalId);
       clearInterval(intervalStep);
     };
@@ -104,27 +89,6 @@ function Kboard(props: Props) {
 
   // Ensure minutes are displayed with leading zero if less than 10
   const formattedMinutes = minutes < 10 ? `0${minutes}` : `${minutes}`;
-
-  const getBoardById = async (boardId: string) => {
-    try {
-      const boardDoc = await getDoc(doc(db, "boards", boardId));
-      if (boardDoc.exists()) {
-        // Document exists, return its data along with the ID
-        const newBoard = { ...boardDoc.data(), id: boardDoc.id };
-        if (newBoard) {
-          setDbBoard(newBoard as Board);
-        }
-        console.log(newBoard);
-      } else {
-        // Document does not exist
-        console.log("User not found");
-        return null;
-      }
-    } catch (error) {
-      console.error("Error fetching user:", error);
-      throw error; // Rethrow the error to handle it where the function is called
-    }
-  };
 
   const getBoardByIdSnap = async (boardId: string) => {
     try {
@@ -506,19 +470,6 @@ function Kboard(props: Props) {
           {({ data, loading }) => {
             if (loading) return <div>loading...</div>;
             if (data) setColors(data);
-            // return (
-            //   <div>
-            //     Palette:
-            //     <ul>
-            //       {data &&
-            //         data?.map((color, index) => (
-            //           <li key={index} style={{ color: color }}>
-            //             <strong>{color}</strong>
-            //           </li>
-            //         ))}
-            //     </ul>
-            //   </div>
-            // );
           }}
         </Palette>
       )}

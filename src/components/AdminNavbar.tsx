@@ -19,8 +19,6 @@ function AdminNavbar(props: Props) {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        // User is signed in, see docs for a list of available properties
-        // https://firebase.google.com/docs/reference/js/auth.user
         const uid = user.uid;
         console.log("connected user", user);
         setConnectedUser(user);
@@ -44,14 +42,12 @@ function AdminNavbar(props: Props) {
     try {
       const boardDoc = await getDoc(doc(db, "boards", boardId));
       if (boardDoc.exists()) {
-        // Document exists, return its data along with the ID
         const newBoard = { ...boardDoc.data(), id: boardDoc.id };
         if (newBoard) {
           setDbBoard(newBoard as Board);
         }
         console.log("newBoard", newBoard);
       } else {
-        // Document does not exist
         console.log("User not found");
         return null;
       }

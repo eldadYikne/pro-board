@@ -20,7 +20,6 @@ import {
   Modal,
   Snackbar,
   TextField,
-  CircularProgress,
 } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -63,7 +62,6 @@ function EditBoard(props: Props) {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         // User is signed in, see docs for a list of available properties
-        // https://firebase.google.com/docs/reference/js/auth.user
         const uid = user.uid;
         console.log("connected user", user);
         setConnectedUser(user);
@@ -401,30 +399,8 @@ function EditBoard(props: Props) {
 
     setSnackbarIsOpen(false);
   };
-  const showBoard = (id: String) => {
-    if (id) {
-      navigate(`/board/${id}`);
-    }
-  };
-  const showUsers = (id: String) => {
-    if (id) {
-      navigate(`/users/${id}`);
-    }
-  };
-  const postCollectionCoustumId = async (
-    collectionName: string,
-    collectionValues: any,
-    idNameCollection: string
-  ) => {
-    const batch = writeBatch(db);
-    const boardRef = doc(collection(db, collectionName), idNameCollection); // Using 'calaniot' as the board ID
+ 
 
-    // Set the data for the board document
-    batch.set(boardRef, collectionValues);
-
-    // Commit the batch write
-    await batch.commit();
-  };
   const shabatTimesToEdit: ShabatTimesToEdit[] = [
     { type: "weekday", name: " זמני יום חול" },
     { type: "friday", name: "זמני ערב שבת" },
@@ -489,27 +465,9 @@ function EditBoard(props: Props) {
       className=" flex flex-col gap-2 sm:justify-center sm:items-center sm:w-full "
     >
       <div className="w-full flex flex-col justify-center">
-        {connectedUser ? (
-          // <div className="flex flex-col w-full justify-center items-center">
-          //   <div className="flex justify-between w-full p-2 items-center bg-slate-400">
-          //     <Menu onClick={() => setMenuIsOpen(true)} sx={{}} />
-          //     <div>{dbBoard && dbBoard.boardName}</div>
-          //     <div className="flex gap-3 items-center">
-          //       {connectedUser && <div> {connectedUser.displayName}</div>}
-          //       <GoogleAuth
-          //         setUser={setConnectedUser}
-          //         userConnected={connectedUser?.email ?? ""}
-          //       />
-          //     </div>
-          //   </div>
-          //   {!dbBoard && (
-          //     <div className="flex ">
-          //       <CircularProgress />
-          //     </div>
-          //   )}
-          // </div>
+        {connectedUser ? 
           <AdminNavbar />
-        ) : (
+        : (
           <div className="flex w-full h-screen justify-center items-center p-5 font-sans flex-col bg-gradient-to-r from-blue-200 to-blue-100">
             <div className="flex flex-col p-7 max-w-96 bg-white shadow-md rounded-xl">
               <div>
@@ -531,28 +489,7 @@ function EditBoard(props: Props) {
         )}
 
         {/* sidebar MENU */}
-        {/* <div
-          className="sidebar"
-          style={{ width: menuIsOpen ? "250px" : "0px" }}
-        >
-          {menuIsOpen && (
-            <div className="flex flex-col p-5 gap-3 text-xl font-sans text-white">
-              <span className="closebtn">
-                <Close onClick={() => setMenuIsOpen(false)} />
-              </span>
-              {menuLinks.map((link) => {
-                return (
-                  <span
-                    className="!hover:shadow-xl active:bg-[#485e82] z-20 rounded-xl p-3 cursor-pointer sidebar-link"
-                    onClick={() => navigate(link.link)}
-                  >
-                    {link.text}
-                  </span>
-                );
-              })}
-            </div>
-          )}
-        </div> */}
+      
         {connectedUser &&
           dbBoard &&
           connectedUser.email &&
