@@ -155,8 +155,8 @@ function EditUsers(props: Props) {
         }
       );
 
-      if (userIdx && user && user.debts && newDebt) {
-        const newDebts: Debt[] = [...user.debts, newDebt];
+      if (userIdx && user && user?.debts && newDebt) {
+        const newDebts: Debt[] = [...user?.debts, newDebt];
 
         if (newDebts) {
           setUserToEdit({
@@ -205,7 +205,7 @@ function EditUsers(props: Props) {
       console.log("user", user);
       console.log("newDebt", newDebts);
       console.log("dbBoard?.users", dbBoard?.users);
-      if (userIdx && user && user.debts && newDebts) {
+      if (userIdx && user && user?.debts && newDebts) {
         if (newDebts) {
           newDebts.splice(debtIdx, 1);
           setUserToEdit({
@@ -319,7 +319,7 @@ function EditUsers(props: Props) {
                   .filter((user: Kuser) =>
                     filters.debt
                       ? user.name.includes(filters.name) &&
-                        user.debts.length > 0
+                        user?.debts.length > 0
                       : user.name.includes(filters.name)
                   )
                   .map((user: Kuser) => (
@@ -349,10 +349,10 @@ function EditUsers(props: Props) {
                         <TableCell className="table-cell-mobile" align="right">
                           <span
                             style={{
-                              color: user.debts.length > 0 ? "red" : "black",
+                              color: user?.debts.length > 0 ? "red" : "black",
                             }}
                           >
-                            {user.debts.length}
+                            {user?.debts.length}
                           </span>
                         </TableCell>
 
@@ -407,8 +407,8 @@ function EditUsers(props: Props) {
                                 alignItems: "start",
                               }}
                             >
-                              {user.debts.length > 0 &&
-                                user.debts.map((debt, debtidx: number) => {
+                              {user?.debts.length > 0 &&
+                                user?.debts.map((debt, debtidx: number) => {
                                   return (
                                     <TableRow className="bg-[#e3d8d854]  table-row ">
                                       <TableCell
