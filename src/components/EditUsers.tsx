@@ -73,7 +73,6 @@ function EditUsers(props: Props) {
   const getBoardByIdSnap = async (boardId: string) => {
     try {
       const boardRef = doc(db, "boards", boardId);
-
       // Listen to changes in the board document
       const unsubscribe = onSnapshot(boardRef, (boardDoc) => {
         if (boardDoc.exists()) {
@@ -322,7 +321,7 @@ function EditUsers(props: Props) {
         </div>
         <div className="px-3">
           {dbBoard?.users && dbBoard?.users.length > 0 && (
-            <div className="  bg-slate-700">
+            <div className=" ">
               <DownloadExcelButton
                 name={dbBoard?.boardName}
                 users={dbBoard?.users}
@@ -462,7 +461,7 @@ function EditUsers(props: Props) {
                                       <TableRow className="bg-[#e3d8d854] !flex  table-row ">
                                         <TableCell
                                           size="small"
-                                          className="table-cell-debt"
+                                          className=" w-[73px] table-cell-debt"
                                           align="right"
                                           component="th"
                                           scope="row"
