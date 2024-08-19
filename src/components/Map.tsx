@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import Kuser, { SeatNumber } from "../types/user";
+import KUser, { SeatNumber } from "../types/user";
 import chair from "../assets/chair.svg";
 import man from "../assets/man.svg";
 import { collection, doc } from "firebase/firestore";
@@ -26,11 +26,11 @@ import AdminNavbar from "./AdminNavbar";
 function Map(props: Props) {
   const seat = [8, 18];
   const allSeats: any = [];
-  const [seats, setSeats] = useState<Kuser[]>();
-  const [editingUser, setEditingUser] = useState<Kuser>();
+  const [seats, setSeats] = useState<KUser[]>();
+  const [editingUser, setEditingUser] = useState<KUser>();
   const [editingSeatNumber, setEditingSeatNumber] = useState<string>();
   const [showName, setShowName] = useState<boolean>(false);
-  const [userToUpdateSeat, setUserToUpdateSeat] = useState<Kuser>();
+  const [userToUpdateSeat, setUserToUpdateSeat] = useState<KUser>();
   const elementRef = useRef(null);
   const [dbBoard, setDbBoard] = useState<Board>();
   const { id } = useParams();
@@ -107,7 +107,7 @@ function Map(props: Props) {
     }
   };
 
-  const getSeats = (users: Kuser[]) => {
+  const getSeats = (users: KUser[]) => {
     try {
       // console.log("users", users);
       for (var i = 0; i < seat[0]; i++) {
@@ -118,7 +118,7 @@ function Map(props: Props) {
           } else {
             let currentSeat = `${i}${j}`;
             allSeats[i][j] =
-              users.find((user: Kuser) =>
+              users.find((user: KUser) =>
                 user.seats?.find(
                   (seat: SeatNumber) => seat.seatNumber === currentSeat
                 )
@@ -157,7 +157,7 @@ function Map(props: Props) {
         (seat) => seat.seatNumber === editingSeatNumber
       );
       if (!seatIsExistInUser) {
-        const newUserToUpdateSeat: Kuser = {
+        const newUserToUpdateSeat: KUser = {
           ...userToUpdateSeat,
           seats: [
             ...(userToUpdateSeat?.seats ?? []),
@@ -167,7 +167,7 @@ function Map(props: Props) {
             },
           ],
         };
-        const newEditingUserToRemoveSeat: Kuser = {
+        const newEditingUserToRemoveSeat: KUser = {
           ...editingUser,
           seats: editingUser?.seats.filter(
             (seat: SeatNumber) => seat.seatNumber !== editingSeatNumber
@@ -258,7 +258,7 @@ function Map(props: Props) {
                 seats?.length > 1 &&
                 seats?.map((row: any, rowIndex: number) => (
                   <tr className="py-2 flex" key={rowIndex}>
-                    {row.map((seatData: Kuser, columnIndex: number) => {
+                    {row.map((seatData: KUser, columnIndex: number) => {
                       let currentSeatNumber = `${rowIndex}${columnIndex}`;
                       return seatData.name ? (
                         <td
@@ -366,7 +366,7 @@ function Map(props: Props) {
                 <span className="text-center">בחר שם מהרשימה</span>
                 <OutoComplete
                   options={dbBoard?.users}
-                  onPickUsername={(e: Kuser) => setUserToUpdateSeat(e)}
+                  onPickUsername={(e: KUser) => setUserToUpdateSeat(e)}
                 />
                 <Button onClick={updateSeat} variant="contained">
                   אישור

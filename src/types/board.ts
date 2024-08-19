@@ -1,4 +1,4 @@
-import Kuser from "./user";
+import KUser from "./user";
 import { TranslationsZmanimKeys } from "./zmanim";
 
 export interface Board {
@@ -15,7 +15,7 @@ export interface Board {
   boardTextColor: string;
   mapBackgroundImage: string;
   timesToShow: Array<keyof TranslationsZmanimKeys>;
-  users?: Kuser[];
+  users?: KUser[];
   theme: Theme;
   isSetShabatTime: { isActive: boolean; enter: string; exit: string };
   screens: ScreenType[];

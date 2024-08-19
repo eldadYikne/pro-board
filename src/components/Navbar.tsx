@@ -6,7 +6,7 @@ import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import { useState, useEffect } from "react";
-import Kuser from "../types/user";
+import KUser from "../types/user";
 import { useParams } from "react-router-dom";
 import { Board } from "../types/board";
 import { Button, Modal } from "@mui/material";
@@ -31,7 +31,7 @@ export default function Navbar(props: Props) {
     }
   }, [id]);
 
-  const onPickUsername = (user: Kuser) => {
+  const onPickUsername = (user: KUser) => {
     if (user) {
       console.log(user);
       localStorage.setItem("user", JSON.stringify(user));
@@ -97,7 +97,7 @@ Navbar.defaultProps = {
 
 interface Props {
   setNewUser: Function;
-  users: Kuser[];
+  users: KUser[];
 }
 
 const style = {

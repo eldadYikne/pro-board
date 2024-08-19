@@ -62,13 +62,32 @@ body {
   margin-top: 15px;
 }
 
+@media screen and (min-width: 600px) {
+  .table-cell-debt {
+    /* width: 150px !important; */
+    display: inline-block !important;
+  }
+  .table-row {
+    /* display: flex !important; */
+    width: 100%;
+    justify-content: space-between;
+    background-color: #e3d8d854 !important;
+    padding: 0 !important;
+  }
+  .debt-title {
+    display: flex !important;
+  }
+}
 @media screen and (max-width: 600px) {
   /* CSS styles here */
   .table {
     table-layout: fixed;
   }
+  .table-row {
+    /* width: 100%; */
+    justify-content: space-between;
+  }
   .table-cell-debt {
-    width: 115px !important;
     display: inline-block !important;
     border-bottom: 0px !important;
   }
@@ -88,13 +107,27 @@ body {
   }
   .table-cell-mobile {
     width: 80px !important;
+    border-bottom: 0px !important;
+
     /* display: inline-block !important; */
   }
 }
-
+.table-cell-mobile-button {
+  border-bottom: 0px !important;
+}
+.debt-title {
+  width: 100% !important;
+  background-color: #e3d8d854 !important;
+  padding-right: 15px;
+  font-size: 18px;
+  justify-content: center;
+}
 .table-row {
   background-color: #e3d8d854 !important;
   padding: 0 !important;
+}
+.table-row * {
+  border-bottom: 0px !important;
 }
 .kdropdown {
   font-family: "IBM Plex Sans", sans-serif;

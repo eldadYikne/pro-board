@@ -1,8 +1,8 @@
 import { collection, doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "..";
-import Kuser from "../types/user";
+import KUser from "../types/user";
 
-export const updateUser = (boardId: string, updatedUser: Kuser) => {
+export const updateUser = (boardId: string, updatedUser: KUser) => {
   const boardRef = doc(collection(db, "boards"), boardId);
   console.log("TRY UPDATE USER", updatedUser);
   getDoc(boardRef)
@@ -15,7 +15,7 @@ export const updateUser = (boardId: string, updatedUser: Kuser) => {
           // Find the index of the user to update
 
           const userIndex = boardData.users.findIndex(
-            (user: Kuser) => user.id === updatedUser.id
+            (user: KUser) => user.id === updatedUser.id
           );
 
           if (userIndex !== -1) {
@@ -44,7 +44,7 @@ export const updateUser = (boardId: string, updatedUser: Kuser) => {
       console.error("Error fetching document: ", error);
     });
 };
-export const updateManyUsers = (boardId: string, updatedUsers: Kuser[]) => {
+export const updateManyUsers = (boardId: string, updatedUsers: KUser[]) => {
   const boardRef = doc(collection(db, "boards"), boardId);
 
   return getDoc(boardRef)
@@ -59,7 +59,7 @@ export const updateManyUsers = (boardId: string, updatedUsers: Kuser[]) => {
           );
 
           // Update each user in the users array
-          const updatedUsersArray = boardData.users.map((user: Kuser) => {
+          const updatedUsersArray = boardData.users.map((user: KUser) => {
             const updatedUser = updatedUsersMap.get(user.id);
             return updatedUser ? { ...user, ...updatedUser } : user;
           });
@@ -83,7 +83,7 @@ export const updateManyUsers = (boardId: string, updatedUsers: Kuser[]) => {
       console.error("Error fetching document: ", error);
     });
 };
-export const addNewUser = (boardId: string, newUser: Kuser) => {
+export const addNewUser = (boardId: string, newUser: KUser) => {
   const boardRef = doc(collection(db, "boards"), boardId);
   // Get the current document snapshot
   getDoc(boardRef)
@@ -95,7 +95,7 @@ export const addNewUser = (boardId: string, newUser: Kuser) => {
 
           // Check if the user already exists
           const userExists = boardData.users.some(
-            (user: Kuser) => user.id === newUser.id
+            (user: KUser) => user.id === newUser.id
           );
 
           if (!userExists) {

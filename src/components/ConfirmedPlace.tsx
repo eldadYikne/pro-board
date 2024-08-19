@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import Kuser from "../types/user";
+import KUser from "../types/user";
 import "firebase/compat/firestore";
 import {
   collection,
@@ -37,13 +37,15 @@ import { getCurrentDateDayFirstByGetDate } from "../utils/const";
 import { ReactComponent as Decorative1 } from "../assets/decorative-1.svg";
 import Navbar from "./Navbar";
 import { updateUser } from "../service/serviceUser";
+import { Background } from "@cloudinary/url-gen/qualifiers";
 
 function ConfirmedPlace(props: Props) {
-  const [user, setUser] = useState<Kuser>();
+  const [user, setUser] = useState<KUser>();
   const [checked, setChecked] = useState(false);
-  const [users, setUsers] = useState<Kuser[]>();
+  const [users, setUsers] = useState<KUser[]>();
   const [snackbarIsOpen, setSnackbarIsOpen] = useState<boolean>();
   const [dbBoard, setDbBoard] = useState<Board>();
+  const [userToEdit, setUserToEdit] = useState<KUser>();
 
   const label = {
     inputProps: { "aria-label": "Switch demo" },
@@ -116,12 +118,34 @@ function ConfirmedPlace(props: Props) {
       throw error; // Rethrow the error to handle it where the function is called
     }
   };
+  const onMarkDebtAsPaid = async (debtIdx: number) => {
+    if (user?.debts && user?.debts.length > 0) {
+      const newDebts = user?.debts;
+      const newDebtToEdit = user?.debts[debtIdx];
+      newDebtToEdit.isPaid = !newDebtToEdit.isPaid;
+      newDebts.splice(debtIdx, 1, newDebtToEdit);
 
+      setUserToEdit({
+        ...user,
+        debts: newDebts,
+      });
+      const newUserToEdit = { ...user, debts: [...newDebts] };
+      try {
+        if (id) {
+          await updateUser(id, newUserToEdit);
+          setSnackbarIsOpen(true);
+          setTimeout(() => setSnackbarIsOpen(false), 2000);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  };
   const handleChange = async (isPresent: boolean) => {
     setChecked(isPresent);
     if (user) {
       try {
-        let newUser: Kuser = {
+        let newUser: KUser = {
           ...user,
           present: !checked,
         };
@@ -140,7 +164,7 @@ function ConfirmedPlace(props: Props) {
     }
   };
 
-  const updateNewUser = async (userId: string, userData: Kuser) => {
+  const updateNewUser = async (userId: string, userData: KUser) => {
     if (id && user) {
       await updateUser(id, userData);
     }
@@ -159,7 +183,7 @@ function ConfirmedPlace(props: Props) {
     { type: "friday", name: " ערב שבת" },
     { type: "saturday", name: " שבת" },
   ];
-  const thTable = ["עבור", "סכום", "תאריך"];
+  const thTable = ["עבור", "סכום", "תאריך", "שולם"];
 
   if (!dbBoard) {
     return <div></div>;
@@ -338,7 +362,7 @@ function ConfirmedPlace(props: Props) {
                         component="th"
                         scope="row"
                       >
-                        {debt.sum}
+                        {debt.sum} ₪
                       </TableCell>
                       <TableCell
                         size="small"
@@ -348,6 +372,18 @@ function ConfirmedPlace(props: Props) {
                       >
                         {getCurrentDateDayFirstByGetDate(debt.date)}
                       </TableCell>
+
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            onChange={() => onMarkDebtAsPaid(debtidx)}
+                            defaultChecked
+                            checked={debt.isPaid}
+                            style={{ color: "green" }}
+                          />
+                        }
+                        label=""
+                      />
                     </TableRow>
                   );
                 })}
@@ -369,11 +405,13 @@ function ConfirmedPlace(props: Props) {
           )}
         </div>
       )}
-      {user && user?.debts?.length > 0 && (
-        <div className="w-full fixed bg-[#e75757] text-white font-medium text-xl font-serif bottom-0 flex h-8 px-1 z-10   justify-center gap-2 items-center ">
-          הוועד מזכיר לך לשלם על נדר שלא שולם
-        </div>
-      )}
+      {user &&
+        user?.debts?.length > 0 &&
+        user?.debts?.find((debt) => !debt.isPaid) && (
+          <div className="w-full fixed bg-[#e75757] text-white font-medium text-xl font-serif bottom-0 flex h-8 px-1 z-10   justify-center gap-2 items-center ">
+            הוועד מזכיר לך לשלם על נדר שלא שולם
+          </div>
+        )}
       <div>
         <Snackbar
           className="flex flex-row-reverse"

@@ -1,4 +1,4 @@
-export default interface Kuser {
+export default interface KUser {
   name: string;
   seats: SeatNumber[];
   present: boolean;
@@ -19,6 +19,7 @@ export interface Debt {
   sum: number;
   date: string;
   reason: string;
+  isPaid: boolean;
 }
 export type DebtReason = "עלייה לתורה" | "תרומה" | "לרפואה" | "לעילוי נשמת";
 export interface Filter {

@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Board } from "../types/board";
 import { db } from "..";
-import Kuser, {
+import KUser, {
   Debt,
   DebtReason,
   Filter,
@@ -28,7 +28,7 @@ import {
   Checkbox,
   FormControlLabel,
 } from "@mui/material";
-import { ExpandLess, ExpandMore, Payment } from "@mui/icons-material";
+import { ExpandLess, ExpandMore, Payment, AddCard } from "@mui/icons-material";
 import { updateBoard } from "../service/serviceBoard";
 import { Delete, Cancel } from "@mui/icons-material";
 import TableRow from "@mui/material/TableRow";
@@ -41,8 +41,8 @@ import AdminNavbar from "./AdminNavbar";
 function EditUsers(props: Props) {
   const { id } = useParams();
   const [dbBoard, setDbBoard] = useState<Board>();
-  const [userToEdit, setUserToEdit] = useState<Kuser>();
-  const [openCollapseUser, setOpenCollapseUser] = useState<Kuser | undefined>(
+  const [userToEdit, setUserToEdit] = useState<KUser>();
+  const [openCollapseUser, setOpenCollapseUser] = useState<KUser | undefined>(
     undefined
   );
   const [filters, setFilters] = useState<Filters>({ name: "", debt: false });
@@ -91,7 +91,7 @@ function EditUsers(props: Props) {
       throw error; // Rethrow the error to handle it where the function is called
     }
   };
-  const newUser: Kuser = {
+  const newUser: KUser = {
     id: generateRandomId(),
     name: "",
     debts: [],
@@ -143,11 +143,35 @@ function EditUsers(props: Props) {
 
     setSnackbarIsOpen(false);
   };
+  const onMarkDebtAsPaid = async (debtIdx: number) => {
+    if (openCollapseUser?.debts && openCollapseUser?.debts.length > 0) {
+      const newDebts = openCollapseUser?.debts;
+      const newDebtToEdit = openCollapseUser?.debts[debtIdx];
+      newDebtToEdit.isPaid = !newDebtToEdit.isPaid;
+      newDebts.splice(debtIdx, 1, newDebtToEdit);
+
+      setUserToEdit({
+        ...openCollapseUser,
+        debts: newDebts,
+      });
+      const newUserToEdit = { ...openCollapseUser, debts: [...newDebts] };
+      try {
+        if (id) {
+          await updateUser(id, newUserToEdit);
+          setSnackbarIsOpen(true);
+          setTimeout(() => setSnackbarIsOpen(false), 2000);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  };
+
   const addDebt = async () => {
     let userIdx: number = NaN;
     if (dbBoard?.users && userToEdit) {
-      const user: Kuser | undefined = dbBoard?.users.find(
-        (user: Kuser, idx: number) => {
+      const user: KUser | undefined = dbBoard?.users.find(
+        (user: KUser, idx: number) => {
           if (user.id === userToEdit?.id) {
             userIdx = idx;
             return true;
@@ -193,8 +217,8 @@ function EditUsers(props: Props) {
     console.log("openCollapseUser", openCollapseUser);
 
     if (dbBoard?.users && openCollapseUser) {
-      const user: Kuser | undefined = dbBoard?.users.find(
-        (user: Kuser, idx: number) => {
+      const user: KUser | undefined = dbBoard?.users.find(
+        (user: KUser, idx: number) => {
           if (user.id === openCollapseUser?.id) {
             userIdx = idx;
             return true;
@@ -213,8 +237,8 @@ function EditUsers(props: Props) {
             debts: newDebts,
           });
           const newUserToEdit = { ...openCollapseUser, debts: [...newDebts] };
-          const newUsers = dbBoard.users;
-          newUsers.splice(userIdx, 1, newUserToEdit);
+          // const newUsers = dbBoard.users;
+          // newUsers.splice(userIdx, 1, newUserToEdit);
 
           try {
             if (id) {
@@ -316,13 +340,13 @@ function EditUsers(props: Props) {
             <TableBody>
               {dbBoard.users &&
                 dbBoard.users
-                  .filter((user: Kuser) =>
+                  .filter((user: KUser) =>
                     filters.debt
                       ? user.name.includes(filters.name) &&
                         user?.debts.length > 0
                       : user.name.includes(filters.name)
                   )
-                  .map((user: Kuser) => (
+                  .map((user: KUser) => (
                     <React.Fragment>
                       <TableRow
                         key={user.id}
@@ -370,10 +394,11 @@ function EditUsers(props: Props) {
                                   date: getCurrentDate(),
                                   reason: "עלייה לתורה",
                                   sum: 0,
+                                  isPaid: false,
                                 });
                               }}
                               variant="contained"
-                              startIcon={<Payment />}
+                              startIcon={<AddCard />}
                             >
                               <span className="mx-1">הוסף חוב</span>
                             </Button>
@@ -410,50 +435,74 @@ function EditUsers(props: Props) {
                               {user?.debts.length > 0 &&
                                 user?.debts.map((debt, debtidx: number) => {
                                   return (
-                                    <TableRow className="bg-[#e3d8d854]  table-row ">
-                                      <TableCell
-                                        size="small"
-                                        className="table-cell-debt"
-                                        align="right"
-                                        component="th"
-                                        scope="row"
-                                      >
-                                        {debt.reason}
-                                      </TableCell>
-                                      <TableCell
-                                        size="small"
-                                        className="table-cell-debt-sum"
-                                        align="right"
-                                        component="th"
-                                        scope="row"
-                                      >
-                                        {debt.sum}
-                                      </TableCell>
-                                      <TableCell
-                                        size="small"
-                                        className="table-cell-debt"
-                                        align="right"
-                                        component="th"
-                                        scope="row"
-                                      >
-                                        {getCurrentDateDayFirstByGetDate(
-                                          debt.date
-                                        )}
-                                      </TableCell>
-                                      <TableCell
-                                        size="small"
-                                        className="table-cell-debt"
-                                        align="right"
-                                        component="th"
-                                        scope="row"
-                                      >
-                                        <Delete
-                                          onClick={() =>
-                                            removeDebt(Number(debtidx))
+                                    <React.Fragment>
+                                      <TableHead className="debt-title">
+                                        נדרים
+                                      </TableHead>
+                                      <TableRow className="bg-[#e3d8d854] !flex  table-row ">
+                                        <TableCell
+                                          size="small"
+                                          className="table-cell-debt"
+                                          align="right"
+                                          component="th"
+                                          scope="row"
+                                        >
+                                          {debt.reason}
+                                        </TableCell>
+                                        <TableCell
+                                          size="small"
+                                          className="table-cell-debt-sum"
+                                          align="right"
+                                          component="th"
+                                          scope="row"
+                                        >
+                                          {debt.sum}
+                                        </TableCell>
+                                        <TableCell
+                                          size="small"
+                                          className="table-cell-debt"
+                                          align="right"
+                                          component="th"
+                                          scope="row"
+                                        >
+                                          {getCurrentDateDayFirstByGetDate(
+                                            debt.date
+                                          )}
+                                        </TableCell>
+                                        <FormControlLabel
+                                          sx={{
+                                            margin: 0,
+                                          }}
+                                          control={
+                                            <Checkbox
+                                              onChange={() =>
+                                                onMarkDebtAsPaid(debtidx)
+                                              }
+                                              defaultChecked
+                                              checked={debt.isPaid}
+                                              style={{
+                                                color: "green",
+                                                padding: 3,
+                                              }}
+                                            />
                                           }
+                                          label="שולם"
                                         />
-                                      </TableCell>
-                                    </TableRow>
+                                        <TableCell
+                                          size="small"
+                                          className="table-cell-debt"
+                                          align="right"
+                                          component="th"
+                                          scope="row"
+                                        >
+                                          <Delete
+                                            onClick={() =>
+                                              removeDebt(Number(debtidx))
+                                            }
+                                          />
+                                        </TableCell>
+                                      </TableRow>
+                                    </React.Fragment>
                                   );
                                 })}
                             </Table>
@@ -512,7 +561,7 @@ function EditUsers(props: Props) {
                 Object.keys(newUser).map((key: string) => {
                   return (
                     <div>
-                      {!Array.isArray(userToEdit[key as keyof Kuser]) &&
+                      {!Array.isArray(userToEdit[key as keyof KUser]) &&
                         key !== "id" &&
                         key !== "present" && (
                           <TextField
@@ -521,7 +570,7 @@ function EditUsers(props: Props) {
                             id="filled-basic"
                             label={key}
                             name={""}
-                            value={userToEdit[key as keyof Kuser]}
+                            value={userToEdit[key as keyof KUser]}
                             type="text"
                             onChange={(e) =>
                               setUserToEdit({
