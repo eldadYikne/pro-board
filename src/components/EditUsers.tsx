@@ -14,7 +14,6 @@ import {
   Box,
   Button,
   Collapse,
-  ListItemText,
   Modal,
   Paper,
   Table,
@@ -28,7 +27,13 @@ import {
   Checkbox,
   FormControlLabel,
 } from "@mui/material";
-import { ExpandLess, ExpandMore, Payment, AddCard } from "@mui/icons-material";
+import {
+  ExpandLess,
+  ExpandMore,
+  Payment,
+  AddCard,
+  PointOfSale,
+} from "@mui/icons-material";
 import { updateBoard } from "../service/serviceBoard";
 import { Delete, Cancel } from "@mui/icons-material";
 import TableRow from "@mui/material/TableRow";
@@ -38,6 +43,7 @@ import KdropDown from "./KdropDown";
 import { KdropDownOption } from "../types/dropDown";
 import { addNewUser, updateUser } from "../service/serviceUser";
 import AdminNavbar from "./AdminNavbar";
+import DownloadExcelButton from "./DownloadExcelButton";
 function EditUsers(props: Props) {
   const { id } = useParams();
   const [dbBoard, setDbBoard] = useState<Board>();
@@ -276,41 +282,54 @@ function EditUsers(props: Props) {
   return (
     <div className="flex flex-col">
       <AdminNavbar isUsersPage={true} setAddUserModal={openAddUserModal} />
-      <div className="w-full flex items-center  gap-2">
-        {filters &&
-          filtersKeys.map((filter: Filter) => {
-            return filter.type === "text" ? (
-              <TextField
-                sx={{ width: "50%" }}
-                dir="rtl"
-                id="filled-basic"
-                label={filter.text}
-                name={""}
-                value={filters[filter.key]}
-                type={filter.type}
-                onChange={(e) =>
-                  setFilters({ ...filters, [filter.key]: e.target.value })
-                }
-                variant="filled"
-              />
-            ) : (
-              <div className="text-black  transition-all  items-center justify-center">
-                <Checkbox
+
+      <div className="w-full flex items-center justify-between  gap-2">
+        <div className="flex w-2/3 items-center justify-between  gap-2">
+          {filters &&
+            filtersKeys.map((filter: Filter) => {
+              return filter.type === "text" ? (
+                <TextField
+                  sx={{ width: "50%" }}
+                  dir="rtl"
+                  id="filled-basic"
+                  label={filter.text}
+                  name={""}
+                  value={filters[filter.key]}
+                  type={filter.type}
                   onChange={(e) =>
-                    setFilters({
-                      ...filters,
-                      [filter.key]: e.target.checked,
-                    })
+                    setFilters({ ...filters, [filter.key]: e.target.value })
                   }
-                  defaultChecked
-                  checked={filters.debt}
+                  variant="filled"
                 />
-                <span className="font-sans  whitespace-nowrap">
-                  {filter.text}
-                </span>
-              </div>
-            );
-          })}
+              ) : (
+                <div className="text-black  transition-all  items-center justify-center">
+                  <Checkbox
+                    onChange={(e) =>
+                      setFilters({
+                        ...filters,
+                        [filter.key]: e.target.checked,
+                      })
+                    }
+                    defaultChecked
+                    checked={filters.debt}
+                  />
+                  <span className="font-sans  whitespace-nowrap">
+                    {filter.text}
+                  </span>
+                </div>
+              );
+            })}
+        </div>
+        <div className="px-3">
+          {dbBoard?.users && dbBoard?.users.length > 0 && (
+            <div className="  bg-slate-700">
+              <DownloadExcelButton
+                name={dbBoard?.boardName}
+                users={dbBoard?.users}
+              />
+            </div>
+          )}
+        </div>
       </div>
       {dbBoard?.users && (
         <TableContainer
@@ -432,13 +451,14 @@ function EditUsers(props: Props) {
                                 alignItems: "start",
                               }}
                             >
-                              {user?.debts.length > 0 &&
-                                user?.debts.map((debt, debtidx: number) => {
-                                  return (
-                                    <React.Fragment>
-                                      <TableHead className="debt-title">
-                                        נדרים
-                                      </TableHead>
+                              <React.Fragment>
+                                <TableHead className=" debt-title">
+                                  <PointOfSale />
+                                  <span className="px-2">נדרים</span>
+                                </TableHead>
+                                {user?.debts.length > 0 &&
+                                  user?.debts.map((debt, debtidx: number) => {
+                                    return (
                                       <TableRow className="bg-[#e3d8d854] !flex  table-row ">
                                         <TableCell
                                           size="small"
@@ -451,12 +471,12 @@ function EditUsers(props: Props) {
                                         </TableCell>
                                         <TableCell
                                           size="small"
-                                          className="table-cell-debt-sum"
+                                          className="whitespace-nowrap table-cell-debt-sum"
                                           align="right"
                                           component="th"
                                           scope="row"
                                         >
-                                          {debt.sum}
+                                          {debt.sum} ₪
                                         </TableCell>
                                         <TableCell
                                           size="small"
@@ -502,9 +522,9 @@ function EditUsers(props: Props) {
                                           />
                                         </TableCell>
                                       </TableRow>
-                                    </React.Fragment>
-                                  );
-                                })}
+                                    );
+                                  })}
+                              </React.Fragment>
                             </Table>
                           </Collapse>
                         </TableCell>

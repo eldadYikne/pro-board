@@ -76,6 +76,7 @@ body {
   }
   .debt-title {
     display: flex !important;
+    padding: 5px;
   }
 }
 @media screen and (max-width: 600px) {
@@ -111,6 +112,9 @@ body {
 
     /* display: inline-block !important; */
   }
+  .debt-title {
+    padding-right: 15px;
+  }
 }
 .table-cell-mobile-button {
   border-bottom: 0px !important;
@@ -118,8 +122,8 @@ body {
 .debt-title {
   width: 100% !important;
   background-color: #e3d8d854 !important;
-  padding-right: 15px;
   font-size: 18px;
+
   justify-content: center;
 }
 .table-row {
