@@ -9,6 +9,10 @@ function KHomePage() {
     { text: "מסך לניהול זמנים", image: "board1" },
     { text: "מסך לאיחולים", image: "board2" },
   ];
+  const iphonePreviews = [
+    { title: "ערוך מכל מקום", image: "edit1" },
+    { title: "נהל מתפללים ונדרים", image: "users1" },
+  ];
   const abilities = [
     " ניהול מידע בצורה קלה",
     " תמיכה במגוון פורמטים",
@@ -121,32 +125,36 @@ function KHomePage() {
             &#10094;
           </button>
         </div>
-        <div className="flex flex-col gap-4 mt-4">
-          <h2 className="text-2xl font-bold mb-1">ערוך מכל מקום</h2>
+        {iphonePreviews.map((iphonePre) => {
+          return (
+            <div className="flex flex-col gap-4 mt-4">
+              <h2 className="text-2xl font-bold mb-1">{iphonePre.title}</h2>
 
-          <div className="flex justify-center items-center">
-            <div className="relative w-2/3 h-96 bg-black rounded-[36px] shadow-lg overflow-hidden">
-              {/* Screen Background */}
-              <div
-                style={{
-                  background: `url(${require(`../assets/${iphoneImg}.png`)}) no-repeat`,
-                  backgroundSize: "cover ",
-                }}
-                className="!bg-cover flex justify-center items-center p-3 absolute inset-0 m-2 bg-black rounded-[36px] "
-              ></div>
+              <div className="flex justify-center items-center">
+                <div className="relative w-2/3 h-96 bg-black rounded-[36px] shadow-lg overflow-hidden">
+                  {/* Screen Background */}
+                  <div
+                    style={{
+                      background: `url(${require(`../assets/${iphonePre.image}.png`)}) no-repeat`,
+                      backgroundSize: "cover ",
+                    }}
+                    className="!bg-cover flex justify-center items-center p-3 absolute inset-0 m-2 bg-black rounded-[36px] "
+                  ></div>
 
-              {/* Notch */}
-              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-16 h-2 bg-black rounded-full shadow-md"></div>
-              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-20 h-4 bg-black rounded-full shadow-md"></div>
+                  {/* Notch */}
+                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-16 h-2 bg-black rounded-full shadow-md"></div>
+                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-20 h-4 bg-black rounded-full shadow-md"></div>
 
-              {/* Bottom Edge */}
-              <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-32 h-1 mb-[1px] bg-gray-300 rounded-full"></div>
+                  {/* Bottom Edge */}
+                  <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-32 h-1 mb-[1px] bg-gray-300 rounded-full"></div>
 
-              {/* Speaker */}
-              <div className="absolute top-1 left-1/2 transform -translate-x-1/2 w-10 h-2 bg-gray-300 rounded-full"></div>
+                  {/* Speaker */}
+                  <div className="absolute top-1 left-1/2 transform -translate-x-1/2 w-10 h-2 bg-gray-300 rounded-full"></div>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+          );
+        })}
       </main>
 
       <footer className="mt-16 text-gray-200 z-10">
