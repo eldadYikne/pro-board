@@ -17,7 +17,7 @@ function KboardTimes(props: Props) {
       <div
         style={{
           color: props.boardTextColor === "auto" ? props.colors[1] : "black",
-          filter: isBgBlur ? "" : "blur(5px)",
+          filter: isBgBlur ? "blur(5px)" : "",
         }}
         className="backdrop-opacity-10 text-center rounded-md backdrop-invert bg-white/50 px-3 py-4 h-full w-full   flex items-center justify-center shadow-sm font-['Yiddish'] sm:text-7xl  text-amber-600-600/75"
       >

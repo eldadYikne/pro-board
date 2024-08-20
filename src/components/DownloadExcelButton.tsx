@@ -16,7 +16,7 @@ const DownloadExcelButton = (props: Props) => {
         user.debts.forEach((debt) => {
           data.push({
             Name: user.name,
-            DebtSum: debt.sum,
+            DebtSum: `${debt.sum}₪`,
             Reason: debt.reason,
             Date: debt.date,
             isPaid: debt.isPaid ? "שולם" : "לא שולם",

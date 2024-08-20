@@ -22,6 +22,7 @@ import { checkIsPast24Hours } from "./utils/utils";
 import Kdashboard from "./components/Kdashboard";
 import EditKidush from "./components/EditKidush";
 import { updateCollectionById } from "./service/serviceBoard";
+import KHomePage from "./components/KHomePage";
 function App() {
   const [hebrewDate, setHebrewDate] = useState<string>();
   const [parasha, setParasha] = useState("");
@@ -280,7 +281,7 @@ function App() {
     <div dir="rtl" className="site-container">
       <div className="content-wrap">
         <Routes>
-          <Route path="/" element={<div>עמוד לא נמצא</div>} />
+          <Route path="/" element={<KHomePage />} />
           <Route path="/map/:id" element={<Map parasha={parasha} />} />
           <Route
             path="/kidush/:id"

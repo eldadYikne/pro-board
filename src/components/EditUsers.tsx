@@ -470,7 +470,7 @@ function EditUsers(props: Props) {
                                         </TableCell>
                                         <TableCell
                                           size="small"
-                                          className="whitespace-nowrap table-cell-debt-sum"
+                                          className="whitespace-nowrap table-cell-debt-sum !flex items-center "
                                           align="right"
                                           component="th"
                                           scope="row"
@@ -479,7 +479,7 @@ function EditUsers(props: Props) {
                                         </TableCell>
                                         <TableCell
                                           size="small"
-                                          className="table-cell-debt"
+                                          className=" table-cell-debt !flex items-center"
                                           align="right"
                                           component="th"
                                           scope="row"
