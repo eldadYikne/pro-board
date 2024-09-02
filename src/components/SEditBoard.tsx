@@ -860,7 +860,7 @@ function SEditBoard(props: Props) {
                       )}
                       {name === "screens" && (
                         <div className="flex flex-col">
-                          <div className="flex gap-2">
+                          <div className="flex gap-2 ">
                             {screenTypes.map((screen: ScreenType, index) => {
                               return (
                                 <div
@@ -883,9 +883,14 @@ function SEditBoard(props: Props) {
                           >
                             <Grid className="sm:w-[600px] w-[350px]" sx={style}>
                               <div className="w-full min-h-[320px]  flex flex-col items-center justify-center gap-3">
-                                <span className="text-center font-['Nachlieli'] text-lg text-blue-400 font-bold  sm:text-4xl">
-                                  {" "}
-                                  כך זה יראה
+                                <span className="text-center font-['Nachlieli'] text-lg text-blue-400 font-bold flex flex-col gap-2  sm:text-4xl">
+                                  <span>
+                                    {screenTypes.find(
+                                      (screenType) =>
+                                        screenType.type === editingScreen?.type
+                                    )?.text ?? ""}
+                                  </span>
+                                  <span>כך זה יראה</span>
                                 </span>
                                 <div
                                   style={{
@@ -1261,7 +1266,7 @@ function SEditBoard(props: Props) {
                             {dbBoard.screens && dbBoard.screens.length > 0 && (
                               <div>
                                 <div> המסכים שלך :</div>
-                                <div className="flex gap-2">
+                                <div className="flex gap-2 overflow-auto">
                                   {dbBoard.screens.map(
                                     (screen: ScreenType, index) => {
                                       return (
@@ -1281,30 +1286,39 @@ function SEditBoard(props: Props) {
                                             }}
                                             className="w-20 h-16 !bg-cover flex justify-center items-center p-3  "
                                           >
-                                            {screen.type === "images" && (
-                                              <div className="flex flex-col gap-1">
-                                                {screen.title}
+                                            {screen.type === "images" &&
+                                              screen?.imgUrl && (
+                                                <div className="flex flex-col gap-1">
+                                                  <span className="text-ellipsis overflow-hidden whitespace-nowrap  ">
+                                                    {screen.title}
+                                                  </span>
 
-                                                <div className="grid gap-1 grid-cols-3">
-                                                  {Array.isArray(
-                                                    screen?.imgUrl
-                                                  ) &&
-                                                    screen?.imgUrl.map(
-                                                      (img: string) => {
-                                                        return (
-                                                          <div className="h-full w-full flex flex-col relative">
-                                                            <img
-                                                              className="w-full h-full "
-                                                              alt=""
-                                                              src={img}
-                                                            />
-                                                          </div>
-                                                        );
-                                                      }
-                                                    )}
+                                                  <div
+                                                    className={`grid gap-6 grid-cols-${
+                                                      screen?.imgUrl.length < 3
+                                                        ? screen?.imgUrl.length
+                                                        : 3
+                                                    } justify-center`}
+                                                  >
+                                                    {Array.isArray(
+                                                      screen?.imgUrl
+                                                    ) &&
+                                                      screen?.imgUrl.map(
+                                                        (img: string) => {
+                                                          return (
+                                                            <div className="h-full w-full flex flex-col relative">
+                                                              <img
+                                                                className="sm:w-full sm:h-full h-1/2 w-1/2  "
+                                                                alt=""
+                                                                src={img}
+                                                              />
+                                                            </div>
+                                                          );
+                                                        }
+                                                      )}
+                                                  </div>
                                                 </div>
-                                              </div>
-                                            )}
+                                              )}
                                             {(screen.type === "image" ||
                                               screen.type === "info") &&
                                               screen?.content &&
@@ -1317,7 +1331,7 @@ function SEditBoard(props: Props) {
                                                 >
                                                   <div className="h-full flex flex-col gap-1 items-center justify-center">
                                                     {screen.title && (
-                                                      <span className="">
+                                                      <span className="text-ellipsis overflow-hidden whitespace-nowrap">
                                                         {screen.title}
                                                       </span>
                                                     )}
@@ -1334,7 +1348,7 @@ function SEditBoard(props: Props) {
                                               screen?.content && (
                                                 <div
                                                   dir="rtl"
-                                                  className="flex w-full items-center justify-center text-center text-[10px] font-['David']"
+                                                  className="flex w-full text-ellipsis overflow-hidden whitespace-nowrap items-center justify-center text-center text-[10px] font-['David']"
                                                 >
                                                   {screen?.content}
                                                 </div>

@@ -215,9 +215,14 @@ function Sboard(props: Props) {
           //     }.jpg`)}) no-repeat`,
           //     backgroundSize: "cover !importent",
           //   }}
-          className={`!bg-cover flex h-screen flex-col items-center justify-center p-3 w-full rounded-sm`}
+          className={`!bg-cover font-['Comix'] flex h-screen flex-col items-center justify-center p-3 w-full rounded-sm`}
         >
-          <span onClick={setStepWithButton}>{step}- step++</span>
+          <span
+            className="text-white w-5 h-5 cursor-pointer"
+            onClick={setStepWithButton}
+          >
+            {/* {step}- step++ */}
+          </span>
 
           {/* {dbBoard.dateTypes.length > 0 && (
             <div className="text-3xl p-2 px-4 flex justify-between w-full font-['Anka'] items-center absolute top-0">
@@ -277,7 +282,7 @@ function Sboard(props: Props) {
                               style={{
                                 color: "black",
                               }}
-                              className="font-['Alef'] font-light sm:text-4xl "
+                              className="font-['Comix'] font-light sm:text-4xl "
                             >
                               {message.content}
                             </li>
@@ -399,7 +404,7 @@ function Sboard(props: Props) {
                         screen?.content && (
                           <div
                             dir="rtl"
-                            className="flex w-full items-center justify-center text-center text-8xl font-['David']"
+                            className="flex w-full items-center justify-center text-center text-8xl font-['Comix']"
                           >
                             {screen?.content}
                           </div>
