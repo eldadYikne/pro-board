@@ -28,6 +28,7 @@ export interface Board {
   inspirationalScreen: InspirationalScreen;
   admins: string[];
   payboxLink: string;
+  messageScreenIsWhatsapp: boolean;
 }
 
 export interface Tfila {

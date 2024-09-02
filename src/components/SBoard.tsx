@@ -11,6 +11,7 @@ import { getCurrentDateDayFirst } from "../utils/const";
 import { ReactComponent as ProBoard } from "../assets/pro-board-logo.svg";
 import WhatsappMessages from "./WhatsappMessages";
 import EmojiObjectsOutlinedIcon from "@mui/icons-material/EmojiObjectsOutlined";
+import MessageIcon from "@mui/icons-material/Message";
 import { dividerClasses } from "@mui/material";
 function Sboard(props: Props) {
   const [dbBoard, setDbBoard] = useState<Board>();
@@ -253,43 +254,42 @@ function Sboard(props: Props) {
               </div>
             )}
             {dbBoard.messages.length > 0 && step === 1 && (
-              //   <div className="flex flex-col gap-8 items-center justify-center">
-              //     <span
-              //       style={{
-              //         color:
-              //           dbBoard.boardTextColor === "auto" ? colors[1] : "black",
-              //       }}
-              //       className="font-bold underline text-8xl font-['Comix'] text-shadow-headline"
-              //     >
-              //       הודעות חשובות
-              //     </span>
-              //     <div className="flex flex-col gap-3">
-              //       {dbBoard.messages.length > 0 &&
-              //         dbBoard.messages.map((message) => {
-              //           return (
-              //             <li
-              //               style={{
-              //                 color:
-              //                   dbBoard.boardTextColor === "auto"
-              //                     ? colors[2]
-              //                     : "black",
-              //               }}
-              //               className="font-['Alef'] font-light sm:text-4xl "
-              //             >
-              //               {message.content}
-              //             </li>
-              //           );
-              //         })}
-              //     </div>
-              //   </div>
-              <WhatsappMessages
-                boardSymbol={dbBoard.boardSymbol ?? ""}
-                boardName={dbBoard.boardName ?? ""}
-                messages={dbBoard.messages ?? []}
-              />
+              <div className="h-full w-full">
+                {dbBoard.messageScreenIsWhatsapp ? (
+                  <WhatsappMessages
+                    boardSymbol={dbBoard.boardSymbol ?? ""}
+                    boardName={dbBoard.boardName ?? ""}
+                    messages={dbBoard.messages ?? []}
+                  />
+                ) : (
+                  <div className="flex flex-col items-center h-full gap-16 justify-center">
+                    <div className="flex gap-1 p-11 bg-blue-400 rounded-3xl items-center">
+                      <span className="text-8xl  font-['Comix']">
+                        הודעות חשובות{" "}
+                      </span>
+                      <MessageIcon sx={{ fontSize: "5rem" }} />
+                    </div>
+                    <div className="flex flex-col gap-3">
+                      {dbBoard.messages.length > 0 &&
+                        dbBoard.messages.map((message) => {
+                          return (
+                            <li
+                              style={{
+                                color: "black",
+                              }}
+                              className="font-['Alef'] font-light sm:text-4xl "
+                            >
+                              {message.content}
+                            </li>
+                          );
+                        })}
+                    </div>
+                  </div>
+                )}
+              </div>
             )}
             {dbBoard?.inspirationalScreen?.isActive && step === 2 && (
-              <div className="w-full gap-8 overflow-hidden h-full flex flex-col items-center justify-center">
+              <div className="w-full gap-16 overflow-hidden h-full flex flex-col items-center justify-center">
                 <div className="flex gap-1 p-11 bg-yellow-300 rounded-3xl items-center">
                   <span className="text-8xl  font-['Comix']">
                     משפט מעורר השראה
@@ -356,6 +356,42 @@ function Sboard(props: Props) {
                                 <div className=" bg-yellow-300 rounded-full h-[100px] w-[100px]    "></div>
                               </div>
                             )}
+                          </div>
+                        )}
+                      {screen.type === "images" &&
+                        screen?.imgUrl &&
+                        Array.isArray(screen?.imgUrl) && (
+                          <div className="flex h-full my-8 items-center justify-center flex-col gap-15 ">
+                            <div
+                              dir="rtl"
+                              className={`flex flex-col w-full h-full items-center gap-7 justify-center text-center text-2xl font-['Comix']`}
+                            >
+                              <div className="flex gap-1  flex-col text-7xl p-11 bg-purple-400 rounded-3xl items-center">
+                                <span className="text-8xl  font-['Comix']">
+                                  {screen.title}
+                                </span>
+                              </div>
+                              <div
+                                className={`grid gap-6 grid-cols-${
+                                  screen.imgUrl.length < 3
+                                    ? screen.imgUrl.length
+                                    : 3
+                                } justify-center`}
+                              >
+                                {Array.isArray(screen?.imgUrl) &&
+                                  screen?.imgUrl.map((img: string) => {
+                                    return (
+                                      <div className="h-full w-full flex flex-col relative">
+                                        <img
+                                          className="w-full h-full "
+                                          alt=""
+                                          src={img}
+                                        />
+                                      </div>
+                                    );
+                                  })}
+                              </div>
+                            </div>
                           </div>
                         )}
                       {(screen.type === "message" ||

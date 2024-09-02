@@ -167,6 +167,10 @@ function SEditBoard(props: Props) {
     { name: "screens", placeholder: "הוסף מסך" },
     { name: "dateTypes", placeholder: "סוג תאריך" },
     { name: "messages", placeholder: "הודעות " },
+    {
+      name: "messageScreenIsWhatsapp",
+      placeholder: "לוח הודעות מוצג בשיחת ווצאפ",
+    },
     { name: "boardTextColor", placeholder: "צבע טקסט" },
     { name: "boardWelcomeImage", placeholder: "ברוכים הבאים" },
     {
@@ -254,7 +258,11 @@ function SEditBoard(props: Props) {
         // console.log(dbBoard?.screens);
       } else {
       }
-    } else if (screenTypeEdit === "image" || screenTypeEdit === "info") {
+    } else if (
+      screenTypeEdit === "image" ||
+      screenTypeEdit === "info" ||
+      screenTypeEdit === "images"
+    ) {
       if (editingScreen?.content || editingScreen?.imgUrl) {
         newScreen = {
           id: generateRandomId(),
@@ -536,6 +544,7 @@ function SEditBoard(props: Props) {
                         name !== "inspirationalScreen" &&
                         name !== "boardSymbol" &&
                         name !== "screens" &&
+                        name !== "messageScreenIsWhatsapp" &&
                         name !== "isSetShabatTime" &&
                         name !== "theme" && (
                           <TextField
@@ -733,6 +742,26 @@ function SEditBoard(props: Props) {
                           })}
                         </div>
                       )}
+                      {name === "messageScreenIsWhatsapp" && (
+                        <div className="flex items-center ">
+                          <Switch
+                            onClick={(e) => {
+                              setDbBoard({
+                                ...dbBoard,
+                                messageScreenIsWhatsapp:
+                                  !dbBoard?.messageScreenIsWhatsapp,
+                              });
+                            }}
+                            name={"messageScreenIsWhatsapp"}
+                            checked={dbBoard?.messageScreenIsWhatsapp}
+                          />
+                          <span>
+                            {dbBoard?.messageScreenIsWhatsapp
+                              ? "מופעל"
+                              : "כבוי"}
+                          </span>
+                        </div>
+                      )}
                       {name === "inspirationalScreen" && (
                         <div>
                           <div className="flex items-center ">
@@ -854,7 +883,10 @@ function SEditBoard(props: Props) {
                           >
                             <Grid className="sm:w-[600px] w-[350px]" sx={style}>
                               <div className="w-full min-h-[320px]  flex flex-col items-center justify-center gap-3">
-                                <span className="text-center"> כך זה יראה</span>
+                                <span className="text-center font-['Nachlieli'] text-lg text-blue-400 font-bold  sm:text-4xl">
+                                  {" "}
+                                  כך זה יראה
+                                </span>
                                 <div
                                   style={{
                                     background: `url(${require(`../assets/school-backgrounds/${
@@ -864,7 +896,7 @@ function SEditBoard(props: Props) {
                                     }.jpg`)}) no-repeat`,
                                     backgroundSize: "cover !importent",
                                   }}
-                                  className="sm:w-full w-[340px] min-h-[160px] !bg-cover flex justify-center items-center p-3  "
+                                  className="sm:w-full w-[340px] sm:min-h-[260px] min-h-[160px] !bg-cover flex justify-center items-center p-3  "
                                 >
                                   {screenTypeEdit === "image" &&
                                     editingScreen && (
@@ -890,7 +922,7 @@ function SEditBoard(props: Props) {
                                         !Array.isArray(
                                           editingScreen?.imgUrl
                                         ) ? (
-                                          <div className="h-full w-full flex flex-col relative">
+                                          <div className="h-full sm:w-1/2 w-full flex flex-col relative">
                                             <img
                                               className=""
                                               alt=""
@@ -911,7 +943,7 @@ function SEditBoard(props: Props) {
                                             </span>
                                           </div>
                                         ) : (
-                                          <div className="p-4 border border-black">
+                                          <div className="p-4 border bg-transparent text-center border-black">
                                             <UploadWidget
                                               text={
                                                 editingScreen?.imgUrl
@@ -944,7 +976,7 @@ function SEditBoard(props: Props) {
                                       >
                                         <input
                                           dir="rtl"
-                                          className="border border-black w-full h-8 px-3 mb-3 rounded-sm"
+                                          className="border border-black bg-transparent text-center w-full h-8 px-3 mb-3 rounded-sm"
                                           placeholder="הוסף כותרת"
                                           type="text"
                                           value={editingScreen?.title}
@@ -955,47 +987,47 @@ function SEditBoard(props: Props) {
                                             })
                                           }
                                         />
-                                        <div className="grid grid-cols-4">
+                                        <div
+                                          className={`grid gap-2 grid-cols-3`}
+                                        >
                                           {Array.isArray(
                                             editingScreen?.imgUrl
                                           ) &&
                                             editingScreen?.imgUrl.map(
                                               (img: string, index: number) => {
                                                 return (
-                                                  <div>
-                                                    <div className="h-full w-full flex flex-col relative">
-                                                      <img
-                                                        className=""
-                                                        alt=""
-                                                        src={img}
-                                                      />
-                                                      <span
-                                                        className="absolute top-1 left-1 cursor-pointer border border-white rounded-full "
-                                                        onClick={() => {
-                                                          let images: string[] =
-                                                            editingScreen?.imgUrl as string[];
-                                                          images?.splice(
-                                                            index,
-                                                            1
-                                                          );
-                                                          setEditingScreen({
-                                                            ...editingScreen,
-                                                            imgUrl: images,
-                                                          });
+                                                  <div className="h-full w-full flex flex-col relative">
+                                                    <img
+                                                      className="w-20 h-20 sm:w-20 sm:h-20"
+                                                      alt=""
+                                                      src={img}
+                                                    />
+                                                    <span
+                                                      className="absolute top-1 left-1 cursor-pointer border border-white rounded-full "
+                                                      onClick={() => {
+                                                        let images: string[] =
+                                                          editingScreen?.imgUrl as string[];
+                                                        images?.splice(
+                                                          index,
+                                                          1
+                                                        );
+                                                        setEditingScreen({
+                                                          ...editingScreen,
+                                                          imgUrl: images,
+                                                        });
+                                                      }}
+                                                    >
+                                                      <Delete
+                                                        style={{
+                                                          color: "white",
                                                         }}
-                                                      >
-                                                        <Delete
-                                                          style={{
-                                                            color: "white",
-                                                          }}
-                                                        />
-                                                      </span>
-                                                    </div>
+                                                      />
+                                                    </span>
                                                   </div>
                                                 );
                                               }
                                             )}
-                                          <div className="p-4 border border-black">
+                                          <div className="p-4 cursor-pointer border bg-transparent text-center border-black">
                                             {Array.isArray(
                                               editingScreen?.imgUrl
                                             ) &&
@@ -1030,25 +1062,23 @@ function SEditBoard(props: Props) {
                                           className="flex w-3/4  h-full items-center gap-7 justify-center text-center  font-['Comix']"
                                         >
                                           <div className="flex flex-col max-w-[50%] gap-2">
-                                            <span className=" ">
-                                              <input
-                                                dir="rtl"
-                                                className="border border-black w-full h-8 px-3 mb-3 rounded-sm"
-                                                placeholder="הוסף כותרת"
-                                                type="text"
-                                                value={editingScreen?.title}
-                                                onChange={(e) =>
-                                                  setEditingScreen({
-                                                    ...editingScreen,
-                                                    title: e.target.value,
-                                                  })
-                                                }
-                                              />
-                                            </span>
+                                            <input
+                                              dir="rtl"
+                                              className="border border-black w-full text-center bg-transparent  h-8 px-3 mb-3 rounded-sm"
+                                              placeholder="הוסף כותרת"
+                                              type="text"
+                                              value={editingScreen?.title}
+                                              onChange={(e) =>
+                                                setEditingScreen({
+                                                  ...editingScreen,
+                                                  title: e.target.value,
+                                                })
+                                              }
+                                            />
                                             <span className="text-sm sm:text-base ">
                                               <textarea
                                                 dir="rtl"
-                                                className="border border-black w-full h-8 px-3 mb-3 rounded-sm"
+                                                className="border border-black w-full h-full text-center sm:min-h-[130px]  px-3 mb-3 rounded-sm"
                                                 placeholder="הוסף מידע"
                                                 value={editingScreen?.content}
                                                 onChange={(e) =>
@@ -1065,7 +1095,7 @@ function SEditBoard(props: Props) {
                                           !Array.isArray(
                                             editingScreen?.imgUrl
                                           ) ? (
-                                            <div className="h-full w-full flex flex-col relative">
+                                            <div className="h-full sm:w-1/2 w-full flex flex-col relative">
                                               <img
                                                 className=""
                                                 alt=""
@@ -1251,6 +1281,30 @@ function SEditBoard(props: Props) {
                                             }}
                                             className="w-20 h-16 !bg-cover flex justify-center items-center p-3  "
                                           >
+                                            {screen.type === "images" && (
+                                              <div className="flex flex-col gap-1">
+                                                {screen.title}
+
+                                                <div className="grid gap-1 grid-cols-3">
+                                                  {Array.isArray(
+                                                    screen?.imgUrl
+                                                  ) &&
+                                                    screen?.imgUrl.map(
+                                                      (img: string) => {
+                                                        return (
+                                                          <div className="h-full w-full flex flex-col relative">
+                                                            <img
+                                                              className="w-full h-full "
+                                                              alt=""
+                                                              src={img}
+                                                            />
+                                                          </div>
+                                                        );
+                                                      }
+                                                    )}
+                                                </div>
+                                              </div>
+                                            )}
                                             {(screen.type === "image" ||
                                               screen.type === "info") &&
                                               screen?.content &&
@@ -1261,14 +1315,14 @@ function SEditBoard(props: Props) {
                                                   dir="rtl"
                                                   className="flex flex-col max-h-full h-full w-full items-center justify-center text-center text-[10px] font-['David']"
                                                 >
-                                                  <div className="h-full">
+                                                  <div className="h-full flex flex-col gap-1 items-center justify-center">
                                                     {screen.title && (
                                                       <span className="">
                                                         {screen.title}
                                                       </span>
                                                     )}
                                                     <img
-                                                      className="w-full h-full"
+                                                      className="w-2/3 h-2/3"
                                                       src={screen?.imgUrl}
                                                       alt=""
                                                     />

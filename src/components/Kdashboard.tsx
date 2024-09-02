@@ -45,6 +45,7 @@ function Kdashboard(props: Props) {
     payboxLink: "",
     lastTimeBoardUpdate: new Date(),
     inspirationalScreen: { isActive: false, text: "", writer: "" },
+    messageScreenIsWhatsapp: false,
   };
   const [newBoard, setNewBoard] = useState<Board>(boardObj);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
