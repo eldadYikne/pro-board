@@ -15,12 +15,15 @@ import Paper from "@mui/material/Paper";
 import { Alert, Box, Button, Modal, Snackbar, TextField } from "@mui/material";
 import { postCollectionCoustumId, updateBoard } from "../service/serviceBoard";
 import { FieldToNewBoard } from "../types/dashboard";
+import KdropDown from "./KdropDown";
+import { KdropDownOption } from "../types/dropDown";
 function Kdashboard(props: Props) {
   const [connectedUser, setConnectedUser] = useState<User>();
   const [boards, setBoards] = useState<Board[]>();
   const boardObj: Board = {
     id: "",
     boardName: "",
+    type: "school",
     geoId: "",
     timeScreenPass: "20",
     dateTypes: ["hebrew"],
@@ -40,6 +43,8 @@ function Kdashboard(props: Props) {
     isFreez: false,
     admins: [],
     payboxLink: "",
+    lastTimeBoardUpdate: new Date(),
+    inspirationalScreen: { isActive: false, text: "", writer: "" },
   };
   const [newBoard, setNewBoard] = useState<Board>(boardObj);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -135,6 +140,14 @@ function Kdashboard(props: Props) {
 
   const fieldsToNewBoard: FieldToNewBoard[] = [
     { key: "boardName", text: "שם" },
+    {
+      key: "type",
+      text: "סוג לוח",
+      options: [
+        { type: "school", text: "בית ספר" },
+        { type: "kodesh", text: "בית כנסת" },
+      ],
+    },
     { key: "id", text: "id" },
     { key: "geoId", text: "מיקום" },
     { key: "payboxLink", text: "קישור לעמוד פייבוקס" },
@@ -303,6 +316,18 @@ function Kdashboard(props: Props) {
                   >
                     הוסף מייל להרשאה
                   </Button>
+                </div>
+              ) : filed.key === "type" ? (
+                <div>
+                  <KdropDown
+                    setItem={(e: KdropDownOption) =>
+                      setNewBoard({
+                        ...newBoard,
+                        [filed.key]: e.type,
+                      })
+                    }
+                    options={filed.options ?? []}
+                  />
                 </div>
               ) : (
                 <div>

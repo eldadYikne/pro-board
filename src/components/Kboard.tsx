@@ -1,6 +1,6 @@
 import { TranslationsZmanimKeys, Zman } from "../types/zmanim";
 import React, { createContext, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, redirect } from "react-router-dom";
 import { doc, getDoc, onSnapshot } from "firebase/firestore";
 import { db } from "..";
 import { Board, ScreenType, ShabatTimesToEdit, Tfila } from "../types/board";
@@ -14,6 +14,7 @@ import {
 import Color, { Palette } from "color-thief-react";
 import KboardTimes from "./KboardTimes";
 import { checkIsPast24Hours } from "../utils/utils";
+import NotFoundPage from "./NotFoundPage";
 
 export const BackgroundIsBlurContext = createContext<boolean>(false);
 
@@ -126,12 +127,19 @@ function Kboard(props: Props) {
     { type: "friday", name: " ערב שבת" },
     { type: "saturday", name: " שבת" },
   ];
+  if (dbBoard?.type === "school") {
+    return (
+      <div>
+        <NotFoundPage />
+      </div>
+    );
+  }
   return (
     <div>
       {dbBoard && (
         <div
           style={{
-            background: `url(${require(`../assets/board-backgrounds/${
+            background: `url(${require(`../assets/kodesh-backgrounds/${
               screenBackground !== ""
                 ? screenBackground
                 : dbBoard.boardBackgroundImage
@@ -184,7 +192,7 @@ function Kboard(props: Props) {
                               gridTemplateColumns: "repeat(2, minmax(0, 1fr)) ",
                             }}
                           >
-                            {dbBoard.tfilaTimes.map((tfila: Tfila) => {
+                            {dbBoard?.tfilaTimes?.map((tfila: Tfila) => {
                               return tfila.day === "weekday" ? (
                                 <div className="flex justify-between w-full">
                                   <div
@@ -276,7 +284,7 @@ function Kboard(props: Props) {
                     <div className="flex flex-col ">
                       {step === 1 && (
                         <div className="flex flex-col gap-2 ">
-                          {dbBoard.timesToShow.map((time: string) => (
+                          {dbBoard?.timesToShow?.map((time: string) => (
                             <div className="flex w-full justify-between ">
                               <span
                                 className="font-['Suez'] font-light text-3xl"
@@ -339,7 +347,7 @@ function Kboard(props: Props) {
                                           "repeat(2, minmax(0, 1fr)) ",
                                       }}
                                     >
-                                      {dbBoard.tfilaTimes.map(
+                                      {dbBoard.tfilaTimes?.map(
                                         (tfila: Tfila) => {
                                           return (
                                             time.type === tfila.day && (
@@ -416,7 +424,7 @@ function Kboard(props: Props) {
                 })}
             </div>
 
-            {dbBoard.forUplifting.length > 0 && (
+            {dbBoard.forUplifting && dbBoard.forUplifting?.length > 0 && (
               <div id="scroll-container">
                 {dbBoard.forUplifting.length > 5 ? (
                   <div className="flex flex-col justify-center items-center font-['Alef']  w-full font-light sm:text-2xl  gap-1">
@@ -428,7 +436,8 @@ function Kboard(props: Props) {
                             <div className="">
                               {" "}
                               {forUplift.content}{" "}
-                              {dbBoard.forUplifting.length > 1
+                              {dbBoard.forUplifting &&
+                              dbBoard.forUplifting.length > 1
                                 ? index === dbBoard.forUplifting.length - 1
                                   ? "."
                                   : ","
@@ -447,7 +456,8 @@ function Kboard(props: Props) {
                         <div>
                           {" "}
                           {forUplift.content}{" "}
-                          {dbBoard.forUplifting.length > 1
+                          {dbBoard.forUplifting &&
+                          dbBoard.forUplifting.length > 1
                             ? index === dbBoard.forUplifting.length - 1
                               ? "."
                               : ","
@@ -464,7 +474,7 @@ function Kboard(props: Props) {
       )}
       {dbBoard && (
         <Palette
-          src={require("../assets/board-backgrounds/" +
+          src={require("../assets/kodesh-backgrounds/" +
             dbBoard.boardBackgroundImage +
             ".jpg")}
           crossOrigin="anonymous"

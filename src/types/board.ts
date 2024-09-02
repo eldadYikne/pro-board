@@ -3,24 +3,29 @@ import { TranslationsZmanimKeys } from "./zmanim";
 
 export interface Board {
   id?: string;
+  type: "kodesh" | "school";
+  boardSymbol?: string;
   boardName: string;
   geoId: string;
   timeScreenPass: string;
+  lastTimeBoardUpdate: Date | TimeObj;
   dateTypes: string[];
-  tfilaTimes: Tfila[];
-  forUplifting: Message[];
-  forMedicine: Message[];
+  tfilaTimes?: Tfila[];
+  forUplifting?: Message[];
+  forMedicine?: Message[];
   messages: Message[];
   boardBackgroundImage: string;
+  boardWelcomeImage?: string;
   boardTextColor: string;
   mapBackgroundImage: string;
-  timesToShow: Array<keyof TranslationsZmanimKeys>;
+  timesToShow?: Array<keyof TranslationsZmanimKeys>;
   users?: KUser[];
   theme: Theme;
-  isSetShabatTime: { isActive: boolean; enter: string; exit: string };
+  isSetShabatTime?: { isActive: boolean; enter: string; exit: string };
   screens: ScreenType[];
   backgroundToWhatsappImg: string;
   isFreez: boolean;
+  inspirationalScreen: InspirationalScreen;
   admins: string[];
   payboxLink: string;
 }
@@ -30,15 +35,33 @@ export interface Tfila {
   name: string;
   day: ShabatDayTfila;
 }
+export interface InspirationalScreen {
+  isActive: boolean;
+  text: string;
+  writer: string;
+}
 export interface ScreenType {
   id: string;
   type: ScreenTypeTypes;
-  text: "תמונה" | "הודעה לציבור" | "איחולים" | "";
+  text:
+    | "תמונה"
+    | "הודעה לציבור"
+    | "איחולים"
+    | "הידעת"
+    | ""
+    | "הודעה"
+    | "קולאז׳ תמונות";
   title: string;
+  imgUrl?: string | string[];
   content: string;
   background?: string;
 }
-export type ScreenTypeTypes = "image" | "message" | "birthday";
+export type ScreenTypeTypes =
+  | "image"
+  | "message"
+  | "birthday"
+  | "info"
+  | "images";
 export type ShabatDayTfila = "saturday" | "friday" | "weekday";
 export interface ShabatTimesToEdit {
   type: ShabatDayTfila;

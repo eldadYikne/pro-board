@@ -116,8 +116,8 @@ function EditBoard(props: Props) {
 
   const handleTimesChange = (time: keyof TranslationsZmanimKeys) => {
     let newArray;
-    if (dbBoard?.timesToShow.includes(time)) {
-      newArray = dbBoard?.timesToShow.filter((item) => item !== time);
+    if (dbBoard?.timesToShow?.includes(time)) {
+      newArray = dbBoard?.timesToShow?.filter((item) => item !== time);
     } else if (dbBoard?.timesToShow) {
       newArray = [...dbBoard?.timesToShow, time];
     }
@@ -304,21 +304,21 @@ function EditBoard(props: Props) {
   ) => {
     if (dbBoard && Array.isArray(dbBoard[arrayName])) {
       if (arrayName !== "tfilaTimes") {
-        const addObjectToArray: Message[] = dbBoard[arrayName];
+        const addObjectToArray: Message[] | undefined = dbBoard[arrayName];
         let newItem: Message = { content: "", date: new Date() };
-        addObjectToArray.push(newItem);
+        addObjectToArray?.push(newItem);
         setDbBoard({
           ...dbBoard,
           [arrayName]: addObjectToArray,
         });
       } else if (arrayName === "tfilaTimes" && dayTfila) {
-        const addObjectToArray: Tfila[] = dbBoard[arrayName];
+        const addObjectToArray: Tfila[] | undefined = dbBoard[arrayName];
         let newItem: Tfila = {
           day: dayTfila,
           name: "",
           time: "",
         };
-        addObjectToArray.push(newItem);
+        addObjectToArray?.push(newItem);
         setDbBoard({
           ...dbBoard,
           [arrayName]: addObjectToArray,
@@ -525,7 +525,7 @@ function EditBoard(props: Props) {
                                 <div className="flex flex-col gap-1">
                                   <span>{time.name} :</span>
                                   <div className="flex flex-col gap-1">
-                                    {dbBoard.tfilaTimes.map(
+                                    {dbBoard.tfilaTimes?.map(
                                       (tfila: Tfila, idx: number) => {
                                         return (
                                           time.type === tfila.day && (
@@ -607,7 +607,7 @@ function EditBoard(props: Props) {
                       {(name === "messages" ||
                         name === "forMedicine" ||
                         name === "forUplifting") &&
-                        dbBoard[name].map((tfila: Message, idx) => (
+                        dbBoard[name]?.map((tfila: Message, idx) => (
                           <div key={idx} className="flex w-full  gap-1">
                             {Object.keys(tfila).map((key: string) => {
                               return (
@@ -683,7 +683,7 @@ function EditBoard(props: Props) {
                               className="min-w-20 min-h-16"
                             >
                               <img
-                                src={require("../assets/board-backgrounds/" +
+                                src={require("../assets/kodesh-backgrounds/" +
                                   item +
                                   ".jpg")}
                                 className={`min-w-20 min-h-16 rounded-md ${
@@ -729,7 +729,7 @@ function EditBoard(props: Props) {
                                           )
                                         }
                                         name={"isSaturdayTfila"}
-                                        checked={dbBoard.timesToShow.includes(
+                                        checked={dbBoard.timesToShow?.includes(
                                           key as keyof TranslationsZmanimKeys
                                         )}
                                       />
@@ -802,18 +802,19 @@ function EditBoard(props: Props) {
                                     ...dbBoard,
                                     isSetShabatTime: {
                                       isActive:
-                                        !dbBoard.isSetShabatTime.isActive,
-                                      enter: dbBoard.isSetShabatTime.enter,
-                                      exit: dbBoard.isSetShabatTime.exit,
+                                        !dbBoard.isSetShabatTime?.isActive,
+                                      enter:
+                                        dbBoard.isSetShabatTime?.enter ?? "",
+                                      exit: dbBoard.isSetShabatTime?.exit ?? "",
                                     },
                                   });
                                 }}
                                 name={"isSetShabatTime"}
-                                checked={dbBoard.isSetShabatTime.isActive}
+                                checked={dbBoard.isSetShabatTime?.isActive}
                               />
                               <span>הגדר עצמאית זמני שבת:</span>
                             </div>
-                            {dbBoard.isSetShabatTime.isActive && (
+                            {dbBoard.isSetShabatTime?.isActive && (
                               <div className="flex flex-col justify-between w-full gap-3">
                                 <TextField
                                   dir="rtl"
@@ -827,9 +828,11 @@ function EditBoard(props: Props) {
                                       ...dbBoard,
                                       isSetShabatTime: {
                                         isActive:
-                                          dbBoard.isSetShabatTime.isActive,
+                                          dbBoard.isSetShabatTime?.isActive ??
+                                          false,
                                         enter: e.target.value,
-                                        exit: dbBoard.isSetShabatTime.exit,
+                                        exit:
+                                          dbBoard.isSetShabatTime?.exit ?? "",
                                       },
                                     })
                                   }
@@ -847,8 +850,10 @@ function EditBoard(props: Props) {
                                       ...dbBoard,
                                       isSetShabatTime: {
                                         isActive:
-                                          dbBoard.isSetShabatTime.isActive,
-                                        enter: dbBoard.isSetShabatTime.enter,
+                                          dbBoard.isSetShabatTime?.isActive ??
+                                          false,
+                                        enter:
+                                          dbBoard.isSetShabatTime?.enter ?? "",
                                         exit: e.target.value,
                                       },
                                     })
@@ -936,7 +941,7 @@ function EditBoard(props: Props) {
                                 <span className="text-center"> כך זה יראה</span>
                                 <div
                                   style={{
-                                    background: `url(${require(`../assets/board-backgrounds/${
+                                    background: `url(${require(`../assets/kodesh-backgrounds/${
                                       screenTypeEdit === "birthday"
                                         ? `${editingScreen?.background}`
                                         : dbBoard.boardBackgroundImage
@@ -1000,12 +1005,13 @@ function EditBoard(props: Props) {
                                       <UploadWidget
                                         text={"הוסף תמונה"}
                                         onSetImageUrl={(e: string) =>
-                                          setEditingScreen({
-                                            id: editingScreen?.id,
-                                            text: editingScreen?.text,
-                                            title: editingScreen?.title,
-                                            type: editingScreen?.type,
-                                            content: e,
+                                          setEditingScreen((prevState) => {
+                                            if (prevState) {
+                                              return {
+                                                ...prevState,
+                                                content: e,
+                                              };
+                                            }
                                           })
                                         }
                                       />
@@ -1053,7 +1059,7 @@ function EditBoard(props: Props) {
                                             }
                                             key={item}
                                             style={{
-                                              background: `url(${require(`../assets/board-backgrounds/birthday${item}.jpg`)}) no-repeat`,
+                                              background: `url(${require(`../assets/kodesh-backgrounds/birthday${item}.jpg`)}) no-repeat`,
                                               backgroundSize:
                                                 "cover !importent",
                                             }}
@@ -1086,7 +1092,7 @@ function EditBoard(props: Props) {
                                         >
                                           <div
                                             style={{
-                                              background: `url(${require(`../assets/board-backgrounds/${
+                                              background: `url(${require(`../assets/kodesh-backgrounds/${
                                                 screen.type === "birthday"
                                                   ? `${screen?.background}`
                                                   : dbBoard.boardBackgroundImage
@@ -1212,7 +1218,7 @@ function EditBoard(props: Props) {
                         <div className=" text-[12px] mb-2  w-24  flex flex-col p-1">
                           <div className="w-full h-3  flex justify-between">
                             <span>
-                              {dbBoard.isSetShabatTime.isActive
+                              {dbBoard.isSetShabatTime?.isActive
                                 ? dbBoard.isSetShabatTime.enter
                                 : props.shabatTimes.candles}
                             </span>
@@ -1220,7 +1226,7 @@ function EditBoard(props: Props) {
                           </div>
                           <div className="w-full h-3 flex justify-between">
                             <span>
-                              {dbBoard.isSetShabatTime.isActive
+                              {dbBoard.isSetShabatTime?.isActive
                                 ? dbBoard.isSetShabatTime.exit
                                 : props.shabatTimes.havdalah}
                             </span>
@@ -1243,21 +1249,23 @@ function EditBoard(props: Props) {
                                 return (
                                   <div className="flex flex-col gap-1 w-full text-base   ">
                                     {/* <div className="underline w-full font-bold">{time.name}</div> */}
-                                    {dbBoard.tfilaTimes.map((tfila: Tfila) => {
-                                      return (
-                                        tfila.day !== "weekday" &&
-                                        time.type === tfila.day && (
-                                          <div className="flex  w-full flex-col  ">
-                                            <div className="flex w-full items-center justify-between gap-1">
-                                              <span className="leading-4">
-                                                {tfila.name}:
-                                              </span>
-                                              <span>{tfila.time} </span>
+                                    {dbBoard?.tfilaTimes?.map(
+                                      (tfila: Tfila) => {
+                                        return (
+                                          tfila.day !== "weekday" &&
+                                          time.type === tfila.day && (
+                                            <div className="flex  w-full flex-col  ">
+                                              <div className="flex w-full items-center justify-between gap-1">
+                                                <span className="leading-4">
+                                                  {tfila.name}:
+                                                </span>
+                                                <span>{tfila.time} </span>
+                                              </div>
                                             </div>
-                                          </div>
-                                        )
-                                      );
-                                    })}
+                                          )
+                                        );
+                                      }
+                                    )}
                                   </div>
                                 );
                               })}
@@ -1267,7 +1275,7 @@ function EditBoard(props: Props) {
                                 return (
                                   <div className="flex flex-col gap-1 w-full text-base items-center justify-center border-black  ">
                                     {/* <div className="underline w-full font-bold">{time.name}</div> */}
-                                    {dbBoard.tfilaTimes.map((tfila: Tfila) => {
+                                    {dbBoard.tfilaTimes?.map((tfila: Tfila) => {
                                       return (
                                         tfila.day === "weekday" &&
                                         time.type === tfila.day && (

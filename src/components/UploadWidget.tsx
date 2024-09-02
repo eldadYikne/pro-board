@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { CloudinaryUploadEvent } from "../types/clodinary";
 import { Button } from "@mui/material";
+import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 
 export function UploadWidget(props: Props) {
   const cloudinaryRef = useRef<any>();
@@ -29,23 +30,30 @@ export function UploadWidget(props: Props) {
 
   return (
     <div className="w-full">
-      <Button
-        className="w-full"
-        onClick={() => widgetRef.current.open()}
-        variant="contained"
-      >
-        {props.text}
-      </Button>
+      {props.previewType === "button" && (
+        <Button
+          className="w-full"
+          onClick={() => widgetRef.current.open()}
+          variant="contained"
+        >
+          {props.text}
+        </Button>
+      )}
+      {props.previewType === "addPhoto" && (
+        <AddPhotoAlternateIcon onClick={() => widgetRef.current.open()} />
+      )}
       {/* {imageUrl && <a href={imageUrl}>קישור לתמונה</a>} */}
     </div>
   );
 }
 UploadWidget.defaultProps = {
   text: "",
+  previewType: "button",
   onSetImageUrl: () => {},
 };
 
 interface Props {
   text: string;
   onSetImageUrl: Function;
+  previewType: "button" | "addPhoto";
 }

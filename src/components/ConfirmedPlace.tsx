@@ -267,7 +267,7 @@ function ConfirmedPlace(props: Props) {
               return (
                 <div key={idx} className="flex flex-col gap-1 w-full text-base">
                   <div className="underline w-full font-bold">{time.name}</div>
-                  {dbBoard.tfilaTimes.map((tfila: Tfila, idx) => {
+                  {dbBoard.tfilaTimes?.map((tfila: Tfila, idx) => {
                     return (
                       time.type === tfila.day && (
                         <div key={idx} className="flex w-full flex-col">

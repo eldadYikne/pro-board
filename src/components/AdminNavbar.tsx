@@ -69,7 +69,9 @@ function AdminNavbar(props: Props) {
   return (
     <div className="flex flex-col w-full justify-center items-center">
       <div className="flex justify-between w-full p-2 items-center bg-slate-400">
-        <Menu onClick={() => setMenuIsOpen(true)} sx={{}} />
+        {!props.isSchoolBoard && (
+          <Menu onClick={() => setMenuIsOpen(true)} sx={{}} />
+        )}
         <div className="font-sans text-xl ">{dbBoard && dbBoard.boardName}</div>
         <div className="flex gap-5 items-center">
           {props.isUsersPage && (
@@ -133,10 +135,12 @@ export default AdminNavbar;
 
 AdminNavbar.defaultProps = {
   isUsersPage: false,
+  isSchoolBoard: false,
   setAddUserModal: () => {},
 };
 
 interface Props {
   setAddUserModal: Function;
   isUsersPage: boolean;
+  isSchoolBoard: boolean;
 }

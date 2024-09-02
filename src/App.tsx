@@ -23,6 +23,8 @@ import Kdashboard from "./components/Kdashboard";
 import EditKidush from "./components/EditKidush";
 import { updateCollectionById } from "./service/serviceBoard";
 import KHomePage from "./components/KHomePage";
+import SBoard from "./components/SBoard";
+import SEditBoard from "./components/SEditBoard";
 function App() {
   const [hebrewDate, setHebrewDate] = useState<string>();
   const [parasha, setParasha] = useState("");
@@ -328,6 +330,34 @@ function App() {
             }
           />
           {/* <Route path="*" element={<div>404 עמוד לא נמצא</div>} /> */}
+          <Route
+            path="/school/:id"
+            element={
+              <div>
+                <SBoard
+                  hebrewDate={hebrewDate}
+                  // isMoridHatal={isMoridHatal}
+                  zmanim={dayTimes}
+                  parasha={parasha}
+                  omerDays={omerDays}
+                  lastTimeDataUpdated={lastTimeUpdatedTimesData}
+                  roshChodesh={roshChodesh}
+                  holiday={holiday}
+                  getTimesFromDb={getTimesFromDb}
+                />
+              </div>
+            }
+          />
+          <Route
+            path="/school/edit/:id"
+            element={
+              <SEditBoard
+                shabatTimes={{ candles: candles, havdalah: havdalah }}
+                zmanim={dayTimes}
+                parasha={parasha}
+              />
+            }
+          />
         </Routes>
       </div>
     </div>
