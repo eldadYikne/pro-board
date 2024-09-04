@@ -22,9 +22,11 @@ import { checkIsPast24Hours } from "./utils/utils";
 import Kdashboard from "./components/Kdashboard";
 import EditKidush from "./components/EditKidush";
 import { updateCollectionById } from "./service/serviceBoard";
-import KHomePage from "./components/KHomePage";
+import HomePage from "./components/HomePage";
 import SBoard from "./components/SBoard";
 import SEditBoard from "./components/SEditBoard";
+import EditBoardWrapper from "./components/EditBoardWrapper";
+import PreviewBoardWrapper from "./components/PreviewBoardWrapper";
 
 function App() {
   const [hebrewDate, setHebrewDate] = useState<string>();
@@ -284,7 +286,7 @@ function App() {
     <div dir="rtl" className="site-container">
       <div className="content-wrap">
         <Routes>
-          <Route path="/" element={<KHomePage />} />
+          <Route path="/" element={<HomePage />} />
           <Route path="/map/:id" element={<Map parasha={parasha} />} />
           <Route
             path="/kidush/:id"
@@ -305,7 +307,7 @@ function App() {
           <Route
             path="/edit/:id"
             element={
-              <EditBoard
+              <EditBoardWrapper
                 shabatTimes={{ candles: candles, havdalah: havdalah }}
                 zmanim={dayTimes}
                 parasha={parasha}
@@ -314,10 +316,11 @@ function App() {
           />
           <Route path="/edit/:id/users" element={<EditUsers />} />
           <Route path="/dashboard" element={<Kdashboard />} />
+
           <Route
             path="/board/:id"
             element={
-              <Kboard
+              <PreviewBoardWrapper
                 hebrewDate={hebrewDate}
                 isMoridHatal={isMoridHatal}
                 zmanim={dayTimes}
@@ -331,34 +334,6 @@ function App() {
             }
           />
           {/* <Route path="*" element={<div>404 עמוד לא נמצא</div>} /> */}
-          <Route
-            path="/school/:id"
-            element={
-              <div>
-                <SBoard
-                  hebrewDate={hebrewDate}
-                  // isMoridHatal={isMoridHatal}
-                  zmanim={dayTimes}
-                  parasha={parasha}
-                  omerDays={omerDays}
-                  lastTimeDataUpdated={lastTimeUpdatedTimesData}
-                  roshChodesh={roshChodesh}
-                  holiday={holiday}
-                  getTimesFromDb={getTimesFromDb}
-                />
-              </div>
-            }
-          />
-          <Route
-            path="/school/edit/:id"
-            element={
-              <SEditBoard
-                shabatTimes={{ candles: candles, havdalah: havdalah }}
-                zmanim={dayTimes}
-                parasha={parasha}
-              />
-            }
-          />
         </Routes>
       </div>
     </div>

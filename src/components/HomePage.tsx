@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Board1 from "../assets/board1.png";
 import { WhatsApp } from "@mui/icons-material";
 import HomePageImg from "../assets/home-page-logo.jpg";
-function KHomePage() {
+function HomePage() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [iphoneImg, setIphoneImg] = useState("edit1");
 
@@ -210,4 +210,4 @@ function KHomePage() {
   );
 }
 
-export default KHomePage;
+export default HomePage;
