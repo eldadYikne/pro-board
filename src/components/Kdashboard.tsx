@@ -46,6 +46,7 @@ function Kdashboard(props: Props) {
     lastTimeBoardUpdate: new Date(),
     inspirationalScreen: { isActive: false, text: "", writer: "" },
     messageScreenIsWhatsapp: false,
+    activeScreens: 0,
   };
   const [newBoard, setNewBoard] = useState<Board>(boardObj);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -137,7 +138,14 @@ function Kdashboard(props: Props) {
     });
   };
   // DATA
-  const thTable = ["שם", "id", "קישור ללוח", "קישור לעריכה", "פעולות"];
+  const thTable = [
+    "שם",
+    "id",
+    "קישור ללוח",
+    "קישור לעריכה",
+    "מסכים פועלים",
+    "פעולות",
+  ];
 
   const fieldsToNewBoard: FieldToNewBoard[] = [
     { key: "boardName", text: "שם" },
@@ -219,7 +227,11 @@ function Kdashboard(props: Props) {
                       {" "}
                       <a
                         className="text-blue-500"
-                        href={`https://kodesh-board.onrender.com/board/${row.id}`}
+                        href={
+                          row.type === "kodesh"
+                            ? `https://kodesh-board.onrender.com/board/${row.id}`
+                            : `https://kodesh-board.onrender.com/school/${row.id}`
+                        }
                       >
                         לוח
                       </a>
@@ -227,10 +239,17 @@ function Kdashboard(props: Props) {
                     <TableCell align="right">
                       <a
                         className="text-blue-500"
-                        href={`https://kodesh-board.onrender.com/edit/${row.id}`}
+                        href={
+                          row.type === "kodesh"
+                            ? `https://kodesh-board.onrender.com/edit/${row.id}`
+                            : `https://kodesh-board.onrender.com/school/edit/${row.id}`
+                        }
                       >
                         עריכה
                       </a>
+                    </TableCell>
+                    <TableCell align="right" component="th" scope="row">
+                      {row?.activeScreens ?? "-"}
                     </TableCell>
                     <TableCell sx={{ display: "flex", gap: 2 }} align="right">
                       <Button
@@ -319,7 +338,7 @@ function Kdashboard(props: Props) {
                   </Button>
                 </div>
               ) : filed.key === "type" ? (
-                <div>
+                <div className="w-full">
                   <KdropDown
                     setItem={(e: KdropDownOption) =>
                       setNewBoard({

@@ -19,9 +19,7 @@ function Sboard(props: Props) {
   const [step, setStep] = useState(0);
   const [isBgBlur, setIsBgBlur] = useState<boolean>(false);
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [screenBackground, setScreenBackground] = useState<string>(
-    dbBoard?.boardWelcomeImage ?? "1"
-  );
+  const [screenBackground, setScreenBackground] = useState<string>();
   const [timeBetweenScreens, setTimeBetweenScreens] = useState<number>(3000);
 
   const { id } = useParams();
@@ -30,11 +28,11 @@ function Sboard(props: Props) {
       if (id) {
         console.log("id", id);
         await getBoardByIdSnap(id);
+        setScreenBackground(dbBoard?.boardWelcomeImage ?? "1");
       } else if (props.board) {
         setDbBoard(props.board);
       }
     }
-
     const hourlyInterval = setInterval(async () => {
       props.getTimesFromDb();
       const date = new Date(props.lastTimeDataUpdated);
@@ -55,47 +53,50 @@ function Sboard(props: Props) {
     }, 1000);
 
     const intervalStep = setInterval(() => {
-      //   let number = dbBoard?.inspirationalScreen?.isActive ? 2 : 1;
-      //   let defaultNumberOfPages = dbBoard?.inspirationalScreen?.isActive ? 2 : 1;
-      //   if (dbBoard?.screens && dbBoard?.screens.length > 0) {
-      //     number = number + dbBoard?.screens.length;
-      //   }
-      //   console.log(number, "number");
-      //   setStep((prevStep) => {
-      //     const updatedStep = prevStep >= number ? 0 : prevStep + 1;
-      //     console.log("step after update", updatedStep);
-      //     switch (updatedStep) {
-      //       case 0:
-      //         setScreenBackground(dbBoard?.boardWelcomeImage ?? "");
-      //         break;
-      //       default:
-      //         if (dbBoard?.inspirationalScreen?.isActive && updatedStep === 2) {
-      //           setScreenBackground("inspirational");
-      //           break;
-      //         }
-      //         if (
-      //           updatedStep >= defaultNumberOfPages + 1 &&
-      //           dbBoard?.screens[updatedStep - (defaultNumberOfPages + 1)]
-      //             ?.background
-      //         ) {
-      //           // console.log("enter to herrrrrrrr");
-      //           setScreenBackground(
-      //             dbBoard?.screens[updatedStep - (defaultNumberOfPages + 1)]
-      //               ?.background ?? ""
-      //           );
-      //         } else {
-      //           // console.log("enter to white");
-      //           // console.log(
-      //           //   "enter to white",
-      //           //   dbBoard?.screens[updatedStep - (defaultNumberOfPages + 1)]
-      //           //     ?.background
-      //           // );
-      //           setScreenBackground("white");
-      //         }
-      //         break;
-      //     }
-      //     return updatedStep;
-      //   });
+      let number = dbBoard?.inspirationalScreen?.isActive ? 2 : 1;
+      let defaultNumberOfPages = dbBoard?.inspirationalScreen?.isActive ? 2 : 1;
+      if (dbBoard?.screens && dbBoard?.screens.length > 0) {
+        number = number + dbBoard?.screens.length;
+      }
+      console.log(number, "number");
+      setStep((prevStep) => {
+        const updatedStep = prevStep >= number ? 0 : prevStep + 1;
+        console.log("step after update", updatedStep);
+        switch (updatedStep) {
+          case 0:
+            setScreenBackground(dbBoard?.boardWelcomeImage ?? "");
+            break;
+
+          default:
+            if (dbBoard?.inspirationalScreen?.isActive && updatedStep === 2) {
+              setScreenBackground("inspirational");
+              break;
+            }
+            if (
+              updatedStep >= defaultNumberOfPages + 1 &&
+              dbBoard?.screens[updatedStep - (defaultNumberOfPages + 1)]
+                ?.background
+            ) {
+              // console.log("enter to herrrrrrrr");
+              setScreenBackground(
+                dbBoard?.screens[updatedStep - (defaultNumberOfPages + 1)]
+                  ?.background ?? ""
+              );
+            } else {
+              // console.log("enter to white");
+              // console.log(
+              //   "enter to white",
+              //   dbBoard?.screens[updatedStep - (defaultNumberOfPages + 1)]
+              //     ?.background
+              // );
+
+              setScreenBackground("white");
+            }
+            break;
+        }
+
+        return updatedStep;
+      });
     }, timeBetweenScreens);
 
     // Clear the interval when the component unmounts
@@ -246,7 +247,9 @@ function Sboard(props: Props) {
                 className="text-9xl overflow-hidden py-4 flex flex-col gap-2 items-center font-bold font-['Comix'] text-shadow-headline"
                 style={{
                   color:
-                    dbBoard.boardTextColor === "auto" ? colors[2] : "black",
+                    dbBoard.boardTextColor === "auto"
+                      ? colors[2]
+                      : dbBoard.boardTextColor,
                 }}
               >
                 <img
@@ -254,8 +257,8 @@ function Sboard(props: Props) {
                   alt=""
                   src={dbBoard?.boardSymbol}
                 />
-                <span>ברוכים הבאים</span>
-                <span>{dbBoard.boardName}</span>
+                <span className="font-['Luizi']">ברוכים הבאים</span>
+                <span className="font-['Luizi']"> {dbBoard.boardName}</span>
               </div>
             )}
             {dbBoard.messages.length > 0 && step === 1 && (
@@ -322,7 +325,7 @@ function Sboard(props: Props) {
                       {(screen.type === "image" || screen.type === "info") &&
                         screen?.imgUrl &&
                         !Array.isArray(screen?.imgUrl) && (
-                          <div className="flex h-full my-8 items-center justify-center flex-col gap-15 ">
+                          <div className="flex h-full w-[90%] my-8 items-center justify-center flex-col gap-15 ">
                             {screen.type === "info" && (
                               <div className="flex gap-1 p-11 bg-yellow-300 rounded-3xl items-center">
                                 <span className="text-8xl  font-['Comix']">
@@ -366,7 +369,7 @@ function Sboard(props: Props) {
                       {screen.type === "images" &&
                         screen?.imgUrl &&
                         Array.isArray(screen?.imgUrl) && (
-                          <div className="flex h-full my-8 items-center justify-center flex-col gap-15 ">
+                          <div className="flex h-full w-full my-8 items-center justify-center flex-col gap-15 ">
                             <div
                               dir="rtl"
                               className={`flex flex-col w-full h-full items-center gap-7 justify-center text-center text-2xl font-['Comix']`}
@@ -377,7 +380,7 @@ function Sboard(props: Props) {
                                 </span>
                               </div>
                               <div
-                                className={`grid gap-6 grid-cols-${
+                                className={`grid gap-6 w-full  grid-cols-${
                                   screen.imgUrl.length < 3
                                     ? screen.imgUrl.length
                                     : 3
@@ -386,13 +389,11 @@ function Sboard(props: Props) {
                                 {Array.isArray(screen?.imgUrl) &&
                                   screen?.imgUrl.map((img: string) => {
                                     return (
-                                      <div className="h-full w-full flex flex-col relative">
-                                        <img
-                                          className="w-full h-full "
-                                          alt=""
-                                          src={img}
-                                        />
-                                      </div>
+                                      <img
+                                        className="w-full h-full "
+                                        alt=""
+                                        src={img}
+                                      />
                                     );
                                   })}
                               </div>

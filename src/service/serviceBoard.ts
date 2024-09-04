@@ -72,3 +72,19 @@ export const updateBoardExceptUsers = async (
     console.error("Error updating board:", error);
   }
 };
+
+export const updateActiveScreens = async (
+  boardId: string,
+  activeScreens: number
+) => {
+  const boardRef = doc(db, "boards", boardId); // Reference to the board document
+
+  try {
+    // Update only the activeScreens key
+    await updateDoc(boardRef, { activeScreens });
+
+    console.log("activeScreens updated successfully!");
+  } catch (error) {
+    console.error("Error updating activeScreens:", error);
+  }
+};

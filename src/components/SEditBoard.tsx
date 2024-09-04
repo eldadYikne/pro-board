@@ -183,6 +183,7 @@ function SEditBoard(props: Props) {
 
   const boardTextColors: { name: string; title: string }[] = [
     { name: "black", title: "שחור" },
+    { name: "white", title: "לבן" },
     { name: "auto", title: "אוטומטי" },
   ];
 
@@ -526,15 +527,17 @@ function SEditBoard(props: Props) {
           dbBoard &&
           connectedUser.email &&
           dbBoard.admins.includes(connectedUser.email) && (
-            <div className=" sm:grid pb-14 grid-cols-2 flex flex-col gap-2">
-              <div>
+            <div className="  pb-14 p-5 sm:px-14 flex flex-col gap-2">
+              <div className=" flex flex-col gap-2">
                 {inputsBoard.map(({ name, placeholder }) => {
                   return (
                     <div key={name} className="flex flex-col gap-1 p-2">
                       {name !== "users" &&
                         name !== "tfilaTimes" &&
                         name !== "isSetShabatTime" && (
-                          <span className="">{placeholder}:</span>
+                          <span className="sm:text-xl font-['Nachlieli'] pb-2">
+                            {placeholder}:
+                          </span>
                         )}
                       {!Array.isArray(dbBoard[name]) &&
                         name !== "boardBackgroundImage" &&
@@ -883,7 +886,7 @@ function SEditBoard(props: Props) {
                           >
                             <Grid className="sm:w-[600px] w-[350px]" sx={style}>
                               <div className="w-full min-h-[320px]  flex flex-col items-center justify-center gap-3">
-                                <span className="text-center font-['Nachlieli'] text-lg text-blue-400 font-bold flex flex-col gap-2  sm:text-4xl">
+                                <span className="text-center font-['Nachlieli'] text-lg text-black font-bold flex flex-col gap-2  sm:text-4xl">
                                   <span>
                                     {screenTypes.find(
                                       (screenType) =>
@@ -1265,7 +1268,10 @@ function SEditBoard(props: Props) {
                           <div>
                             {dbBoard.screens && dbBoard.screens.length > 0 && (
                               <div>
-                                <div> המסכים שלך :</div>
+                                <div className="font-['Nachlieli'] py-2 sm:text-xl">
+                                  {" "}
+                                  המסכים שלך :
+                                </div>
                                 <div className="flex gap-2 overflow-auto">
                                   {dbBoard.screens.map(
                                     (screen: ScreenType, index) => {
@@ -1284,17 +1290,21 @@ function SEditBoard(props: Props) {
                                               backgroundSize:
                                                 "cover !importent",
                                             }}
-                                            className="w-20 h-16 !bg-cover flex justify-center items-center p-3  "
+                                            className=" sm:w-36 sm:h-32  w-28 h-24 !bg-cover flex justify-center items-center p-3  "
                                           >
                                             {screen.type === "images" &&
                                               screen?.imgUrl && (
                                                 <div className="flex flex-col gap-1">
-                                                  <span className="text-ellipsis overflow-hidden whitespace-nowrap  ">
+                                                  <span className="flex w-full text-ellipsis overflow-hidden whitespace-nowrap items-center justify-center text-center text-[10px] font-['Comix'] ">
                                                     {screen.title}
                                                   </span>
 
                                                   <div
-                                                    className={`grid gap-6 grid-cols-${
+                                                    className={`grid gap-6  w-full ${
+                                                      screen?.imgUrl.length < 3
+                                                        ? "h-[20px]"
+                                                        : "h-full"
+                                                    } grid-cols-${
                                                       screen?.imgUrl.length < 3
                                                         ? screen?.imgUrl.length
                                                         : 3
@@ -1306,13 +1316,11 @@ function SEditBoard(props: Props) {
                                                       screen?.imgUrl.map(
                                                         (img: string) => {
                                                           return (
-                                                            <div className="h-full w-full flex flex-col relative">
-                                                              <img
-                                                                className="sm:w-full sm:h-full h-1/2 w-1/2  "
-                                                                alt=""
-                                                                src={img}
-                                                              />
-                                                            </div>
+                                                            <img
+                                                              className="w-full h-full  "
+                                                              alt=""
+                                                              src={img}
+                                                            />
                                                           );
                                                         }
                                                       )}
@@ -1327,7 +1335,7 @@ function SEditBoard(props: Props) {
                                               ) && (
                                                 <div
                                                   dir="rtl"
-                                                  className="flex flex-col max-h-full h-full w-full items-center justify-center text-center text-[10px] font-['David']"
+                                                  className="flex flex-col max-h-full h-full w-full items-center justify-center text-center text-[10px] font-['Comix']"
                                                 >
                                                   <div className="h-full flex flex-col gap-1 items-center justify-center">
                                                     {screen.title && (
@@ -1348,7 +1356,7 @@ function SEditBoard(props: Props) {
                                               screen?.content && (
                                                 <div
                                                   dir="rtl"
-                                                  className="flex w-full text-ellipsis overflow-hidden whitespace-nowrap items-center justify-center text-center text-[10px] font-['David']"
+                                                  className="flex w-full text-ellipsis overflow-hidden whitespace-nowrap items-center justify-center text-center text-[10px] font-['Comix']"
                                                 >
                                                   {screen?.content}
                                                 </div>

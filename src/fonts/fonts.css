@@ -9,6 +9,10 @@
   src: url("./damka-regular-fm.otf") format("opentype");
 }
 @font-face {
+  font-family: "Luizi";
+  src: url("./OsLuizi.otf") format("opentype");
+}
+@font-face {
   font-family: "BonaNova";
   src: url("./BonaNova-Regular.ttf") format("truetype");
 }

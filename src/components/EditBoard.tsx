@@ -1100,7 +1100,7 @@ function EditBoard(props: Props) {
                                               backgroundSize:
                                                 "cover !importent",
                                             }}
-                                            className="w-20 h-16 !bg-cover flex justify-center items-center p-3  "
+                                            className="w-28 h-24 !bg-cover flex justify-center items-center p-3  "
                                           >
                                             {screen.type === "image" &&
                                               screen?.content && (

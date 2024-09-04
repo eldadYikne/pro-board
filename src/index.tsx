@@ -10,17 +10,16 @@ import { getFirestore } from "firebase/firestore";
 import { getAuth, getRedirectResult, GoogleAuthProvider } from "firebase/auth";
 
 // authDomain: "calaniot-159d1.firebaseapp.com",
-
 // TASK 13: PASS TO ENV FILE ! ! !
 const firebaseConfig = {
-  apiKey: "AIzaSyB0_l-bYxRBeKGR_t_jujHRRzQacqQcRXk",
-  authDomain: "calaniot-159d1.firebaseapp.com",
-  databaseURL: "https://calaniot-159d1-default-rtdb.firebaseio.com",
-  projectId: "calaniot-159d1",
-  storageBucket: "calaniot-159d1.appspot.com",
-  messagingSenderId: "136983399478",
-  appId: "1:136983399478:web:b331a7943d3c795ea01c97",
-  measurementId: "G-RQP15RZNBH",
+  apiKey: process.env.REACT_APP_API_KEY,
+  authDomain: process.env.REACT_APP_AUTH_DOMAIN,
+  databaseURL: process.env.REACT_APP_DATABASE_URL,
+  projectId: process.env.REACT_APP_PROJECT_ID,
+  storageBucket: process.env.REACT_APP_STOREAGE_BUCKET,
+  messagingSenderId: process.env.REACT_APP_MESSAGING_SENDERID,
+  appId: process.env.REACT_APP_APP_ID,
+  measurementId: process.env.REACT_APP_MEASUREMENID,
 };
 
 const app = initializeApp(firebaseConfig);

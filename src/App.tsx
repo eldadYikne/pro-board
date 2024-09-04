@@ -25,6 +25,7 @@ import { updateCollectionById } from "./service/serviceBoard";
 import KHomePage from "./components/KHomePage";
 import SBoard from "./components/SBoard";
 import SEditBoard from "./components/SEditBoard";
+
 function App() {
   const [hebrewDate, setHebrewDate] = useState<string>();
   const [parasha, setParasha] = useState("");
