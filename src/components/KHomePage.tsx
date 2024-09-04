@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Board1 from "../assets/board1.png";
 import { WhatsApp } from "@mui/icons-material";
+import HomePageImg from "../assets/home-page-logo.jpg";
 function KHomePage() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [iphoneImg, setIphoneImg] = useState("edit1");
@@ -28,15 +29,22 @@ function KHomePage() {
   };
 
   return (
-    <div className="bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 min-h-screen flex flex-col justify-center items-center text-white relative overflow-hidden">
-      <header className="text-center mb-8">
-        <h1 className="text-5xl mt-4 font-extrabold drop-shadow-lg">
-          קודש בורד
-        </h1>
-        <p className="text-xl mt-4">ברוכים הבאים לפורטל הקדוש שלך</p>
-      </header>
+    <div className=" justify-center font-['Nachlieli']  min-h-screen flex flex-col items-center text-balck relative overflow-hidden">
+      <div className="bg-white px-5 py-4 ">
+        <img src={HomePageImg} alt="" />
+        <header className="text-center mb-8">
+          <h1 className="text-5xl mt-4 font-extrabold drop-shadow-lg">
+            Pro board
+          </h1>
+          <p className="text-xl mt-4">ברוכים הבאים </p>
+          <p className="text-xl mt-4">
+            {" "}
+            מנהלים בצורה חכמה ופשוטה לוחות דיגיטליים
+          </p>
+        </header>
+      </div>
 
-      <main className="text-center z-10">
+      <main className="text-center z-10 px-5 py-4 ">
         <p className="text-lg mb-6">
           כאן תוכלו לנהל ולצפות במידע חשוב בצורה קלה ונוחה.
         </p>
@@ -62,7 +70,7 @@ function KHomePage() {
                 >
                   {/* SVG Arrow */}
                   <svg
-                    className="w-6 h-6 text-white mr-2"
+                    className="w-6 h-6 text-purple-700 mr-2"
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
                   >

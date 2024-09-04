@@ -44,6 +44,7 @@ import GoogleAuth from "./GoogleAuth";
 import { User, getAuth, onAuthStateChanged } from "firebase/auth";
 import AdminNavbar from "./AdminNavbar";
 import { updateBoardExceptUsers } from "../service/serviceBoard";
+import Login from "./Login";
 
 function SEditBoard(props: Props) {
   const [dbBoard, setDbBoard] = useState<Board>();
@@ -501,24 +502,10 @@ function SEditBoard(props: Props) {
         {connectedUser ? (
           <AdminNavbar isSchoolBoard={true} />
         ) : (
-          <div className="flex w-full h-screen justify-center items-center p-5 font-sans flex-col bg-gradient-to-r from-blue-200 to-blue-100">
-            <div className="flex flex-col p-7 max-w-96 bg-white shadow-md rounded-xl">
-              <div>
-                <span className="text-purple-400 text-xl font-bold">
-                  ברוך הבא ללוח שלך!
-                </span>
-                <div className="text-blue-900 text-3xl font-black">
-                  {dbBoard && dbBoard.boardName}
-                </div>
-              </div>
-              <span className="text-blue-300 text-2xl pt-4 pb-6">
-                הכנס וערוך את הלוח שלך
-              </span>
-              <div className="flex justify-end">
-                <GoogleAuth setUser={setConnectedUser} userConnected={""} />
-              </div>
-            </div>
-          </div>
+          <Login
+            boardName={dbBoard?.boardName ?? ""}
+            setConnectedUser={setConnectedUser}
+          />
         )}
 
         {/* sidebar MENU */}
@@ -1169,41 +1156,7 @@ function SEditBoard(props: Props) {
                                       </div>
                                     )}
                                 </div>
-                                {/* {(screenTypeEdit === "image" ||
-                                  screenTypeEdit === "info") &&
-                                  editingScreen && (
-                                    <div className="w-full">
-                                      <input
-                                        dir="rtl"
-                                        className="border border-black w-full h-8 px-3 mb-3 rounded-sm"
-                                        placeholder="הוסף כותרת"
-                                        type="text"
-                                        value={editingScreen?.title}
-                                        onChange={(e) =>
-                                          setEditingScreen({
-                                            ...editingScreen,
-                                            title: e.target.value,
-                                          })
-                                        }
-                                      />
-                                      {screenTypeEdit === "info" && (
-                                        <textarea
-                                          dir="rtl"
-                                          className="border border-black w-full h-8 px-3 mb-3 rounded-sm"
-                                          placeholder="הוסף מידע"
-                                          value={editingScreen?.content}
-                                          onChange={(e) =>
-                                            setEditingScreen({
-                                              ...editingScreen,
-                                              content: e.target.value,
-                                            })
-                                          }
-                                          name="Outlined"
-                                        />
-                                      )}
-                                    
-                                    </div>
-                                  )} */}
+
                                 {(screenTypeEdit === "message" ||
                                   screenTypeEdit === "birthday") &&
                                   editingScreen && (
