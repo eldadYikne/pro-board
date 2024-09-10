@@ -13,6 +13,7 @@ import WhatsappMessages from "./WhatsappMessages";
 import EmojiObjectsOutlinedIcon from "@mui/icons-material/EmojiObjectsOutlined";
 import MessageIcon from "@mui/icons-material/Message";
 import { dividerClasses } from "@mui/material";
+import YouTubeAudioPlayer from "./YouTubeAudioPlayer";
 function Sboard(props: Props) {
   const [dbBoard, setDbBoard] = useState<Board>();
   const [colors, setColors] = useState<string[]>([]);
@@ -20,8 +21,11 @@ function Sboard(props: Props) {
   const [isBgBlur, setIsBgBlur] = useState<boolean>(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [screenBackground, setScreenBackground] = useState<string>();
-  const [timeBetweenScreens, setTimeBetweenScreens] = useState<number>(3000);
-
+  const [timeBetweenScreens, setTimeBetweenScreens] = useState<number>(15000);
+  enum STATIC_SCREEN_TYPES {
+    welcome = 1,
+    MESSAGES = 2,
+  }
   const { id } = useParams();
   useEffect(() => {
     async function fetchData() {
@@ -83,13 +87,6 @@ function Sboard(props: Props) {
                   ?.background ?? ""
               );
             } else {
-              // console.log("enter to white");
-              // console.log(
-              //   "enter to white",
-              //   dbBoard?.screens[updatedStep - (defaultNumberOfPages + 1)]
-              //     ?.background
-              // );
-
               setScreenBackground("white");
             }
             break;
@@ -113,52 +110,52 @@ function Sboard(props: Props) {
     dbBoard?.inspirationalScreen?.isActive,
   ]);
 
-  const setStepWithButton = () => {
-    let number = dbBoard?.inspirationalScreen?.isActive ? 2 : 1;
-    let defaultNumberOfPages = dbBoard?.inspirationalScreen?.isActive ? 2 : 1;
-    if (dbBoard?.screens && dbBoard?.screens.length > 0) {
-      number = number + dbBoard?.screens.length;
-    }
-    console.log(number, "number");
-    setStep((prevStep) => {
-      const updatedStep = prevStep >= number ? 0 : prevStep + 1;
-      console.log("step after update", updatedStep);
-      switch (updatedStep) {
-        case 0:
-          setScreenBackground(dbBoard?.boardWelcomeImage ?? "");
-          break;
+  // const setStepWithButton = () => {
+  //   let number = dbBoard?.inspirationalScreen?.isActive ? 2 : 1;
+  //   let defaultNumberOfPages = dbBoard?.inspirationalScreen?.isActive ? 2 : 1;
+  //   if (dbBoard?.screens && dbBoard?.screens.length > 0) {
+  //     number = number + dbBoard?.screens.length;
+  //   }
+  //   console.log(number, "number");
+  //   setStep((prevStep) => {
+  //     const updatedStep = prevStep >= number ? 0 : prevStep + 1;
+  //     console.log("step after update", updatedStep);
+  //     switch (updatedStep) {
+  //       case 0:
+  //         setScreenBackground(dbBoard?.boardWelcomeImage ?? "");
+  //         break;
 
-        default:
-          if (dbBoard?.inspirationalScreen?.isActive && updatedStep === 2) {
-            setScreenBackground("inspirational");
-            break;
-          }
-          if (
-            updatedStep >= defaultNumberOfPages + 1 &&
-            dbBoard?.screens[updatedStep - (defaultNumberOfPages + 1)]
-              ?.background
-          ) {
-            // console.log("enter to herrrrrrrr");
-            setScreenBackground(
-              dbBoard?.screens[updatedStep - (defaultNumberOfPages + 1)]
-                ?.background ?? ""
-            );
-          } else {
-            // console.log("enter to white");
-            // console.log(
-            //   "enter to white",
-            //   dbBoard?.screens[updatedStep - (defaultNumberOfPages + 1)]
-            //     ?.background
-            // );
+  //       default:
+  //         if (dbBoard?.inspirationalScreen?.isActive && updatedStep === 2) {
+  //           setScreenBackground("inspirational");
+  //           break;
+  //         }
+  //         if (
+  //           updatedStep >= defaultNumberOfPages + 1 &&
+  //           dbBoard?.screens[updatedStep - (defaultNumberOfPages + 1)]
+  //             ?.background
+  //         ) {
+  //           // console.log("enter to herrrrrrrr");
+  //           setScreenBackground(
+  //             dbBoard?.screens[updatedStep - (defaultNumberOfPages + 1)]
+  //               ?.background ?? ""
+  //           );
+  //         } else {
+  //           // console.log("enter to white");
+  //           // console.log(
+  //           //   "enter to white",
+  //           //   dbBoard?.screens[updatedStep - (defaultNumberOfPages + 1)]
+  //           //     ?.background
+  //           // );
 
-            setScreenBackground("white");
-          }
-          break;
-      }
+  //           setScreenBackground("white");
+  //         }
+  //         break;
+  //     }
 
-      return updatedStep;
-    });
-  };
+  //     return updatedStep;
+  //   });
+  // };
   const getBoardByIdSnap = async (boardId: string) => {
     try {
       const boardRef = doc(db, "boards", boardId);
@@ -218,12 +215,12 @@ function Sboard(props: Props) {
           //   }}
           className={`!bg-cover font-['Comix'] flex h-screen flex-col items-center justify-center p-3 w-full rounded-sm`}
         >
-          <span
+          {/* <span
             className="text-white w-5 h-5 cursor-pointer"
             onClick={setStepWithButton}
           >
-            {/* {step}- step++ */}
-          </span>
+            {step}- step++ 
+        </span>*/}
 
           {/* {dbBoard.dateTypes.length > 0 && (
             <div className="text-3xl p-2 px-4 flex justify-between w-full font-['Anka'] items-center absolute top-0">
@@ -242,7 +239,9 @@ function Sboard(props: Props) {
             </div>
           )} */}
           <div className="flex flex-col h-full w-full items-center justify-center">
-            {(step <= 0 || (step === 1 && dbBoard.messages.length === 0)) && (
+            {(step <= 0 ||
+              (step === STATIC_SCREEN_TYPES.welcome &&
+                dbBoard.messages.length === 0)) && (
               <div
                 className="text-9xl overflow-hidden py-4 flex flex-col gap-2 items-center font-bold font-['Comix'] text-shadow-headline"
                 style={{
@@ -262,7 +261,7 @@ function Sboard(props: Props) {
               </div>
             )}
             {dbBoard.messages.length > 0 && step === 1 && (
-              <div className="h-full w-full">
+              <div className="h-full w-full p-6">
                 {dbBoard.messageScreenIsWhatsapp ? (
                   <WhatsappMessages
                     boardSymbol={dbBoard.boardSymbol ?? ""}
@@ -417,20 +416,28 @@ function Sboard(props: Props) {
           </div>
         </div>
       )}
+      {dbBoard &&
+        dbBoard?.youtubeUrl?.isActive &&
+        dbBoard?.youtubeUrl?.youtubeId && (
+          <YouTubeAudioPlayer videoId={dbBoard?.youtubeUrl?.youtubeId} />
+        )}
+
       {dbBoard && (
-        <Palette
-          src={require("../assets/school-backgrounds/" +
-            dbBoard.boardBackgroundImage +
-            ".jpg")}
-          crossOrigin="anonymous"
-          format="hex"
-          colorCount={4}
-        >
-          {({ data, loading }) => {
-            if (loading) return <div>loading...</div>;
-            if (data) setColors(data);
-          }}
-        </Palette>
+        <React.Fragment>
+          <Palette
+            src={require("../assets/school-backgrounds/" +
+              dbBoard.boardBackgroundImage +
+              ".jpg")}
+            crossOrigin="anonymous"
+            format="hex"
+            colorCount={4}
+          >
+            {({ data, loading }) => {
+              if (loading) return <div>loading...</div>;
+              if (data) setColors(data);
+            }}
+          </Palette>
+        </React.Fragment>
       )}
     </div>
   );

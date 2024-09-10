@@ -38,7 +38,7 @@ function AdminNavbar(props: Props) {
     }
     fetchData();
     return unsubscribe;
-  }, [id]);
+  }, [id, connectedUser?.email]);
   const getBoardById = async (boardId: string) => {
     try {
       const boardDoc = await getDoc(doc(db, "boards", boardId));
@@ -88,7 +88,10 @@ function AdminNavbar(props: Props) {
           <div className="flex gap-2 items-center">
             {connectedUser && <div> {connectedUser.displayName}</div>}
             <GoogleAuth
-              setUser={setConnectedUser}
+              setUser={(e: User) => {
+                props.setConnectedUser(e);
+                setConnectedUser(e);
+              }}
               userConnected={connectedUser?.email ?? ""}
             />
           </div>
@@ -137,10 +140,12 @@ AdminNavbar.defaultProps = {
   isUsersPage: false,
   isSchoolBoard: false,
   setAddUserModal: () => {},
+  setConnectedUser: () => {},
 };
 
 interface Props {
   setAddUserModal: Function;
   isUsersPage: boolean;
   isSchoolBoard: boolean;
+  setConnectedUser: Function;
 }

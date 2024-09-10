@@ -9,6 +9,7 @@ import {
   ShabatDayTfila,
   Tfila,
   Theme,
+  YoutubeUrl,
 } from "../types/board";
 import {
   Alert,
@@ -45,11 +46,13 @@ import { User, getAuth, onAuthStateChanged } from "firebase/auth";
 import AdminNavbar from "./AdminNavbar";
 import { updateBoardExceptUsers } from "../service/serviceBoard";
 import Login from "./Login";
+import YouTubeAudioPlayer from "./YouTubeAudioPlayer";
+import YouTubeURLInput from "./YouTubeURLInput";
+import NotAllowedEdit from "./NotAllowedEdit";
 
 function SEditBoard(props: Props) {
   const [dbBoard, setDbBoard] = useState<Board>();
   const [snackbarIsOpen, setSnackbarIsOpen] = useState<boolean>();
-  const [menuIsOpen, setMenuIsOpen] = useState<boolean>(false);
   const [imageUrl, setImageUrl] = useState("");
   const [screenEditorIsOpen, setScreenEditorIsOpen] = useState<boolean>(false);
   const [downloadTimesImgIsOpen, setDownloadTimesImgIsOpen] =
@@ -178,6 +181,8 @@ function SEditBoard(props: Props) {
       name: "inspirationalScreen",
       placeholder: "מסך משפטים מעוררי השראה",
     },
+    { name: "youtubeUrl", placeholder: "שיר מתנגן ברקע" },
+
     // { name: "boardBackgroundImage", placeholder: "רקע ללוח" },
     // { name: "theme", placeholder: "ערכת נושא" },
   ];
@@ -223,6 +228,8 @@ function SEditBoard(props: Props) {
     }
   };
   const onDeleteScreen = (screenToDelete: ScreenType) => {
+    setScreenEditorIsOpen(false);
+
     const filterScreens = dbBoard?.screens.filter(
       (screen) => screen.id !== screenToDelete.id
     );
@@ -447,20 +454,10 @@ function SEditBoard(props: Props) {
     !dbBoard?.admins.includes(connectedUser?.email)
   ) {
     return (
-      <Box sx={styleBoxNotAllowEdit}>
-        <div className="flex w-full flex-col justify-center items-center m-2">
-          {connectedUser && (
-            <div className="flex flex-col">
-              <span>שלום {connectedUser.displayName}</span>
-              <span>למשתמש {connectedUser.email} אין הרשאה לערוך לוח זה</span>
-            </div>
-          )}
-          <GoogleAuth
-            setUser={setConnectedUser}
-            userConnected={connectedUser?.email ?? ""}
-          />
-        </div>
-      </Box>
+      <NotAllowedEdit
+        setConnectedUser={setConnectedUser}
+        connectedUser={connectedUser}
+      />
     );
   }
 
@@ -500,7 +497,10 @@ function SEditBoard(props: Props) {
     >
       <div className="w-full flex flex-col justify-center">
         {connectedUser ? (
-          <AdminNavbar isSchoolBoard={true} />
+          <AdminNavbar
+            setConnectedUser={setConnectedUser}
+            isSchoolBoard={true}
+          />
         ) : (
           <Login
             boardName={dbBoard?.boardName ?? ""}
@@ -508,13 +508,11 @@ function SEditBoard(props: Props) {
           />
         )}
 
-        {/* sidebar MENU */}
-
         {connectedUser &&
           dbBoard &&
           connectedUser.email &&
           dbBoard.admins.includes(connectedUser.email) && (
-            <div className="  pb-14 p-5 sm:px-14 flex flex-col gap-2">
+            <div className="  pb-24 p-5 sm:px-14 flex flex-col gap-2">
               <div className=" flex flex-col gap-2">
                 {inputsBoard.map(({ name, placeholder }) => {
                   return (
@@ -534,6 +532,7 @@ function SEditBoard(props: Props) {
                         name !== "inspirationalScreen" &&
                         name !== "boardSymbol" &&
                         name !== "screens" &&
+                        name !== "youtubeUrl" &&
                         name !== "messageScreenIsWhatsapp" &&
                         name !== "isSetShabatTime" &&
                         name !== "theme" && (
@@ -1209,12 +1208,26 @@ function SEditBoard(props: Props) {
                                       })}
                                     </div>
                                   )}
-                                <Button
-                                  onClick={() => handleAddScreen()}
-                                  variant="contained"
-                                >
-                                  אישור
-                                </Button>
+                                <div className="flex gap-3">
+                                  {editingScreen && (
+                                    <Button
+                                      onClick={() => {
+                                        onDeleteScreen(editingScreen);
+                                      }}
+                                      variant="contained"
+                                      color="error"
+                                      startIcon={<Delete />}
+                                    >
+                                      הסר מסך
+                                    </Button>
+                                  )}
+                                  <Button
+                                    onClick={() => handleAddScreen()}
+                                    variant="contained"
+                                  >
+                                    אישור
+                                  </Button>
+                                </div>
                               </div>
                             </Grid>
                           </Modal>
@@ -1230,7 +1243,12 @@ function SEditBoard(props: Props) {
                                     (screen: ScreenType, index) => {
                                       return (
                                         <div
-                                          className="flex flex-col gap-2"
+                                          onClick={() => {
+                                            setEditingScreen(screen);
+                                            setScreenEditorIsOpen(true);
+                                            setScreenTypeEdit(screen.type);
+                                          }}
+                                          className="flex flex-col gap-2 cursor-pointer"
                                           key={index}
                                         >
                                           <div
@@ -1243,7 +1261,7 @@ function SEditBoard(props: Props) {
                                               backgroundSize:
                                                 "cover !importent",
                                             }}
-                                            className=" sm:w-36 sm:h-32  w-28 h-24 !bg-cover flex justify-center items-center p-3  "
+                                            className=" sm:w-36 sm:h-32  w-28 h-24 !bg-cover flex justify-center rounded-sm items-center p-3  "
                                           >
                                             {screen.type === "images" &&
                                               screen?.imgUrl && (
@@ -1315,24 +1333,6 @@ function SEditBoard(props: Props) {
                                                 </div>
                                               )}
                                           </div>
-                                          <Button
-                                            onClick={() => {
-                                              setEditingScreen(screen);
-                                              setScreenEditorIsOpen(true);
-                                              setScreenTypeEdit(screen.type);
-                                            }}
-                                            variant="contained"
-                                          >
-                                            ערוך
-                                          </Button>
-                                          <Button
-                                            onClick={() => {
-                                              onDeleteScreen(screen);
-                                            }}
-                                            variant="contained"
-                                          >
-                                            הסר
-                                          </Button>
                                         </div>
                                       );
                                     }
@@ -1343,10 +1343,52 @@ function SEditBoard(props: Props) {
                           </div>
                         </div>
                       )}
+                      {name === "youtubeUrl" && (
+                        <div>
+                          <div className="flex  items-center ">
+                            <Switch
+                              onClick={(e) => {
+                                setDbBoard({
+                                  ...dbBoard,
+                                  youtubeUrl: {
+                                    ...dbBoard.youtubeUrl,
+                                    isActive:
+                                      !dbBoard?.youtubeUrl?.isActive ?? false,
+                                  } as YoutubeUrl,
+                                });
+                              }}
+                              name={"youtubeUrl"}
+                              checked={dbBoard?.youtubeUrl?.isActive ?? false}
+                            />
+                            <span>
+                              {dbBoard?.youtubeUrl?.isActive ? "מופעל" : "כבוי"}
+                            </span>
+                          </div>
+                          {dbBoard.youtubeUrl?.isActive && (
+                            <YouTubeURLInput
+                              value={dbBoard?.youtubeUrl?.youtubeId}
+                              title={dbBoard.youtubeUrl.title ?? ""}
+                              setYoutubeLink={(e: {
+                                id: string;
+                                title: string;
+                              }) =>
+                                setDbBoard({
+                                  ...dbBoard,
+                                  youtubeUrl: {
+                                    title: e.title ?? "",
+                                    youtubeId: e.id,
+                                    isActive: true,
+                                  },
+                                })
+                              }
+                            />
+                          )}
+                        </div>
+                      )}
                     </div>
                   );
                 })}
-                <div className="w-full fixed  bottom-0 flex h-14 px-1 z-10  bg-white he justify-center gap-2 shadow-md items-center ">
+                <div className="w-full fixed  bottom-0 flex h-14  z-10  bg-white  justify-center gap-2 shadow-md items-center ">
                   <Button
                     className="mobile-only:w-3/4 w-36"
                     variant="contained"
@@ -1354,116 +1396,10 @@ function SEditBoard(props: Props) {
                   >
                     עדכן לוח
                   </Button>
-
-                  {/* <Button
-                    className="mobile-only:w-3/4 w-36"
-                    variant="contained"
-                    onClick={() => setDownloadTimesImgIsOpen(true)}
-                  >
-                    יצא פלאייר
-                  </Button> */}
                 </div>
               </div>
             </div>
           )}
-      </div>
-
-      {/* MODAL TO DOWNLOAD IMG TO WHATSAPP */}
-      <div className="overflow-y-auto">
-        <Modal
-          sx={{ overflowY: "scroll", overflowX: "hidden" }}
-          open={downloadTimesImgIsOpen}
-          onClose={() => setDownloadTimesImgIsOpen(false)}
-          aria-labelledby="modal-modal-title"
-          aria-describedby="modal-modal-description"
-        >
-          <Box sx={styleDownloadImgBox}>
-            {dbBoard && (
-              <div ref={elementRef}>
-                <Card
-                  className="!bg-cover !bg-repeat-round pt-8 pb-6 p-2"
-                  sx={{
-                    width: 345,
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    background: `url(${require(`../assets/${
-                      dbBoard.backgroundToWhatsappImg ?? "background-frame2"
-                    }.jpg`)}) no-repeat`,
-                    backgroundSize: "cover !importent",
-                  }}
-                >
-                  <CardContent>
-                    <div className="w-full font-['Comix'] flex flex-col items-center weekly-times ">
-                      <div className="w-full font-['Comix'] flex justify-end text-xl font-bold">
-                        <span className="pr-[33px] flex items-center">
-                          {dbBoard.boardName}
-                        </span>
-                      </div>
-                      <div className="flex flex-col items-center justify-center px-2 w-[85%]">
-                        <div className="relative">
-                          {dbBoard.messages && dbBoard.messages.length > 0 && (
-                            <div className="w-full flex flex-col items-center justify-center text-center">
-                              <div className="font-bold underline">הודעות</div>
-                              {dbBoard.messages.map((message) => {
-                                return (
-                                  <div dir="rtl" className="font-sm flex">
-                                    <span>-</span>
-                                    {` ${message.content} `}
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            )}
-            {dbBoard && (
-              <div className="flex gap-1 w-full overflow-x-auto">
-                {["1", "2", "3", "4", "5"].map((item, index) => (
-                  <div
-                    onClick={() =>
-                      setDbBoard({
-                        ...dbBoard,
-                        backgroundToWhatsappImg: `background-frame${item}`,
-                      })
-                    }
-                    key={index}
-                    className="min-w-20 max-h-32"
-                  >
-                    <img
-                      src={require("../assets/background-frame" +
-                        item +
-                        ".jpg")}
-                      className={`min-w-20 h-28 rounded-md ${
-                        item === dbBoard.backgroundToWhatsappImg
-                          ? "border-2 border-sky-500 border-spacing-1"
-                          : ""
-                      }`}
-                      alt={item}
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
-            <div dir="rtl" className="flex gap-3">
-              <Button onClick={onDownloadTimesImg} variant="contained">
-                הורד
-              </Button>
-              <Button
-                onClick={() => setDownloadTimesImgIsOpen(false)}
-                variant="contained"
-              >
-                ביטול
-              </Button>
-            </div>
-          </Box>
-        </Modal>
       </div>
 
       <Snackbar

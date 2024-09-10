@@ -30,8 +30,10 @@ function HomePage() {
 
   return (
     <div className=" justify-center font-['Nachlieli']  min-h-screen flex flex-col items-center text-balck relative overflow-hidden">
-      <div className="bg-white px-5 py-4 ">
-        <img src={HomePageImg} alt="" />
+      <div className="bg-white flex flex-col justify-center items-center w-full px-5 py-4 ">
+        <div className="flex justify-center w-full">
+          <img src={HomePageImg} className="w-1/2 h-1/2" alt="" />
+        </div>
         <header className="text-center mb-8">
           <h1 className="text-5xl mt-4 font-extrabold drop-shadow-lg">
             Pro board

@@ -227,11 +227,7 @@ function Kdashboard(props: Props) {
                       {" "}
                       <a
                         className="text-blue-500"
-                        href={
-                          row.type === "kodesh"
-                            ? `https://kodesh-board.onrender.com/board/${row.id}`
-                            : `https://kodesh-board.onrender.com/school/${row.id}`
-                        }
+                        href={`https://pro-board.onrender.com/board/${row.id}`}
                       >
                         לוח
                       </a>
@@ -239,11 +235,7 @@ function Kdashboard(props: Props) {
                     <TableCell align="right">
                       <a
                         className="text-blue-500"
-                        href={
-                          row.type === "kodesh"
-                            ? `https://kodesh-board.onrender.com/edit/${row.id}`
-                            : `https://kodesh-board.onrender.com/school/edit/${row.id}`
-                        }
+                        href={`https://pro-board.onrender.com/edit/${row.id}`}
                       >
                         עריכה
                       </a>

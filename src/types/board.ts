@@ -30,6 +30,7 @@ export interface Board {
   payboxLink: string;
   messageScreenIsWhatsapp: boolean;
   activeScreens: number;
+  youtubeUrl?: YoutubeUrl;
 }
 
 export interface Tfila {
@@ -41,6 +42,11 @@ export interface InspirationalScreen {
   isActive: boolean;
   text: string;
   writer: string;
+}
+export interface YoutubeUrl {
+  isActive: boolean;
+  youtubeId: string;
+  title: string;
 }
 export interface ScreenType {
   id: string;

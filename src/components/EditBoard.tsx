@@ -42,6 +42,7 @@ import { User, getAuth, onAuthStateChanged } from "firebase/auth";
 import AdminNavbar from "./AdminNavbar";
 import { updateBoardExceptUsers } from "../service/serviceBoard";
 import Login from "./Login";
+import NotAllowedEdit from "./NotAllowedEdit";
 
 function EditBoard(props: Props) {
   const [dbBoard, setDbBoard] = useState<Board>();
@@ -84,16 +85,6 @@ function EditBoard(props: Props) {
     return unsubscribe;
   }, [id]);
 
-  // const setIdToUsers = () => {
-  //   const newUsersIds = dbBoard?.users?.map((user) => ({
-  //     id: generateRandomId(),
-  //     ...user,
-  //     debts: [],
-  //   }));
-  //   if (dbBoard) {
-  //     setDbBoard({ ...dbBoard, users: newUsersIds });
-  //   }
-  // };
   const getBoardById = async (boardId: string) => {
     try {
       const boardDoc = await getDoc(doc(db, "boards", boardId));
@@ -209,6 +200,8 @@ function EditBoard(props: Props) {
     }
   };
   const onDeleteScreen = (screenToDelete: ScreenType) => {
+    setScreenEditorIsOpen(false);
+
     const filterScreens = dbBoard?.screens.filter(
       (screen) => screen.id !== screenToDelete.id
     );
@@ -409,20 +402,10 @@ function EditBoard(props: Props) {
     !dbBoard?.admins.includes(connectedUser?.email)
   ) {
     return (
-      <Box sx={styleBoxNotAllowEdit}>
-        <div className="flex w-full flex-col justify-center items-center m-2">
-          {connectedUser && (
-            <div className="flex flex-col">
-              <span>שלום {connectedUser.displayName}</span>
-              <span>למשתמש {connectedUser.email} אין הרשאה לערוך לוח זה</span>
-            </div>
-          )}
-          <GoogleAuth
-            setUser={setConnectedUser}
-            userConnected={connectedUser?.email ?? ""}
-          />
-        </div>
-      </Box>
+      <NotAllowedEdit
+        setConnectedUser={setConnectedUser}
+        connectedUser={connectedUser}
+      />
     );
   }
 
@@ -1057,12 +1040,26 @@ function EditBoard(props: Props) {
                                       })}
                                     </div>
                                   )}
-                                <Button
-                                  onClick={() => handleAddScreen()}
-                                  variant="contained"
-                                >
-                                  אישור
-                                </Button>
+                                <div className="flex gap-3 justify-center">
+                                  {editingScreen && (
+                                    <Button
+                                      onClick={() => {
+                                        onDeleteScreen(editingScreen);
+                                      }}
+                                      variant="contained"
+                                      color="error"
+                                      startIcon={<Delete />}
+                                    >
+                                      הסר מסך
+                                    </Button>
+                                  )}
+                                  <Button
+                                    onClick={() => handleAddScreen()}
+                                    variant="contained"
+                                  >
+                                    אישור
+                                  </Button>
+                                </div>
                               </div>
                             </Box>
                           </Modal>
@@ -1075,6 +1072,11 @@ function EditBoard(props: Props) {
                                     (screen: ScreenType, index) => {
                                       return (
                                         <div
+                                          onClick={() => {
+                                            setEditingScreen(screen);
+                                            setScreenEditorIsOpen(true);
+                                            setScreenTypeEdit(screen.type);
+                                          }}
                                           className="flex flex-col gap-2"
                                           key={index}
                                         >
@@ -1121,7 +1123,7 @@ function EditBoard(props: Props) {
                                                 </div>
                                               )}
                                           </div>
-                                          <Button
+                                          {/* <Button
                                             onClick={() => {
                                               setEditingScreen(screen);
                                               setScreenEditorIsOpen(true);
@@ -1138,7 +1140,7 @@ function EditBoard(props: Props) {
                                             variant="contained"
                                           >
                                             הסר
-                                          </Button>
+                                          </Button> */}
                                         </div>
                                       );
                                     }
