@@ -15,6 +15,7 @@ import Color, { Palette } from "color-thief-react";
 import KboardTimes from "./KboardTimes";
 import { checkIsPast24Hours } from "../utils/utils";
 import NotFoundPage from "./NotFoundPage";
+import FreezePage from "./FreezePage";
 
 export const BackgroundIsBlurContext = createContext<boolean>(false);
 
@@ -127,6 +128,9 @@ function Kboard(props: Props) {
     { type: "friday", name: " ערב שבת" },
     { type: "saturday", name: " שבת" },
   ];
+  if (dbBoard?.isFreez) {
+    return <FreezePage baordName={dbBoard.boardName} />;
+  }
   if (dbBoard?.type === "school") {
     return (
       <div>

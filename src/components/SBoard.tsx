@@ -2,7 +2,7 @@ import { doc, onSnapshot } from "firebase/firestore";
 import { Board, ScreenType, TimeObj } from "../types/board";
 import { Zman } from "../types/zmanim";
 import { db } from "..";
-import { checkIsPast24Hours } from "../utils/utils";
+import { checkIsPast24Hours, checkIsPast3Hours } from "../utils/utils";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import NotFoundPage from "./NotFoundPage";
@@ -14,6 +14,8 @@ import EmojiObjectsOutlinedIcon from "@mui/icons-material/EmojiObjectsOutlined";
 import MessageIcon from "@mui/icons-material/Message";
 import { dividerClasses } from "@mui/material";
 import YouTubeAudioPlayer from "./YouTubeAudioPlayer";
+import { updateActiveScreens } from "../service/serviceBoard";
+import FreezePage from "./FreezePage";
 function Sboard(props: Props) {
   const [dbBoard, setDbBoard] = useState<Board>();
   const [colors, setColors] = useState<string[]>([]);
@@ -27,6 +29,7 @@ function Sboard(props: Props) {
     MESSAGES = 2,
   }
   const { id } = useParams();
+  const [uniqueIdentifier, setUniqueIdentifier] = useState("");
   useEffect(() => {
     async function fetchData() {
       if (id) {
@@ -51,6 +54,7 @@ function Sboard(props: Props) {
         console.log("isTime24Past!");
         props.getTimesFromDb();
       }
+      await handleAndUpadteActiveScreens();
     }, 3600000);
     const intervalId = setInterval(() => {
       setCurrentTime(new Date());
@@ -109,7 +113,67 @@ function Sboard(props: Props) {
     dbBoard?.screens.length,
     dbBoard?.inspirationalScreen?.isActive,
   ]);
+  useEffect(() => {
+    const updateActiveBoard = async () => {
+      await handleAndUpadteActiveScreens();
+    };
+    updateActiveBoard();
+  }, []);
+  const handleAndUpadteActiveScreens = async () => {
+    const fingerprint = [
+      navigator.userAgent,
+      navigator.platform,
+      navigator.language,
+      navigator.vendor,
+      navigator.hardwareConcurrency,
+      navigator.maxTouchPoints,
+    ].join(" ");
 
+    const hashCode = (str: string) => {
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
+        hash = (hash << 5) - hash + char;
+        hash |= 0;
+      }
+      return hash;
+    };
+    if (!uniqueIdentifier) {
+      setUniqueIdentifier(String(hashCode(fingerprint)));
+    }
+    if (id && dbBoard) {
+      const existActiveScreen = dbBoard.activeScreens.find((activeScreen) => {
+        return activeScreen.id === uniqueIdentifier;
+      });
+      if (existActiveScreen) {
+        const newDateToScreen = new Date();
+        const filtersActiveScreens = dbBoard.activeScreens.filter(
+          (activeScreen) => activeScreen.id !== existActiveScreen.id
+        );
+        await updateActiveScreens(id, [
+          ...filtersActiveScreens,
+          { id: existActiveScreen.id, date: newDateToScreen },
+        ]);
+      } else {
+        const newActiveScreen = { date: new Date(), id: uniqueIdentifier };
+        await updateActiveScreens(id, [
+          ...dbBoard.activeScreens,
+          newActiveScreen,
+        ]);
+      }
+
+      const updatedScreenActive = dbBoard.activeScreens.filter(
+        (activeScreen) => {
+          const date = new Date(activeScreen.date);
+          if (checkIsPast3Hours(String(date))) {
+            return false;
+          }
+          return true;
+        }
+      );
+      await updateActiveScreens(id, updatedScreenActive);
+    }
+  };
   // const setStepWithButton = () => {
   //   let number = dbBoard?.inspirationalScreen?.isActive ? 2 : 1;
   //   let defaultNumberOfPages = dbBoard?.inspirationalScreen?.isActive ? 2 : 1;
@@ -183,7 +247,9 @@ function Sboard(props: Props) {
       throw error; // Rethrow the error to handle it where the function is called
     }
   };
-
+  if (dbBoard?.isFreez) {
+    return <FreezePage baordName={dbBoard.boardName} />;
+  }
   if (dbBoard?.type === "kodesh") {
     return (
       <div>
@@ -215,29 +281,6 @@ function Sboard(props: Props) {
           //   }}
           className={`!bg-cover font-['Comix'] flex h-screen flex-col items-center justify-center p-3 w-full rounded-sm`}
         >
-          {/* <span
-            className="text-white w-5 h-5 cursor-pointer"
-            onClick={setStepWithButton}
-          >
-            {step}- step++ 
-        </span>*/}
-
-          {/* {dbBoard.dateTypes.length > 0 && (
-            <div className="text-3xl p-2 px-4 flex justify-between w-full font-['Anka'] items-center absolute top-0">
-              <span className="text-3xl  ">
-                {dbBoard.dateTypes.includes("hebrew") && (
-                  <span> בס״ד {props.hebrewDate}</span>
-                )}
-              </span>
-              <span onClick={setStepWithButton}>step++</span>
-
-              <span className="text-3xl ">
-                {dbBoard.dateTypes.includes("number") && (
-                  <span>{getCurrentDateDayFirst()}</span>
-                )}
-              </span>
-            </div>
-          )} */}
           <div className="flex flex-col h-full w-full items-center justify-center">
             {(step <= 0 ||
               (step === STATIC_SCREEN_TYPES.welcome &&
@@ -371,9 +414,9 @@ function Sboard(props: Props) {
                           <div className="flex h-full w-full my-8 items-center justify-center flex-col gap-15 ">
                             <div
                               dir="rtl"
-                              className={`flex flex-col w-full h-full items-center gap-7 justify-center text-center text-2xl font-['Comix']`}
+                              className={`flex flex-col w-[80%] h-full items-center gap-7 justify-center text-center text-2xl font-['Comix']`}
                             >
-                              <div className="flex gap-1  flex-col text-7xl p-11 bg-purple-400 rounded-3xl items-center">
+                              <div className="flex gap-1  flex-col text-6xl p-7 bg-purple-400 rounded-3xl items-center">
                                 <span className="text-8xl  font-['Comix']">
                                   {screen.title}
                                 </span>

@@ -32,6 +32,14 @@ export function isTimeBetween0000And0130() {
   // Check if the time is between 00:00 and 01:30
   return (hours === 0 && minutes >= 0) || (hours === 1 && minutes <= 30);
 }
+export function checkIsPast3Hours(stringDate: string) {
+  const currentTime = new Date().getTime();
+  let date = new Date(stringDate);
+  const providedTime = date.getTime();
+  const difference = currentTime - providedTime;
+  const millisecondsIn3Hours = 3 * 60 * 60 * 1000;
+  return difference >= millisecondsIn3Hours;
+}
 export function generateRandomId() {
   let length = 15;
   const characters =

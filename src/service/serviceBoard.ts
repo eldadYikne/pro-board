@@ -7,7 +7,7 @@ import {
   writeBatch,
 } from "firebase/firestore";
 import { db } from "..";
-import { Board } from "../types/board";
+import { ActiveScreen, Board } from "../types/board";
 
 export const postCollectionCoustumId = async (
   collectionName: string,
@@ -75,7 +75,7 @@ export const updateBoardExceptUsers = async (
 
 export const updateActiveScreens = async (
   boardId: string,
-  activeScreens: number
+  activeScreens: ActiveScreen[]
 ) => {
   const boardRef = doc(db, "boards", boardId); // Reference to the board document
 

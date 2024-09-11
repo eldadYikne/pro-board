@@ -46,7 +46,8 @@ function Kdashboard(props: Props) {
     lastTimeBoardUpdate: new Date(),
     inspirationalScreen: { isActive: false, text: "", writer: "" },
     messageScreenIsWhatsapp: false,
-    activeScreens: 0,
+    activeScreens: [],
+    approvedScren: 0,
   };
   const [newBoard, setNewBoard] = useState<Board>(boardObj);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -144,6 +145,7 @@ function Kdashboard(props: Props) {
     "קישור ללוח",
     "קישור לעריכה",
     "מסכים פועלים",
+    "מסכים מאושרים",
     "פעולות",
   ];
 
@@ -157,6 +159,7 @@ function Kdashboard(props: Props) {
         { type: "kodesh", text: "בית כנסת" },
       ],
     },
+    { key: "approvedScren", text: "מסכים מאושרים" },
     { key: "id", text: "id" },
     { key: "geoId", text: "מיקום" },
     { key: "payboxLink", text: "קישור לעמוד פייבוקס" },
@@ -241,7 +244,10 @@ function Kdashboard(props: Props) {
                       </a>
                     </TableCell>
                     <TableCell align="right" component="th" scope="row">
-                      {row?.activeScreens ?? "-"}
+                      {row?.activeScreens?.length ?? "-"}
+                    </TableCell>
+                    <TableCell align="right" component="th" scope="row">
+                      {row?.approvedScren ?? "-"}
                     </TableCell>
                     <TableCell sx={{ display: "flex", gap: 2 }} align="right">
                       <Button

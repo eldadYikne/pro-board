@@ -29,10 +29,15 @@ export interface Board {
   admins: string[];
   payboxLink: string;
   messageScreenIsWhatsapp: boolean;
-  activeScreens: number;
+  activeScreens: ActiveScreen[];
   youtubeUrl?: YoutubeUrl;
+  approvedScren: number;
 }
 
+export interface ActiveScreen {
+  id: string;
+  date: Date;
+}
 export interface Tfila {
   time: string;
   name: string;

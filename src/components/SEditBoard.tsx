@@ -49,6 +49,7 @@ import Login from "./Login";
 import YouTubeAudioPlayer from "./YouTubeAudioPlayer";
 import YouTubeURLInput from "./YouTubeURLInput";
 import NotAllowedEdit from "./NotAllowedEdit";
+import FreezePage from "./FreezePage";
 
 function SEditBoard(props: Props) {
   const [dbBoard, setDbBoard] = useState<Board>();
@@ -467,23 +468,7 @@ function SEditBoard(props: Props) {
     dbBoard?.admins.includes(connectedUser?.email) &&
     dbBoard?.isFreez
   ) {
-    return (
-      <div className="flex justify-center items-center w-full h-full">
-        <div className="p-10 bg-yellow-400 text-3xl flex flex-col justify-center items-center gap-3 font-bold">
-          <span>מצטערים , משתמש זה הוקפא </span>
-          <a href="https://wa.me/+972526587480/?text=שלום%20מדוע%20המשתמש%20שלי%20הוקפא%20?">
-            <Button
-              className="flex gap-2 items-center"
-              color="success"
-              variant="contained"
-            >
-              <span>צרו קשר בווצאפ</span>
-              <WhatsApp />
-            </Button>
-          </a>
-        </div>
-      </div>
-    );
+    return <FreezePage connectedUser={connectedUser} />;
   }
   return (
     <div
