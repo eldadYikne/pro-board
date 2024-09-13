@@ -46,7 +46,7 @@ function Sboard(props: Props) {
         console.log("id", id);
         await getBoardByIdSnap(id);
         setScreenBackground(dbBoard?.boardWelcomeImage ?? "1");
-        await updateTurnOffScreen();
+        // await updateTurnOffScreen();
         setStep(1);
       } else if (props.board) {
         setDbBoard(props.board);
@@ -74,67 +74,67 @@ function Sboard(props: Props) {
       setCurrentTime(new Date());
     }, 1000);
 
-    // const intervalStep = setInterval(() => {
-    //   let isHasMessagesScreen =
-    //     dbBoard?.messages && dbBoard?.messages?.length > 0;
-    //   let activeDefaultScreens = [
-    //     "boardName", //WELCOME SCREEN
-    //     isHasMessagesScreen ? "messages" : "",
-    //     dbBoard?.inspirationalScreen?.isActive ? "inspirationalScreen" : "",
-    //     dbBoard?.keyOfHeartsScreenActive ? "keyOfHeartsScreenActive" : "",
-    //   ].filter((isScreen) => !!isScreen);
-    //   console.log("array", activeDefaultScreens);
-    //   let activeDefaultScreensNumber = activeDefaultScreens.length ?? 1;
+    const intervalStep = setInterval(() => {
+      let isHasMessagesScreen =
+        dbBoard?.messages && dbBoard?.messages?.length > 0;
+      let activeDefaultScreens = [
+        "boardName", //WELCOME SCREEN
+        isHasMessagesScreen ? "messages" : "",
+        dbBoard?.inspirationalScreen?.isActive ? "inspirationalScreen" : "",
+        dbBoard?.keyOfHeartsScreenActive ? "keyOfHeartsScreenActive" : "",
+      ].filter((isScreen) => !!isScreen);
+      console.log("array", activeDefaultScreens);
+      let activeDefaultScreensNumber = activeDefaultScreens.length ?? 1;
 
-    //   setDefaultScreenActive(activeDefaultScreens);
+      setDefaultScreenActive(activeDefaultScreens);
 
-    //   let allScreensActiveNumber = 0;
-    //   if (dbBoard?.screens && dbBoard?.screens.length > 0) {
-    //     allScreensActiveNumber =
-    //       activeDefaultScreensNumber + dbBoard?.screens.length;
-    //   }
+      let allScreensActiveNumber = 0;
+      if (dbBoard?.screens && dbBoard?.screens.length > 0) {
+        allScreensActiveNumber =
+          activeDefaultScreensNumber + dbBoard?.screens.length;
+      }
 
-    //   console.log(activeDefaultScreens, "activeDefaultScreens");
-    //   console.log(allScreensActiveNumber, "allScreensActiveNumber");
-    //   setStep((prevStep) => {
-    //     const updatedStep =
-    //       prevStep >= allScreensActiveNumber ? 1 : prevStep + 1;
-    //     console.log("step after update", updatedStep);
-    //     switch (updatedStep) {
-    //       case 1:
-    //         setScreenBackground(dbBoard?.boardWelcomeImage ?? "");
-    //         break;
-    //       default:
-    //         if (isHasMessagesScreen && updatedStep === 2) {
-    //           setScreenBackground("white");
-    //           break;
-    //         }
-    //         if (dbBoard?.inspirationalScreen?.isActive && updatedStep === 3) {
-    //           setScreenBackground("inspirational");
-    //           break;
-    //         }
-    //         if (dbBoard?.keyOfHeartsScreenActive && updatedStep === 4) {
-    //           setScreenBackground("white");
-    //           break;
-    //         }
-    //         if (
-    //           updatedStep > activeDefaultScreensNumber &&
-    //           dbBoard?.screens[updatedStep - activeDefaultScreensNumber - 1]
-    //             ?.background
-    //         ) {
-    //           setScreenBackground(
-    //             dbBoard?.screens[updatedStep - activeDefaultScreensNumber - 1]
-    //               ?.background ?? ""
-    //           );
-    //         } else {
-    //           setScreenBackground("white");
-    //         }
-    //         break;
-    //     }
+      console.log(activeDefaultScreens, "activeDefaultScreens");
+      console.log(allScreensActiveNumber, "allScreensActiveNumber");
+      setStep((prevStep) => {
+        const updatedStep =
+          prevStep >= allScreensActiveNumber ? 1 : prevStep + 1;
+        console.log("step after update", updatedStep);
+        switch (updatedStep) {
+          case 1:
+            setScreenBackground(dbBoard?.boardWelcomeImage ?? "");
+            break;
+          default:
+            if (isHasMessagesScreen && updatedStep === 2) {
+              setScreenBackground("white");
+              break;
+            }
+            if (dbBoard?.inspirationalScreen?.isActive && updatedStep === 3) {
+              setScreenBackground("inspirational");
+              break;
+            }
+            if (dbBoard?.keyOfHeartsScreenActive && updatedStep === 4) {
+              setScreenBackground("white");
+              break;
+            }
+            if (
+              updatedStep > activeDefaultScreensNumber &&
+              dbBoard?.screens[updatedStep - activeDefaultScreensNumber - 1]
+                ?.background
+            ) {
+              setScreenBackground(
+                dbBoard?.screens[updatedStep - activeDefaultScreensNumber - 1]
+                  ?.background ?? ""
+              );
+            } else {
+              setScreenBackground("white");
+            }
+            break;
+        }
 
-    //     return updatedStep;
-    //   });
-    // }, timeBetweenScreens);
+        return updatedStep;
+      });
+    }, timeBetweenScreens);
     findKeyHeartByCurrentMonth();
     // Clear the interval when the component unmounts
     fetchData();
@@ -145,7 +145,7 @@ function Sboard(props: Props) {
     return () => {
       clearInterval(hourlyInterval);
       clearInterval(intervalId);
-      // clearInterval(intervalStep);
+      clearInterval(intervalStep);
     };
   }, [
     id,
@@ -343,8 +343,8 @@ function Sboard(props: Props) {
   }
   return (
     <div>
-      <button onClick={setStepWithButton}>setStepWithButton - {step} </button>
-      <span>screenBackground-{screenBackground}</span>
+      {/* <button onClick={setStepWithButton}>setStepWithButton - {step} </button>
+      <span>screenBackground-{screenBackground}</span> */}
       {dbBoard && (
         <div
           style={{
