@@ -32,6 +32,7 @@ function Kdashboard(props: Props) {
     forMedicine: [],
     messages: [],
     boardBackgroundImage: "1",
+    boardWelcomeImage: "1",
     boardTextColor: "",
     mapBackgroundImage: "1",
     timesToShow: [],
@@ -48,6 +49,7 @@ function Kdashboard(props: Props) {
     messageScreenIsWhatsapp: false,
     activeScreens: [],
     approvedScren: 0,
+    keyOfHeartsScreenActive: false,
   };
   const [newBoard, setNewBoard] = useState<Board>(boardObj);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);

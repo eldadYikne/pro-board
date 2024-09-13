@@ -13,6 +13,7 @@ import {
 import { useEffect, useState } from "react";
 import GoogleIcon from "@mui/icons-material/Google";
 import { ReactComponent as GoogleSvg } from "../assets/google.svg";
+import LogoutIcon from "@mui/icons-material/Logout";
 
 function GoogleAuth(props: Props) {
   const [email, setEmail] = useState("");
@@ -66,14 +67,16 @@ function GoogleAuth(props: Props) {
           </span>
         </Button>
       )}
+
       {props.userConnected && (
         <Button
-          className=" "
+          className=" flex gap-1"
           variant="outlined"
           color="primary"
           onClick={logOut}
+          endIcon={<LogoutIcon />}
         >
-          התנתק
+          {props.userConnected}
         </Button>
       )}
     </div>

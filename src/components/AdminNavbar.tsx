@@ -7,6 +7,7 @@ import { Board, MenuLink } from "../types/board";
 import { db } from "..";
 import GoogleAuth from "./GoogleAuth";
 import { Button, CircularProgress } from "@mui/material";
+import LogoutIcon from "@mui/icons-material/Logout";
 function AdminNavbar(props: Props) {
   const { id } = useParams();
 
@@ -67,12 +68,12 @@ function AdminNavbar(props: Props) {
   ];
 
   return (
-    <div className="flex flex-col w-full justify-center items-center">
+    <div className="flex flex-col w-full font-['Nachlieli'] justify-center items-center">
       <div className="flex justify-between w-full p-2 items-center bg-slate-400">
         {!props.isSchoolBoard && (
           <Menu onClick={() => setMenuIsOpen(true)} sx={{}} />
         )}
-        <div className="font-sans text-xl ">{dbBoard && dbBoard.boardName}</div>
+        <div className=" text-xl ">{dbBoard && dbBoard.boardName}</div>
         <div className="flex gap-5 items-center">
           {props.isUsersPage && (
             <div className="flex gap-3 items-center">
@@ -85,14 +86,14 @@ function AdminNavbar(props: Props) {
               </Button>
             </div>
           )}
-          <div className="flex gap-2 items-center">
-            {connectedUser && <div> {connectedUser.displayName}</div>}
+          <div className="flex gap-2 items-center ">
+            {/* {connectedUser && <div> {connectedUser.displayName}</div>} */}
             <GoogleAuth
               setUser={(e: User) => {
                 props.setConnectedUser(e);
                 setConnectedUser(e);
               }}
-              userConnected={connectedUser?.email ?? ""}
+              userConnected={connectedUser?.displayName ?? ""}
             />
           </div>
         </div>

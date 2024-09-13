@@ -4,6 +4,7 @@ const YouTubeAudioPlayer = (props: Props) => {
   return (
     <div className="audio-container">
       <iframe
+        className="w-full "
         width={props.isVideoPreview ? "300" : "0"}
         height={props.isVideoPreview ? "240" : "0"}
         src={`https://www.youtube.com/embed/${props.videoId}?autoplay=${

@@ -20,7 +20,7 @@ function NotAllowedEdit(props: Props) {
         <div className="flex flex-col items-center">
           <GoogleAuth
             setUser={props.setConnectedUser}
-            userConnected={props.connectedUser.email ?? ""}
+            userConnected={props.connectedUser.displayName ?? ""}
           />
         </div>
       </div>

@@ -1,265 +1,116 @@
 import { TranslationsZmanimKeys } from "../types/zmanim";
 
-export const dbUsers = [
+export const keyOfHeartScreens: KeyOfHeartScreen[] = [
   {
-    name: "יקנה",
-    seats: ["117"],
-    present: true,
+    title: "תשרי",
+    content:
+      "שיתוף והשתתפות – בחודש זה מדגישים את החשיבות של עבודה משותפת והשתתפות פעילה בקהילה.",
+    subtitle: "שיתוף והשתתפות",
+    imageUrl:
+      "https://pop.education.gov.il/remote.axd?http://meyda.education.gov.il/files/pop/21621/caring.jpg?anchor=center&mode=crop&width=603&height=482&rnd=132789487410000000",
+    gregorianDate: 9,
   },
   {
-    name: "צברי",
-    seats: ["013", "014", "015", "016", "017"],
-    present: true,
+    title: "חשוון",
+    content:
+      "מעורבות חברתית – בחודש זה מדגישים את חשיבות המעורבות בקהילה והעזרה לזולת.",
+    subtitle: "מעורבות חברתית",
+    imageUrl:
+      "https://pop.education.gov.il/remote.axd?http://meyda.education.gov.il/files/pop/19460/unity3.jpg?anchor=center&mode=crop&width=603&height=482&rnd=132646051440000000",
+    gregorianDate: 10,
   },
   {
-    name: "אליה כהן",
-    seats: ["114", "115", "116"],
-    present: true,
+    title: "כסלו",
+    content: "שוֹנוּת – בחודש זה מדברים על קבלת השונה וכיבוד המגוון האנושי.",
+    subtitle: "קבלת השונה",
+    imageUrl:
+      "https://pop.education.gov.il/remote.axd?http://meyda.education.gov.il/files/pop/20691/shonut.jpg?center=0.35833333333333334,0.5&mode=crop&width=603&height=482&rnd=133466814900000000",
+    gregorianDate: 11,
   },
   {
-    name: "נוריאל",
-    seats: ["113", "19", "110", "112"],
-    present: true,
+    title: "טבת",
+    content:
+      "ניהול קונפליקטים – בחודש זה מדגישים את דרכי פתרון קונפליקטים בצורה בונה ומכבדת.",
+    subtitle: "ניהול קונפליקטים",
+    imageUrl:
+      "https://pop.education.gov.il/remote.axd?http://meyda.education.gov.il/files/pop/28278/conflict-management-a.jpg?anchor=center&mode=crop&width=603&height=482&rnd=133481595860000000",
+    gregorianDate: 12,
   },
   {
-    name: "טנגי",
-    seats: ["18", "17"],
-    present: true,
+    title: "שבט",
+    content: "אחריות – בחודש זה מדברים על קבלת אחריות אישית וקהילתית.",
+    subtitle: "אחריות",
+    imageUrl:
+      "https://pop.education.gov.il/remote.axd?http://meyda.education.gov.il/files/pop/21640/responsibility8.jpg?anchor=center&mode=crop&width=603&height=482&rnd=132789590220000000",
+    gregorianDate: 1,
   },
   {
-    name: "נפתלי",
-    seats: ["13"],
-    present: true,
+    title: "אדר",
+    content: "נתינה – בחודש זה מדגישים את חשיבות הנתינה והעזרה לזולת.",
+    subtitle: "נתינה",
+    imageUrl:
+      "https://pop.education.gov.il/remote.axd?http://meyda.education.gov.il/files/pop/20687/giving.jpg?anchor=center&mode=crop&width=603&height=482&rnd=132716947340000000",
+    gregorianDate: 2,
   },
   {
-    name: "גואטה",
-    seats: ["10", "11", "12"],
-    present: true,
+    title: "ניסן",
+    content:
+      "אחדות ושונות – בחודש זה מדברים על החשיבות של אחדות תוך קבלת השונות והייחודיות של כל אחד.",
+    subtitle: "אחדות ושונות",
+    imageUrl:
+      "https://pop.education.gov.il/remote.axd?http://meyda.education.gov.il/files/pop/14430/22.jpg?anchor=center&mode=crop&width=603&height=482&rnd=132223533500000000",
+    gregorianDate: 3,
   },
   {
-    name: "שוקרי",
-    seats: ["20", "21", "22", "23"],
-    present: true,
+    title: "אייר",
+    content: "כבוד – בחודש זה מדברים על ערך הכבוד לאחר, לעצמך ולסביבה.",
+    subtitle: "כבוד",
+    imageUrl:
+      "https://pop.education.gov.il/remote.axd?http://meyda.education.gov.il/files/pop/21466/respect-child.jpg?anchor=center&mode=crop&width=603&height=482&rnd=132778994170000000",
+    gregorianDate: 4,
   },
   {
-    name: "פדלון",
-    seats: ["26", "25"],
-    present: true,
+    title: "סיון",
+    content:
+      "עבודה בצוות – בחודש זה מדגישים את החשיבות של עבודה משותפת ושיתוף פעולה בקבוצה.",
+    subtitle: "עבודת צוות",
+    imageUrl:
+      "https://pop.education.gov.il/remote.axd?http://meyda.education.gov.il/files/pop/9846/ohlosyot-shonot.jpg?anchor=center&mode=crop&width=603&height=482&rnd=131901217320000000",
+    gregorianDate: 5,
   },
   {
-    name: "בנדריהם",
-    seats: ["27", "28"],
-    present: true,
+    title: "תמוז",
+    content:
+      "ביטחון ובטיחות – בחודש זה מדברים על החשיבות של שמירה על ביטחון אישי וקבוצתי.",
+    subtitle: "ביטחון ובטיחות",
+    imageUrl:
+      "https://pop.education.gov.il/remote.axd?http://meyda.education.gov.il/files/pop/22168/security-and-safety6.jpg?anchor=center&mode=crop&width=603&height=482&rnd=132808410290000000",
+    gregorianDate: 6,
   },
   {
-    name: "חי",
-    seats: ["29", "210"],
-    present: true,
+    title: "אב",
+    content: "תיקון והתחדשות – מדברים על התחדשות מתוך משברים ותיקון עצמי.",
+    subtitle: "תיקון והתחדשות",
+    imageUrl:
+      "https://pop.education.gov.il/remote.axd?http://meyda.education.gov.il/files/pop/10117/day-lost.jpg?anchor=center&mode=crop&width=603&height=482&rnd=131915168830000000",
+    gregorianDate: 7,
   },
   {
-    name: "זקזאק",
-    seats: ["211", "212", "213"],
-    present: true,
-  },
-  {
-    name: "מזרחי",
-    seats: ["214", "215"],
-    present: true,
-  },
-  {
-    name: "פינקלשטיין",
-    seats: ["216", "217"],
-    present: true,
-  },
-  {
-    name: "מנאי",
-    seats: ["317", "316", "315", "314"],
-    present: true,
-  },
-  {
-    name: "לוי",
-    seats: ["312", "311"],
-    present: true,
-  },
-  {
-    name: "וקנין",
-    seats: ["30", "31", "32", "33"],
-    present: true,
-  },
-  {
-    name: "מוסאי",
-    seats: ["35", "36"],
-    present: true,
-  },
-  {
-    name: "שלמה מימון",
-    seats: ["40"],
-    present: true,
-  },
-  {
-    name: "שלי",
-    seats: ["41", "42", "43"],
-    present: true,
-  },
-  {
-    name: "דוד",
-    seats: ["44", "45"],
-    present: true,
-  },
-  {
-    name: "בוסקילה",
-    seats: ["46"],
-    present: true,
-  },
-  {
-    name: "פרץ",
-    seats: ["417", "416", "415", "0414"],
-    present: true,
-  },
-  {
-    name: "טיירי",
-    seats: ["413"],
-    present: true,
-  },
-  {
-    name: "קליין",
-    seats: ["412", "411"],
-    present: true,
-  },
-  {
-    name: "קרייף",
-    seats: ["50", "51", "52", "53"],
-    present: true,
-  },
-  {
-    name: "סעדיה",
-    seats: ["54"],
-    present: true,
-  },
-  {
-    name: "גבאי",
-    seats: ["55", "56"],
-    present: true,
-  },
-  {
-    name: "עובדיה",
-    seats: ["515", "514"],
-    present: true,
-  },
-  {
-    name: "אלון",
-    seats: ["512", "511"],
-    present: true,
-  },
-  {
-    name: "קליינברג",
-    seats: ["60", "61"],
-    present: true,
-  },
-  {
-    name: "הלוי",
-    seats: ["62", "63"],
-    present: true,
-  },
-  {
-    name: "בליקשטיין",
-    seats: ["64"],
-    present: true,
-  },
-  {
-    name: "יפרח",
-    seats: ["65", "66"],
-    present: true,
-  },
-  {
-    name: "אלחייק",
-    seats: ["617", "616"],
-    present: true,
-  },
-  {
-    name: "דהן",
-    seats: ["615", "614"],
-    present: true,
-  },
-  {
-    name: "רביבו",
-    seats: ["613", "612", "611"],
-    present: true,
-  },
-  {
-    name: "ברששת",
-    seats: ["74", "75", "76"],
-    present: true,
-  },
-  {
-    name: "קמחי",
-    seats: ["717", "716"],
-    present: true,
-  },
-  {
-    name: "בנימין",
-    seats: ["715", "714"],
-    present: true,
-  },
-  {
-    name: "אביטל",
-    seats: ["711", "712", "713"],
-    present: true,
-  },
-
-  {
-    name: "אוחנה",
-    seats: ["011", "012"],
-    present: true,
-  },
-  {
-    name: "מימון",
-    seats: ["010", "09"],
-    present: true,
-  },
-  {
-    name: "אלעזרה",
-    seats: ["07", "08"],
-    present: true,
-  },
-  {
-    name: "שפירא",
-    seats: ["06", "05"],
-    present: true,
-  },
-  {
-    name: "חזן",
-    seats: ["04"],
-    present: true,
-  },
-  {
-    name: "דוד",
-    seats: ["03", "02"],
-    present: true,
-  },
-  {
-    name: "שמור",
-    seats: [
-      "00",
-      "01",
-      "111",
-      "15",
-      "14",
-      "16",
-      "24",
-      "313",
-      "34",
-      "516",
-      "517",
-      "513",
-      "70",
-      "71",
-      "72",
-      "73",
-    ],
-    present: true,
+    title: "אלול",
+    content: "חשבון נפש והתבוננות – מדברים על חשבון נפש אישי וחברתי.",
+    subtitle: "חשבון נפש והתבוננות",
+    imageUrl:
+      "data:image/jpeg;base64,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",
+    gregorianDate: 8,
   },
 ];
+export interface KeyOfHeartScreen {
+  title: string;
+  content: string;
+  subtitle: string;
+  imageUrl: string;
+  gregorianDate: number;
+}
 
 export function getCurrentDate() {
   const currentDate = new Date();

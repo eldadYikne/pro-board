@@ -16,11 +16,6 @@ body {
 .content-wrap {
   flex: 1;
   background-color: #ffffff;
-  /* background-image: url("/assets/images/background-stars.png"); */
-  /* background-position: left top;
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-attachment: fixed; */
 }
 .MuiAlert-filledSuccess {
   display: flex;

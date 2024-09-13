@@ -38,6 +38,14 @@ export function checkIsPast3Hours(stringDate: string) {
   const providedTime = date.getTime();
   const difference = currentTime - providedTime;
   const millisecondsIn3Hours = 3 * 60 * 60 * 1000;
+  console.log(
+    "checkIsPast3Hours",
+    stringDate,
+    providedTime,
+    difference,
+    millisecondsIn3Hours,
+    difference >= millisecondsIn3Hours
+  );
   return difference >= millisecondsIn3Hours;
 }
 export function generateRandomId() {

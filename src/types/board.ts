@@ -32,11 +32,12 @@ export interface Board {
   activeScreens: ActiveScreen[];
   youtubeUrl?: YoutubeUrl;
   approvedScren: number;
+  keyOfHeartsScreenActive?: boolean;
 }
 
 export interface ActiveScreen {
   id: string;
-  date: Date;
+  date: Date | TimeObj;
 }
 export interface Tfila {
   time: string;

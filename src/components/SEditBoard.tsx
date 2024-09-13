@@ -50,6 +50,7 @@ import YouTubeAudioPlayer from "./YouTubeAudioPlayer";
 import YouTubeURLInput from "./YouTubeURLInput";
 import NotAllowedEdit from "./NotAllowedEdit";
 import FreezePage from "./FreezePage";
+import ScreenPreview from "./ScreenPreview";
 
 function SEditBoard(props: Props) {
   const [dbBoard, setDbBoard] = useState<Board>();
@@ -170,11 +171,15 @@ function SEditBoard(props: Props) {
     { name: "boardName", placeholder: "שם בית הספר" },
     { name: "boardSymbol", placeholder: "סמל בית הספר" },
     { name: "screens", placeholder: "הוסף מסך" },
-    { name: "dateTypes", placeholder: "סוג תאריך" },
+    // { name: "dateTypes", placeholder: "סוג תאריך" },
     { name: "messages", placeholder: "הודעות " },
     {
       name: "messageScreenIsWhatsapp",
       placeholder: "לוח הודעות מוצג בשיחת ווצאפ",
+    },
+    {
+      name: "keyOfHeartsScreenActive",
+      placeholder: "מסך מפתח הלב",
     },
     { name: "boardTextColor", placeholder: "צבע טקסט" },
     { name: "boardWelcomeImage", placeholder: "ברוכים הבאים" },
@@ -230,15 +235,17 @@ function SEditBoard(props: Props) {
   };
   const onDeleteScreen = (screenToDelete: ScreenType) => {
     setScreenEditorIsOpen(false);
-
-    const filterScreens = dbBoard?.screens.filter(
-      (screen) => screen.id !== screenToDelete.id
-    );
-    if (dbBoard) {
-      setDbBoard({
-        ...dbBoard,
-        screens: [...(filterScreens ?? [])],
-      });
+    console.log("screenToDelete", screenToDelete);
+    if (screenToDelete.id) {
+      const filterScreens = dbBoard?.screens.filter(
+        (screen) => screen.id !== screenToDelete.id
+      );
+      if (dbBoard) {
+        setDbBoard({
+          ...dbBoard,
+          screens: [...(filterScreens ?? [])],
+        });
+      }
     }
   };
   const handleAddScreen = () => {
@@ -497,11 +504,14 @@ function SEditBoard(props: Props) {
           dbBoard &&
           connectedUser.email &&
           dbBoard.admins.includes(connectedUser.email) && (
-            <div className="  pb-24 p-5 sm:px-14 flex flex-col gap-2">
+            <div className=" pb-24  flex flex-col gap-2">
               <div className=" flex flex-col gap-2">
                 {inputsBoard.map(({ name, placeholder }) => {
                   return (
-                    <div key={name} className="flex flex-col gap-1 p-2">
+                    <div
+                      key={name}
+                      className="flex flex-col gap-1 p-4 sm:px-14 "
+                    >
                       {name !== "users" &&
                         name !== "tfilaTimes" &&
                         name !== "isSetShabatTime" && (
@@ -519,9 +529,11 @@ function SEditBoard(props: Props) {
                         name !== "screens" &&
                         name !== "youtubeUrl" &&
                         name !== "messageScreenIsWhatsapp" &&
+                        name !== "keyOfHeartsScreenActive" &&
                         name !== "isSetShabatTime" &&
                         name !== "theme" && (
                           <TextField
+                            disabled={name === "boardName"}
                             dir="rtl"
                             id="filled-basic"
                             label={placeholder}
@@ -620,13 +632,12 @@ function SEditBoard(props: Props) {
                                 })
                               }
                               key={index}
-                              className="min-w-20 min-h-16"
                             >
                               <img
                                 src={require("../assets/school-backgrounds/" +
                                   item +
                                   ".jpg")}
-                                className={`min-w-20 min-h-16 rounded-md ${
+                                className={` sm:min-w-[230px] sm:min-h-[200px]  min-w-20 min-h-16 rounded-md ${
                                   item === dbBoard.boardWelcomeImage
                                     ? "border-2 border-sky-500 border-spacing-1"
                                     : ""
@@ -716,24 +727,20 @@ function SEditBoard(props: Props) {
                           })}
                         </div>
                       )}
-                      {name === "messageScreenIsWhatsapp" && (
+                      {(name === "messageScreenIsWhatsapp" ||
+                        name === "keyOfHeartsScreenActive") && (
                         <div className="flex items-center ">
                           <Switch
                             onClick={(e) => {
                               setDbBoard({
                                 ...dbBoard,
-                                messageScreenIsWhatsapp:
-                                  !dbBoard?.messageScreenIsWhatsapp,
+                                [name]: !dbBoard?.[name],
                               });
                             }}
-                            name={"messageScreenIsWhatsapp"}
-                            checked={dbBoard?.messageScreenIsWhatsapp}
+                            name={name}
+                            checked={dbBoard?.[name]}
                           />
-                          <span>
-                            {dbBoard?.messageScreenIsWhatsapp
-                              ? "מופעל"
-                              : "כבוי"}
-                          </span>
+                          <span>{dbBoard?.[name] ? "מופעל" : "כבוי"}</span>
                         </div>
                       )}
                       {name === "inspirationalScreen" && (
@@ -856,364 +863,30 @@ function SEditBoard(props: Props) {
                             aria-describedby="modal-modal-description"
                           >
                             <Grid className="sm:w-[600px] w-[350px]" sx={style}>
-                              <div className="w-full min-h-[320px]  flex flex-col items-center justify-center gap-3">
-                                <span className="text-center font-['Nachlieli'] text-lg text-black font-bold flex flex-col gap-2  sm:text-4xl">
-                                  <span>
-                                    {screenTypes.find(
-                                      (screenType) =>
-                                        screenType.type === editingScreen?.type
-                                    )?.text ?? ""}
-                                  </span>
-                                  <span>כך זה יראה</span>
+                              <span className="text-center font-['Nachlieli'] text-lg text-black font-bold flex flex-col gap-2  sm:text-4xl">
+                                <span>
+                                  {screenTypes.find(
+                                    (screenType) =>
+                                      screenType.type === editingScreen?.type
+                                  )?.text ?? ""}
                                 </span>
-                                <div
-                                  style={{
-                                    background: `url(${require(`../assets/school-backgrounds/${
-                                      screenTypeEdit === "birthday"
-                                        ? `${editingScreen?.background}`
-                                        : dbBoard.boardBackgroundImage
-                                    }.jpg`)}) no-repeat`,
-                                    backgroundSize: "cover !importent",
-                                  }}
-                                  className="sm:w-full w-[340px] sm:min-h-[260px] min-h-[160px] !bg-cover flex justify-center items-center p-3  "
-                                >
-                                  {screenTypeEdit === "image" &&
-                                    editingScreen && (
-                                      <div
-                                        dir="rtl"
-                                        className="flex flex-col w-full items-center justify-center text-center text-2xl font-['David']"
-                                      >
-                                        <input
-                                          dir="rtl"
-                                          className="border border-black w-full h-8 px-3 mb-3 rounded-sm"
-                                          placeholder="הוסף כותרת"
-                                          type="text"
-                                          value={editingScreen?.title}
-                                          onChange={(e) =>
-                                            setEditingScreen({
-                                              ...editingScreen,
-                                              title: e.target.value,
-                                            })
-                                          }
-                                        />
+                                <span>כך זה יראה</span>
+                              </span>
 
-                                        {editingScreen?.imgUrl &&
-                                        !Array.isArray(
-                                          editingScreen?.imgUrl
-                                        ) ? (
-                                          <div className="h-full sm:w-1/2 w-full flex flex-col relative">
-                                            <img
-                                              className=""
-                                              alt=""
-                                              src={editingScreen?.imgUrl}
-                                            />
-                                            <span
-                                              className="absolute top-1 left-1 cursor-pointer border border-white rounded-full "
-                                              onClick={() => {
-                                                setEditingScreen({
-                                                  ...editingScreen,
-                                                  imgUrl: "",
-                                                });
-                                              }}
-                                            >
-                                              <Delete
-                                                style={{ color: "white" }}
-                                              />
-                                            </span>
-                                          </div>
-                                        ) : (
-                                          <div className="p-4 border bg-transparent text-center border-black">
-                                            <UploadWidget
-                                              text={
-                                                editingScreen?.imgUrl
-                                                  ? "החלף תמונה"
-                                                  : "הוסף תמונה"
-                                              }
-                                              previewType="addPhoto"
-                                              onSetImageUrl={(e: string) =>
-                                                setEditingScreen(
-                                                  (prevState) => {
-                                                    if (prevState) {
-                                                      return {
-                                                        ...prevState,
-                                                        imgUrl: e,
-                                                      };
-                                                    }
-                                                  }
-                                                )
-                                              }
-                                            />
-                                          </div>
-                                        )}
-                                      </div>
-                                    )}
-                                  {screenTypeEdit === "images" &&
-                                    editingScreen && (
-                                      <div
-                                        dir="rtl"
-                                        className="flex flex-col w-full items-center justify-center text-center text-2xl font-['David']"
-                                      >
-                                        <input
-                                          dir="rtl"
-                                          className="border border-black bg-transparent text-center w-full h-8 px-3 mb-3 rounded-sm"
-                                          placeholder="הוסף כותרת"
-                                          type="text"
-                                          value={editingScreen?.title}
-                                          onChange={(e) =>
-                                            setEditingScreen({
-                                              ...editingScreen,
-                                              title: e.target.value,
-                                            })
-                                          }
-                                        />
-                                        <div
-                                          className={`grid gap-2 grid-cols-3`}
-                                        >
-                                          {Array.isArray(
-                                            editingScreen?.imgUrl
-                                          ) &&
-                                            editingScreen?.imgUrl.map(
-                                              (img: string, index: number) => {
-                                                return (
-                                                  <div className="h-full w-full flex flex-col relative">
-                                                    <img
-                                                      className="w-20 h-20 sm:w-20 sm:h-20"
-                                                      alt=""
-                                                      src={img}
-                                                    />
-                                                    <span
-                                                      className="absolute top-1 left-1 cursor-pointer border border-white rounded-full "
-                                                      onClick={() => {
-                                                        let images: string[] =
-                                                          editingScreen?.imgUrl as string[];
-                                                        images?.splice(
-                                                          index,
-                                                          1
-                                                        );
-                                                        setEditingScreen({
-                                                          ...editingScreen,
-                                                          imgUrl: images,
-                                                        });
-                                                      }}
-                                                    >
-                                                      <Delete
-                                                        style={{
-                                                          color: "white",
-                                                        }}
-                                                      />
-                                                    </span>
-                                                  </div>
-                                                );
-                                              }
-                                            )}
-                                          <div className="p-4 cursor-pointer border bg-transparent text-center border-black">
-                                            {Array.isArray(
-                                              editingScreen?.imgUrl
-                                            ) &&
-                                              editingScreen?.imgUrl && (
-                                                <UploadWidget
-                                                  text="הוסף תמונה"
-                                                  previewType="addPhoto"
-                                                  onSetImageUrl={(e: string) =>
-                                                    setEditScreenWithImagesArray(
-                                                      e
-                                                    )
-                                                  }
-                                                />
-                                              )}
-                                          </div>
-                                        </div>
-                                      </div>
-                                    )}
-                                  {screenTypeEdit === "info" &&
-                                    editingScreen && (
-                                      <div className="flex h-full w-full items-center justify-center flex-col gap-2 ">
-                                        <div className="flex gap-1 p-2 bg-yellow-300 rounded-3xl items-center">
-                                          <span className=" font-['Comix']">
-                                            הידעת
-                                          </span>
-                                          <EmojiObjectsOutlined
-                                            sx={{ fontSize: "" }}
-                                          />
-                                        </div>
-                                        <div
-                                          dir="rtl"
-                                          className="flex w-3/4  h-full items-center gap-7 justify-center text-center  font-['Comix']"
-                                        >
-                                          <div className="flex flex-col max-w-[50%] gap-2">
-                                            <input
-                                              dir="rtl"
-                                              className="border border-black w-full text-center bg-transparent  h-8 px-3 mb-3 rounded-sm"
-                                              placeholder="הוסף כותרת"
-                                              type="text"
-                                              value={editingScreen?.title}
-                                              onChange={(e) =>
-                                                setEditingScreen({
-                                                  ...editingScreen,
-                                                  title: e.target.value,
-                                                })
-                                              }
-                                            />
-                                            <span className="text-sm sm:text-base ">
-                                              <textarea
-                                                dir="rtl"
-                                                className="border border-black w-full h-full text-center sm:min-h-[130px]  px-3 mb-3 rounded-sm"
-                                                placeholder="הוסף מידע"
-                                                value={editingScreen?.content}
-                                                onChange={(e) =>
-                                                  setEditingScreen({
-                                                    ...editingScreen,
-                                                    content: e.target.value,
-                                                  })
-                                                }
-                                                name="Outlined"
-                                              />
-                                            </span>
-                                          </div>
-                                          {editingScreen?.imgUrl &&
-                                          !Array.isArray(
-                                            editingScreen?.imgUrl
-                                          ) ? (
-                                            <div className="h-full sm:w-1/2 w-full flex flex-col relative">
-                                              <img
-                                                className=""
-                                                alt=""
-                                                src={editingScreen?.imgUrl}
-                                              />
-                                              <span
-                                                className="absolute top-1 left-1 cursor-pointer border border-white rounded-full "
-                                                onClick={() => {
-                                                  setEditingScreen({
-                                                    ...editingScreen,
-                                                    imgUrl: "",
-                                                  });
-                                                }}
-                                              >
-                                                <Delete
-                                                  style={{ color: "white" }}
-                                                />
-                                              </span>
-                                            </div>
-                                          ) : (
-                                            <div className="p-4 border border-black">
-                                              <UploadWidget
-                                                text={
-                                                  editingScreen?.imgUrl
-                                                    ? "החלף תמונה"
-                                                    : "הוסף תמונה"
-                                                }
-                                                previewType="addPhoto"
-                                                onSetImageUrl={(e: string) =>
-                                                  setEditingScreen(
-                                                    (prevState) => {
-                                                      if (prevState) {
-                                                        return {
-                                                          ...prevState,
-                                                          imgUrl: e,
-                                                        };
-                                                      }
-                                                    }
-                                                  )
-                                                }
-                                              />
-                                            </div>
-                                          )}
-                                        </div>
-                                      </div>
-                                    )}
-                                  {screenTypeEdit === "message" &&
-                                    editingScreen?.content && (
-                                      <div
-                                        dir="rtl"
-                                        className="flex w-full items-center justify-center text-center text-2xl font-['David']"
-                                      >
-                                        {editingScreen?.content}
-                                      </div>
-                                    )}
-                                  {screenTypeEdit === "birthday" &&
-                                    editingScreen?.content && (
-                                      <div
-                                        dir="rtl"
-                                        className="flex w-full items-center justify-center text-center text-2xl font-['David']"
-                                      >
-                                        {editingScreen?.content}
-                                      </div>
-                                    )}
-                                </div>
-
-                                {(screenTypeEdit === "message" ||
-                                  screenTypeEdit === "birthday") &&
-                                  editingScreen && (
-                                    <div className="w-full">
-                                      <input
-                                        dir="rtl"
-                                        className="border border-black w-full h-8 px-3 rounded-sm"
-                                        placeholder="הקלד הודעה"
-                                        type="text"
-                                        value={editingScreen?.content}
-                                        onChange={(e) =>
-                                          setEditingScreen({
-                                            id: editingScreen?.id,
-                                            text: editingScreen?.text,
-                                            title: editingScreen?.title,
-                                            type: editingScreen?.type,
-                                            background:
-                                              editingScreen.background ?? "",
-                                            content: e.target?.value,
-                                          })
-                                        }
-                                      />
-                                    </div>
-                                  )}
-                                {screenTypeEdit === "birthday" &&
-                                  editingScreen && (
-                                    <div className="flex gap-2 overflow-x-auto sm:w-full !w-[350px]">
-                                      {["1", "2", "3", "4", "5"].map((item) => {
-                                        return (
-                                          <div
-                                            onClick={() =>
-                                              setEditingScreen({
-                                                id: editingScreen?.id,
-                                                text: editingScreen?.text,
-                                                title: editingScreen?.title,
-                                                type: editingScreen?.type,
-                                                background: `birthday${item}`,
-                                                content: editingScreen?.content,
-                                              })
-                                            }
-                                            key={item}
-                                            style={{
-                                              background: `url(${require(`../assets/kodesh-backgrounds/birthday${item}.jpg`)}) no-repeat`,
-                                              backgroundSize:
-                                                "cover !importent",
-                                            }}
-                                            className="h-16 w-24 !bg-cover flex justify-center items-center p-3  "
-                                          ></div>
-                                        );
-                                      })}
-                                    </div>
-                                  )}
-                                <div className="flex gap-3">
-                                  {editingScreen && (
-                                    <Button
-                                      onClick={() => {
-                                        onDeleteScreen(editingScreen);
-                                      }}
-                                      variant="contained"
-                                      color="error"
-                                      startIcon={<Delete />}
-                                    >
-                                      הסר מסך
-                                    </Button>
-                                  )}
-                                  <Button
-                                    onClick={() => handleAddScreen()}
-                                    variant="contained"
-                                  >
-                                    אישור
-                                  </Button>
-                                </div>
-                              </div>
+                              {editingScreen && screenTypeEdit && (
+                                <ScreenPreview
+                                  screen={editingScreen}
+                                  screenType={screenTypeEdit}
+                                  onDeleteScreen={onDeleteScreen}
+                                  handleAddScreen={handleAddScreen}
+                                  setEditingScreen={setEditingScreen}
+                                  setEditScreenWithImagesArray={
+                                    setEditScreenWithImagesArray
+                                  }
+                                  dbBoard={dbBoard}
+                                  isEditScreen={true}
+                                />
+                              )}
                             </Grid>
                           </Modal>
                           <div>
@@ -1236,88 +909,18 @@ function SEditBoard(props: Props) {
                                           className="flex flex-col gap-2 cursor-pointer"
                                           key={index}
                                         >
-                                          <div
-                                            style={{
-                                              background: `url(${require(`../assets/school-backgrounds/${
-                                                screen.type === "birthday"
-                                                  ? `${screen?.background}`
-                                                  : dbBoard.boardBackgroundImage
-                                              }.jpg`)}) no-repeat`,
-                                              backgroundSize:
-                                                "cover !importent",
-                                            }}
-                                            className=" sm:w-36 sm:h-32  w-28 h-24 !bg-cover flex justify-center rounded-sm items-center p-3  "
-                                          >
-                                            {screen.type === "images" &&
-                                              screen?.imgUrl && (
-                                                <div className="flex flex-col gap-1">
-                                                  <span className="flex w-full text-ellipsis overflow-hidden whitespace-nowrap items-center justify-center text-center text-[10px] font-['Comix'] ">
-                                                    {screen.title}
-                                                  </span>
-
-                                                  <div
-                                                    className={`grid gap-6  w-full ${
-                                                      screen?.imgUrl.length < 3
-                                                        ? "h-[20px]"
-                                                        : "h-full"
-                                                    } grid-cols-${
-                                                      screen?.imgUrl.length < 3
-                                                        ? screen?.imgUrl.length
-                                                        : 3
-                                                    } justify-center`}
-                                                  >
-                                                    {Array.isArray(
-                                                      screen?.imgUrl
-                                                    ) &&
-                                                      screen?.imgUrl.map(
-                                                        (img: string) => {
-                                                          return (
-                                                            <img
-                                                              className="w-full h-full  "
-                                                              alt=""
-                                                              src={img}
-                                                            />
-                                                          );
-                                                        }
-                                                      )}
-                                                  </div>
-                                                </div>
-                                              )}
-                                            {(screen.type === "image" ||
-                                              screen.type === "info") &&
-                                              screen?.content &&
-                                              !Array.isArray(
-                                                screen?.imgUrl
-                                              ) && (
-                                                <div
-                                                  dir="rtl"
-                                                  className="flex flex-col max-h-full h-full w-full items-center justify-center text-center text-[10px] font-['Comix']"
-                                                >
-                                                  <div className="h-full flex flex-col gap-1 items-center justify-center">
-                                                    {screen.title && (
-                                                      <span className="text-ellipsis overflow-hidden whitespace-nowrap">
-                                                        {screen.title}
-                                                      </span>
-                                                    )}
-                                                    <img
-                                                      className="w-2/3 h-2/3"
-                                                      src={screen?.imgUrl}
-                                                      alt=""
-                                                    />
-                                                  </div>
-                                                </div>
-                                              )}
-                                            {(screen.type === "message" ||
-                                              screen.type === "birthday") &&
-                                              screen?.content && (
-                                                <div
-                                                  dir="rtl"
-                                                  className="flex w-full text-ellipsis overflow-hidden whitespace-nowrap items-center justify-center text-center text-[10px] font-['Comix']"
-                                                >
-                                                  {screen?.content}
-                                                </div>
-                                              )}
-                                          </div>
+                                          <ScreenPreview
+                                            screen={screen}
+                                            screenType={screen.type}
+                                            onDeleteScreen={onDeleteScreen}
+                                            handleAddScreen={handleAddScreen}
+                                            setEditingScreen={setEditingScreen}
+                                            setEditScreenWithImagesArray={
+                                              setEditScreenWithImagesArray
+                                            }
+                                            dbBoard={dbBoard}
+                                            isEditScreen={false}
+                                          />
                                         </div>
                                       );
                                     }
@@ -1386,7 +989,6 @@ function SEditBoard(props: Props) {
             </div>
           )}
       </div>
-
       <Snackbar
         className="flex flex-row-reverse"
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}

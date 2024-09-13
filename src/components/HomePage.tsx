@@ -55,7 +55,7 @@ function HomePage() {
           <a
             target="_blank"
             className="flex justify-center gap-2 items-center"
-            href="https://wa.me/+972526587480/?text=שלום%20,%20אני%20רוצה%20לשמוע%20פרטים%20לגבי%20קודש%20בורד"
+            href="https://wa.me/+972526587480/?text=שלום%20,%20אני%20רוצה%20לשמוע%20פרטים%20לגבי%פרו%20בורד"
           >
             <span>התחל עכשיו</span>
             <WhatsApp />
@@ -170,7 +170,7 @@ function HomePage() {
       </main>
 
       <footer className="mt-16 text-gray-200 z-10">
-        <p>© 2024 קודש בורד. כל הזכויות שמורות.</p>
+        <p>© 2024 פרו בורד. כל הזכויות שמורות.</p>
       </footer>
 
       <div className="absolute top-0 left-0 w-64 h-64">

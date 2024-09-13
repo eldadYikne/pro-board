@@ -83,7 +83,7 @@ export const updateActiveScreens = async (
     // Update only the activeScreens key
     await updateDoc(boardRef, { activeScreens });
 
-    console.log("activeScreens updated successfully!");
+    console.log("activeScreens updated successfully!", activeScreens);
   } catch (error) {
     console.error("Error updating activeScreens:", error);
   }

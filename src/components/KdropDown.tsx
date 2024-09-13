@@ -49,7 +49,11 @@ const Select = React.forwardRef(function CustomSelect(
     // Your styling here
   });
 
-  return <MuiSelect {...props} ref={ref} />;
+  return (
+    <div className="w-full">
+      <MuiSelect {...props} ref={ref} />
+    </div>
+  );
 });
 
 KdropDown.defaultProps = {
