@@ -374,6 +374,7 @@ function Sboard(props: Props) {
                             className="absolute top-6 left-6 h-52"
                             alt=""
                             src={dbBoard?.boardSymbol}
+                            loading="lazy"
                           />
                           <span className="font-['Luizi']">ברוכים הבאים</span>
                           <span className="font-['Luizi']">
@@ -462,6 +463,7 @@ function Sboard(props: Props) {
                                   className="w-1/2 h-1/2 rounded-md  border-black border-2 "
                                   src={keyOfHeartScreen.imageUrl}
                                   alt=""
+                                  loading="lazy"
                                 />
                               </div>
 
@@ -516,6 +518,7 @@ function Sboard(props: Props) {
                                 className="h-1/2"
                                 alt=""
                                 src={screen?.imgUrl}
+                                loading="lazy"
                               />
                             </div>
                             {screen.type === "info" && (
@@ -554,6 +557,7 @@ function Sboard(props: Props) {
                                         className="w-full h-full "
                                         alt=""
                                         src={img}
+                                        loading="lazy"
                                       />
                                     );
                                   })}

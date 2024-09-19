@@ -19,9 +19,7 @@ function ScreenPreview(props: Props) {
       <div
         style={{
           background: `url(${require(`../assets/school-backgrounds/${
-            screenType === "birthday"
-              ? `${screen.background}`
-              : dbBoard.boardBackgroundImage
+            screenType === "birthday" ? `${screen.background}` : "white"
           }.jpg`)}) no-repeat`,
           backgroundSize: "cover !importent",
         }}
