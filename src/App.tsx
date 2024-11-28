@@ -27,6 +27,7 @@ import SBoard from "./components/SBoard";
 import SEditBoard from "./components/SEditBoard";
 import EditBoardWrapper from "./components/EditBoardWrapper";
 import PreviewBoardWrapper from "./components/PreviewBoardWrapper";
+import KMap from "./components/KMap";
 
 function App() {
   const [hebrewDate, setHebrewDate] = useState<string>();
@@ -287,7 +288,8 @@ function App() {
       <div className="content-wrap">
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/map/:id" element={<Map parasha={parasha} />} />
+          {/* <Route path="/map/:id" element={<Map parasha={parasha} />} /> */}
+          <Route path="/map/:id" element={<KMap parasha={parasha} />} />
           <Route
             path="/kidush/:id"
             element={<EditKidush parasha={parasha} />}

@@ -1,3 +1,5 @@
+import { TimeObj } from "../types/board";
+
 export function checkIsPast24Hours(stringDate: string) {
   // Get the current time in milliseconds
   const currentTime = new Date().getTime();
@@ -72,4 +74,44 @@ export function getCurrentDate(): string {
   day = day < 10 ? `0${day}` : day;
 
   return `${year}-${month}-${day}`;
+}
+export function getLastSunday() {
+  const today = new Date(); // Get the current date
+  const dayOfWeek = today.getDay(); // Get the current day of the week (0 = Sunday)
+  const daysToSubtract = dayOfWeek === 0 ? 7 : dayOfWeek; // Days to go back to the last Sunday
+  const lastSunday = new Date(today); // Clone the current date
+  lastSunday.setDate(today.getDate() - daysToSubtract); // Subtract days to reach the last Sunday
+  return lastSunday;
+}
+
+export function isWithinSevenDaysFromLastSunday(date: string) {
+  const today = new Date(date);
+  const dayOfWeek = today.getDay(); // Get the current day of the week (0 = Sunday)
+  const dayToCheck = 6;
+  // Calculate last Sunday's date
+  const daysToSubtract = dayOfWeek === 0 ? dayToCheck : dayOfWeek;
+  const lastSunday = new Date(today);
+  lastSunday.setDate(today.getDate() - daysToSubtract);
+
+  // Calculate the date dayToCheck days after the last Sunday
+  const sevenDaysFromLastSunday = new Date(lastSunday);
+  sevenDaysFromLastSunday.setDate(lastSunday.getDate() + dayToCheck);
+
+  // Check if today is within the range of last Sunday to dayToCheck days after
+  return today <= sevenDaysFromLastSunday;
+}
+
+export function isPastSixDays(timestamp: TimeObj) {
+  // Convert Firestore timestamp to a JavaScript Date object
+  const inputDate = new Date(
+    timestamp.seconds * 1000 + timestamp.nanoseconds / 1e6
+  );
+
+  const today = new Date(); // Current date
+  const sixDaysAgo = new Date(); // Clone current date
+  sixDaysAgo.setDate(today.getDate() - 6); // Subtract 6 days from today
+  console.log("isWithinSevenDaysFromLastSunday sixDaysAgo", sixDaysAgo);
+  console.log(" isWithinSevenDaysFromLastSunday inputDate", timestamp);
+  // Compare the input date with six days ago
+  return inputDate < sixDaysAgo;
 }

@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import Board1 from "../assets/board1.png";
 import { WhatsApp } from "@mui/icons-material";
 import HomePageImg from "../assets/home-page-logo.jpg";
+import { AppBar, IconButton, Toolbar, Typography } from "@mui/material";
+import TvIcon from "@mui/icons-material/Tv";
 function HomePage() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [iphoneImg, setIphoneImg] = useState("edit1");
@@ -29,28 +31,46 @@ function HomePage() {
   };
 
   return (
-    <div className=" justify-center font-['Nachlieli']  min-h-screen flex flex-col items-center text-balck relative overflow-hidden">
-      <div className="bg-white flex flex-col justify-center items-center w-full px-5 py-4 ">
-        <div className="flex justify-center w-full">
-          <img src={HomePageImg} className="w-1/2 h-1/2" alt="" />
-        </div>
-        <header className="text-center mb-8">
-          <h1 className="text-5xl mt-4 font-extrabold drop-shadow-lg">
-            Pro board
-          </h1>
-          <p className="text-xl mt-4">ברוכים הבאים </p>
-          <p className="text-xl mt-4">
-            {" "}
-            מנהלים בצורה חכמה ופשוטה לוחות דיגיטליים
-          </p>
-        </header>
+    <div className=" justify-between font-['Nachlieli']  min-h-screen flex flex-col items-center text-balck relative overflow-hidden">
+      <div dir="ltr" className="w-full ">
+        <AppBar className="!bg-[#ececeb] " position="fixed" color="primary">
+          <Toolbar>
+            <IconButton
+              size="large"
+              edge="start"
+              aria-label="menu"
+              sx={{ mr: 2 }}
+              style={{ color: "#0288d1" }}
+            >
+              <TvIcon />
+            </IconButton>
+            <Typography
+              variant="h6"
+              style={{ color: "#0288d1" }}
+              component="div"
+              sx={{ flexGrow: 1 }}
+            >
+              Pro-board
+            </Typography>
+          </Toolbar>
+        </AppBar>
       </div>
-
-      <main className="text-center z-10 px-5 py-4 ">
-        <p className="text-lg mb-6">
-          כאן תוכלו לנהל ולצפות במידע חשוב בצורה קלה ונוחה.
-        </p>
-
+      <div className="bg-blue-400 mt-16 flex sm:gap-8 gap-4 flex-col justify-center items-center w-full px-5 py-4 ">
+        <div className="flex sm:flex-row flex-col  sm:gap-8 gap-4 justify-center items-center w-full">
+          <div className="text-center mb-8">
+            <h1 className="text-5xl mt-4 font-extrabold drop-shadow-lg">
+              Pro board
+            </h1>
+            <p className="text-xl mt-4">
+              {" "}
+              מנהלים בצורה חכמה ופשוטה לוחות דיגיטליים
+            </p>
+            <p className="text-lg mb-6">
+              כאן תוכלו לנהל ולצפות במידע חשוב בצורה קלה ונוחה.
+            </p>
+          </div>
+          <img src={HomePageImg} className="sm:w-[350px] rounded-md" alt="" />
+        </div>
         <button className="bg-white text-purple-700 py-3 px-6 rounded-full shadow-lg hover:bg-gray-200 transition duration-300">
           <a
             target="_blank"
@@ -61,6 +81,8 @@ function HomePage() {
             <WhatsApp />
           </a>
         </button>
+      </div>
+      <main className="text-center z-10 px-5 py-4 ">
         <div className="mt-10">
           <h2 className="text-2xl font-bold mb-4">מה אנחנו מציעים?</h2>
           <div className="flex justify-center w-full">
@@ -168,11 +190,9 @@ function HomePage() {
           })}
         </div>
       </main>
-
       <footer className="mt-16 text-gray-200 z-10">
         <p>© 2024 פרו בורד. כל הזכויות שמורות.</p>
       </footer>
-
       <div className="absolute top-0 left-0 w-64 h-64">
         <svg
           className="w-full h-full text-white opacity-20"
@@ -183,7 +203,6 @@ function HomePage() {
           <path d="M12 0C5.37 0 0 5.37 0 12s5.37 12 12 12 12-5.37 12-12S18.63 0 12 0zm0 22C6.48 22 2 17.52 2 12S6.48 2 12 2s10 4.48 10 10-4.48 10-10 10z" />
         </svg>
       </div>
-
       <div className="absolute bottom-0 right-0 w-48 h-48">
         <svg
           className="w-full h-full text-white opacity-20"
@@ -194,7 +213,6 @@ function HomePage() {
           <path d="M12 0C5.37 0 0 5.37 0 12s5.37 12 12 12 12-5.37 12-12S18.63 0 12 0zm0 22C6.48 22 2 17.52 2 12S6.48 2 12 2s10 4.48 10 10-4.48 10-10 10z" />
         </svg>
       </div>
-
       <div className="absolute sm:bottom-0 bottom-[-55px] left-0 w-full">
         <svg
           className="w-full h-48"

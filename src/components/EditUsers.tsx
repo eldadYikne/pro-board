@@ -3,13 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Board } from "../types/board";
 import { db } from "..";
-import KUser, {
-  Debt,
-  DebtReason,
-  Filter,
-  Filters,
-  SeatUser,
-} from "../types/user";
+import KUser, { Debt, DebtReason, Filter, Filters } from "../types/user";
 import {
   Box,
   Button,

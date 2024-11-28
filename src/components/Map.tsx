@@ -17,7 +17,7 @@ import {
 import { toPng } from "html-to-image";
 import { Board } from "../types/board";
 import { useParams } from "react-router-dom";
-import OutoComplete from "./OutoComplete";
+import KAutoComplete from "./KAutoComplete";
 import { updateManyUsers, updateUser } from "../service/serviceUser";
 import { User, getAuth, onAuthStateChanged } from "firebase/auth";
 import GoogleAuth from "./GoogleAuth";
@@ -364,7 +364,7 @@ function Map(props: Props) {
                 <span className="text-center"> {userToUpdateSeat?.name}</span>
 
                 <span className="text-center">בחר שם מהרשימה</span>
-                <OutoComplete
+                <KAutoComplete
                   options={dbBoard?.users}
                   onPickUsername={(e: KUser) => setUserToUpdateSeat(e)}
                 />

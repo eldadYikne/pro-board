@@ -10,7 +10,6 @@ import { Button, CircularProgress } from "@mui/material";
 import LogoutIcon from "@mui/icons-material/Logout";
 function AdminNavbar(props: Props) {
   const { id } = useParams();
-
   const auth = getAuth();
   const [connectedUser, setConnectedUser] = useState<User>();
   const [dbBoard, setDbBoard] = useState<Board>();

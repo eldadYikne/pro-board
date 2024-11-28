@@ -38,6 +38,7 @@ import { ReactComponent as Decorative1 } from "../assets/decorative-1.svg";
 import Navbar from "./Navbar";
 import { updateUser } from "../service/serviceUser";
 import { Background } from "@cloudinary/url-gen/qualifiers";
+import { startOverSeatsInSunday } from "../service/serviceBoard";
 
 function ConfirmedPlace(props: Props) {
   const [user, setUser] = useState<KUser>();
@@ -64,6 +65,7 @@ function ConfirmedPlace(props: Props) {
       if (id) {
         console.log("id", id);
         await getBoardByIdSnap(id);
+        await startOverSeatsInSunday(id);
       }
     }
     fetchData();
@@ -100,7 +102,7 @@ function ConfirmedPlace(props: Props) {
             );
             if (updateUser) {
               setUser(updateUser);
-              localStorage.setItem("user", JSON.stringify(user));
+              localStorage.setItem("userId", JSON.stringify(user.id));
               console.log("updatedUser", updateUser);
             }
           }
@@ -141,18 +143,25 @@ function ConfirmedPlace(props: Props) {
       }
     }
   };
-  const handleChange = async (isPresent: boolean) => {
+  const handleChange = async (isPresent: boolean, seatNumber: string) => {
     setChecked(isPresent);
-    if (user) {
+    const newUserUpdated = dbBoard?.users?.find(
+      (userUpdate) => userUpdate.id === user?.id
+    );
+    if (newUserUpdated) {
       try {
         let newUser: KUser = {
-          ...user,
-          present: !checked,
+          ...newUserUpdated,
+          present: isPresent,
+          seats: newUserUpdated.seats.map((seat) =>
+            seat.seatNumber === seatNumber
+              ? { ...seat, present: isPresent }
+              : seat
+          ),
         };
         if (newUser?.name) {
-          localStorage.setItem("user", JSON.stringify(newUser));
+          localStorage.setItem("userId", JSON.stringify(newUser.id));
           setUser(newUser);
-
           await updateNewUser(newUser?.id!, newUser);
           setSnackbarIsOpen(true);
           setTimeout(() => setSnackbarIsOpen(false), 2000);
@@ -185,12 +194,22 @@ function ConfirmedPlace(props: Props) {
   ];
   const thTable = ["עבור", "סכום", "תאריך", "שולם"];
 
+  const setUserFromModal = (userId: string) => {
+    const userToSet = dbBoard?.users?.find((user) => user.id === userId);
+    if (userToSet) {
+      setUser(userToSet);
+    }
+  };
   if (!dbBoard) {
     return <div></div>;
   }
   return (
     <div className="flex flex-col pb-8 justify-center items-center w-full gap-3 ">
-      <Navbar users={dbBoard?.users} setNewUser={setUser} />
+      <Navbar
+        boardName={dbBoard.boardName}
+        users={dbBoard?.users}
+        setNewUserId={setUserFromModal}
+      />
       <Card sx={{ maxWidth: 345 }}>
         <CardMedia
           component="img"
@@ -201,7 +220,7 @@ function ConfirmedPlace(props: Props) {
 
         <CardContent>
           <Typography gutterBottom variant="h5" component="div">
-            <span>נוכחות - {props.parasha}</span>
+            <span> {props.parasha}</span>
           </Typography>
           <Typography variant="body2" color="text.secondary">
             <div className="text-sm w-36">
@@ -214,34 +233,52 @@ function ConfirmedPlace(props: Props) {
             </div>
           </Typography>
           {user?.name && (
-            <div className="text-black  transition-all flex items-center justify-center">
-              {/* {checked ? "נמצא" : "לא נמצא"} */}
-              {/* <Switch
-                {...label}
-                defaultChecked
-                checked={checked}
-                onChange={handleChange}
-              /> */}
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    onChange={() => handleChange(true)}
-                    defaultChecked
-                    checked={checked}
-                  />
-                }
-                label="נמצא"
-              />
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    onChange={() => handleChange(false)}
-                    defaultChecked
-                    checked={!checked}
-                  />
-                }
-                label="לא נמצא"
-              />
+            <div className="text-black  transition-all ">
+              <div className=" flex gap-4  items-center justify-center">
+                {dbBoard.users?.find((userDb) => user.id === userDb.id)?.seats
+                  .length ?? 0 > 0 ? (
+                  dbBoard.users
+                    ?.find((userDb) => user.id === userDb.id)
+                    ?.seats.map((seat) => {
+                      return (
+                        <div
+                          className="cursor-pointer"
+                          onClick={() =>
+                            handleChange(!seat.present, seat.seatNumber)
+                          }
+                        >
+                          <div
+                            className={`${
+                              seat.present ? "bg-green-600" : "bg-gray-600"
+                            } relative w-8 h-8  rounded-t-full`}
+                          >
+                            <div
+                              className={` ${
+                                seat.present ? "bg-green-500" : "bg-gray-500"
+                              } absolute bottom-0 left-0 w-full h-1/2 rounded-t-md`}
+                            ></div>
+                            <div className="absolute bottom-0 -left-1 w-1 h-1/2 bg-gray-700 rounded-md"></div>
+                            <div className="absolute bottom-0 -right-1 w-1 h-1/2 bg-gray-700 rounded-md"></div>
+                          </div>
+                        </div>
+                      );
+                    })
+                ) : (
+                  <Typography gutterBottom variant="h6" component="div">
+                    <div>לא נמצאו מקומות על שמך</div>
+                  </Typography>
+                )}
+              </div>
+              <div className="flex gap-2 w-full justify-end mt-5 items-center">
+                <span className="flex items-center gap-1">
+                  <span className="w-4 h-4 bg-green-500 shadow-md rounded-sm"></span>
+                  <span> נמצא</span>
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="w-4 h-4 bg-gray-500 shadow-md rounded-sm"></span>
+                  <span> לא נמצא</span>
+                </span>
+              </div>
             </div>
           )}
         </CardContent>
@@ -263,25 +300,35 @@ function ConfirmedPlace(props: Props) {
             <div className="w-full flex justify-center text-xl font-bold">
               זמני תפילות
             </div>
-            {shabatTimesToEdit.map((time, idx) => {
-              return (
-                <div key={idx} className="flex flex-col gap-1 w-full text-base">
-                  <div className="underline w-full font-bold">{time.name}</div>
-                  {dbBoard.tfilaTimes?.map((tfila: Tfila, idx) => {
-                    return (
-                      time.type === tfila.day && (
-                        <div key={idx} className="flex w-full flex-col">
-                          <div className="flex w-full justify-between gap-1">
-                            <span>{tfila.name}:</span>
-                            <span>{tfila.time} </span>
+            {dbBoard?.tfilaTimes &&
+              dbBoard?.tfilaTimes.length > 0 &&
+              shabatTimesToEdit.map((time, idx) => {
+                return (
+                  <div
+                    key={idx}
+                    className="flex flex-col gap-1 w-full text-base"
+                  >
+                    <div className="underline w-full font-bold">
+                      {time.name}
+                    </div>
+                    {dbBoard.tfilaTimes?.map((tfila: Tfila, idx) => {
+                      return (
+                        time.type === tfila.day && (
+                          <div key={idx} className="flex w-full flex-col">
+                            <div className="flex w-full justify-between gap-1">
+                              <span>{tfila.name}:</span>
+                              <span>{tfila.time} </span>
+                            </div>
                           </div>
-                        </div>
-                      )
-                    );
-                  })}
-                </div>
-              );
-            })}
+                        )
+                      );
+                    })}
+                  </div>
+                );
+              })}
+            {dbBoard?.tfilaTimes && dbBoard?.tfilaTimes.length === 0 && (
+              <div>אין זמנים להצגה</div>
+            )}
           </CardContent>
         </Card>
       )}

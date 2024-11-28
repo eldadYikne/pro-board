@@ -4,7 +4,7 @@ import Autocomplete from "@mui/material/Autocomplete";
 import KUser from "../types/user";
 import { useState, useEffect } from "react";
 
-export default function OutoComplete(props: Props) {
+export default function KAutoComplete(props: Props) {
   const defaultProps = {
     options: props.options?.map((user: KUser) => ({ label: user.name })),
   };
@@ -20,8 +20,9 @@ export default function OutoComplete(props: Props) {
     }
   };
   return (
-    <div dir="rtl" className="">
+    <div className="">
       <Autocomplete
+        dir="rtl"
         {...defaultProps}
         id="clear-on-escape"
         className="w-full flex flex-row-reverse"
@@ -30,13 +31,13 @@ export default function OutoComplete(props: Props) {
           onSetUser(newValue);
         }}
         renderInput={(params) => (
-          <TextField {...params} label="שם" variant="standard" />
+          <TextField {...params} dir="rtl" label="שם" variant="standard" />
         )}
       />
     </div>
   );
 }
-OutoComplete.defaultProps = {
+KAutoComplete.defaultProps = {
   options: [],
 };
 interface Option {

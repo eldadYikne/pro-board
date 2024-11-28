@@ -5,12 +5,7 @@ export default interface KUser {
   id: string;
   debts: Debt[];
 }
-export interface SeatUser {
-  name: string;
-  present: boolean;
-  seat: SeatNumber;
-  id?: string;
-}
+
 export interface SeatNumber {
   present: boolean;
   seatNumber: string;

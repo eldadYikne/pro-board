@@ -1,3 +1,4 @@
+import { RowOfSeats } from "./map";
 import KUser from "./user";
 import { TranslationsZmanimKeys } from "./zmanim";
 
@@ -33,6 +34,8 @@ export interface Board {
   youtubeUrl?: YoutubeUrl;
   approvedScren: number;
   keyOfHeartsScreenActive?: boolean;
+  seats: RowOfSeats[];
+  startOverSeats: string;
 }
 
 export interface ActiveScreen {

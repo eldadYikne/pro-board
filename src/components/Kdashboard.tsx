@@ -50,6 +50,8 @@ function Kdashboard(props: Props) {
     activeScreens: [],
     approvedScren: 0,
     keyOfHeartsScreenActive: false,
+    seats: [],
+    startOverSeats: "",
   };
   const [newBoard, setNewBoard] = useState<Board>(boardObj);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);

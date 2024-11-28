@@ -10,11 +10,10 @@ import KUser from "../types/user";
 import { useParams } from "react-router-dom";
 import { Board } from "../types/board";
 import { Button, Modal } from "@mui/material";
-import OutoComplete from "./OutoComplete";
+import KAutoComplete from "./KAutoComplete";
 
 export default function Navbar(props: Props) {
-  const [user, setUser] = useState<any>();
-  const [dbBoard, setDbBoard] = useState<Board>();
+  const [user, setUser] = useState<KUser>();
   const { id } = useParams();
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => {
@@ -22,11 +21,12 @@ export default function Navbar(props: Props) {
   };
   const handleClose = () => setOpen(false);
   useEffect(() => {
-    const user = localStorage.getItem("user");
+    const userId = localStorage.getItem("userId");
 
-    if (user) {
-      let userToSet = JSON.parse(user);
-      props.setNewUser(userToSet);
+    if (userId) {
+      let userIdToSet = JSON.parse(userId);
+      props.setNewUserId(userIdToSet);
+      const userToSet = props.users.find((user) => user.id === userIdToSet);
       setUser(userToSet);
     }
   }, [id]);
@@ -34,29 +34,22 @@ export default function Navbar(props: Props) {
   const onPickUsername = (user: KUser) => {
     if (user) {
       console.log(user);
-      localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("userId", JSON.stringify(user.id));
       setUser(user);
-      props.setNewUser(user);
+      props.setNewUserId(user.id);
     }
   };
   return (
     <Box sx={{ flexGrow: 1, width: "100%" }}>
       <AppBar position="static">
         <Toolbar>
-          <IconButton
-            size="large"
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            sx={{ mr: 2 }}
-          ></IconButton>
           <Typography
             className="whitespace-nowrap"
             variant="h6"
             component="div"
             sx={{ flexGrow: 1 }}
           >
-            {dbBoard && dbBoard.boardName}
+            {props.boardName && props.boardName}
           </Typography>
 
           {props.users && (
@@ -73,7 +66,7 @@ export default function Navbar(props: Props) {
                 <Box sx={style}>
                   <div className="w-full h-full flex flex-col gap-3">
                     <span className="text-center">בחר שם מהרשימה</span>
-                    <OutoComplete
+                    <KAutoComplete
                       options={props.users}
                       onPickUsername={onPickUsername}
                     />
@@ -91,13 +84,15 @@ export default function Navbar(props: Props) {
   );
 }
 Navbar.defaultProps = {
-  setNewUser: () => {},
+  setNewUserId: () => {},
   users: [],
+  boardName: "",
 };
 
 interface Props {
-  setNewUser: Function;
+  setNewUserId: Function;
   users: KUser[];
+  boardName: string;
 }
 
 const style = {
