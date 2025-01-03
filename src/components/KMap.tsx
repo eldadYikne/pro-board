@@ -61,6 +61,7 @@ export default function KMap({ parasha }: Props) {
   const [snackbarIsOpen, setSnackbarIsOpen] = useState<boolean>();
   const [isSettingOpen, setIsSettingOpen] = useState<boolean>(false);
   const [userToEdit, setUserToEdit] = useState<KUser>();
+  const [rectSize, setRectSize] = useState<number>(30);
   const shapeRef = useRef(null);
 
   const newUser: KUser = {
@@ -234,15 +235,20 @@ export default function KMap({ parasha }: Props) {
     const startX = rows.length > 0 ? rows[rows.length - 1].rectangles[0].x : 50; // starting X position
     const startY =
       rows.length > 0 ? rows[rows.length - 1].rectangles[0].y : 150; // starting Y position
-    const startRotation = rows.length > 0 ? rows[rows.length - 1].rotation : 0; // starting Y position
-    const startXSeat = 50; // starting X position
-    const startYSeat = Math.random() * stageSize.height * 0.8; // starting Y position
+    console.log(
+      "startX",
+      startX,
+      "startY",
+      startY,
+      "startX + i * 40",
+      startX * 40
+    );
     for (let i = 0; i < rowCount; i++) {
       rowRects.push({
-        x: startX + i * 60,
+        x: startX + i * 40,
         y: 0, // Keep the y position relative to the row
-        width: 50,
-        height: 50,
+        width: rectSize,
+        height: rectSize,
         fill: "green",
         id: generateRandomId(),
         rotation: 0,
@@ -256,10 +262,10 @@ export default function KMap({ parasha }: Props) {
       id: generateRandomId(),
       rectangles: rowRects,
       rotation: 0,
-      x: 50,
+      x: startX,
       y: startY,
-      height: 50,
-      width: 50,
+      height: rectSize,
+      width: rectSize,
     };
 
     setRows((prevRows) => [...prevRows, newRow]);
@@ -292,8 +298,7 @@ export default function KMap({ parasha }: Props) {
         const updatedRectangles = row.rectangles.map((rect, index) => {
           return {
             ...rect,
-            // width: newWidth, // Update width
-            // height: newHeight, // Update height
+
             rotation: 0,
           };
         });
@@ -428,6 +433,20 @@ export default function KMap({ parasha }: Props) {
       console.log(err);
     }
   };
+  const setAllRectInRows = (size: number) => {
+    console.log("size", size);
+    setRows((prevRows) =>
+      prevRows.map((row) => ({
+        ...row,
+        rectangles: row.rectangles.map((rect) => ({
+          ...rect,
+          height: size,
+          width: size,
+        })),
+      }))
+    );
+    setRectSize(size);
+  };
   return (
     <div>
       <AdminNavbar isUsersPage={true} setAddUserModal={openAddUserModal} />
@@ -438,21 +457,38 @@ export default function KMap({ parasha }: Props) {
           <div className="flex w-full bg-blue-200 p-3 items-center justify-between">
             <div>
               {isEditMapMode && (
-                <div className="flex w-72 gap-2   justify-center items-center">
-                  <div className="flex gap-2">
-                    <span>שורה בת</span>
-                    <input
-                      type="number"
-                      value={rowCount}
-                      onChange={(e) => setRowCount(Number(e.target.value))}
-                      min="1"
-                      max="20"
-                      style={{ marginRight: "10px" }}
-                      placeholder="Number of rectangles"
-                      className="bg-blue-200"
-                    />
+                <div className="flex w-72 gap-2  justify-center items-center">
+                  <div className="flex flex-col gap-2 justify-center">
+                    <div className="flex gap-2">
+                      <span>שורה בת</span>
+                      <input
+                        type="number"
+                        value={rowCount}
+                        onChange={(e) => setRowCount(Number(e.target.value))}
+                        min="1"
+                        max="20"
+                        style={{ marginRight: "10px" }}
+                        placeholder="Number of rectangles"
+                        className="bg-blue-200"
+                      />
 
-                    <span>מושבים</span>
+                      <span>מושבים</span>
+                    </div>
+                    <div>
+                      <span>גודל מושבים</span>
+                      <input
+                        type="number"
+                        value={rectSize}
+                        onChange={(e) =>
+                          setAllRectInRows(Number(e.target.value))
+                        }
+                        min="10"
+                        max="50"
+                        style={{ marginRight: "10px" }}
+                        placeholder="Number of rect size"
+                        className="bg-blue-200"
+                      />
+                    </div>
                   </div>
                   <Button onClick={createRow} variant="contained">
                     הוסף{" "}
@@ -506,9 +542,9 @@ export default function KMap({ parasha }: Props) {
                       React.createRef<Konva.Group>().current!
                     );
                   }
-                  groupRefs.current
-                    .get(row?.id)
-                    ?.setSize({ height: row.height, width: row.width });
+                  // groupRefs.current
+                  //   .get(row?.id)
+                  //   ?.setSize({ height: rectSize * 5, width: rectSize * 5 });
 
                   console.log(
                     "groupRefs height",

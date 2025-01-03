@@ -69,10 +69,11 @@ export default function Rectangle({
       {shapeProps.userId && showNames && (
         <Text
           x={
-            shapeProps.x + shapeProps.width / 2 - shapeProps.username.length * 3
+            shapeProps.x + shapeProps.width / 1 - shapeProps.username.length * 2
           } // Centering the text horizontally
-          y={shapeProps.y + shapeProps.height / 2} // Centering the text vertically
+          y={shapeProps.y + shapeProps.height / 2 + 5} // Centering the text vertically
           text={shapeProps.username}
+          rotation={180}
           fontSize={14}
           fill="black" // You can customize the color
           align="center"
