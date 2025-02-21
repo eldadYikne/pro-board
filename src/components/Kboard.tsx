@@ -154,6 +154,14 @@ function Kboard(props: Props) {
             step === 0 ? "flip-image" : ""
           }`}
         >
+          <img
+            src="https://res.cloudinary.com/dwdpgwxqv/image/upload/v1740129840/sdxe8aewqqxmbisvi0hz.png"
+            alt=""
+            loading="lazy"
+            className={`h-44 pl-12 absolute  top-14 ${
+              step === 0 ? "flip-image right-20" : "left-20"
+            }`}
+          />
           <div
             className={`flex flex-col gap-4 h-full w-full items-center justify-center ${
               step === 0 ? "flip-image" : ""
