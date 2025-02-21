@@ -1189,7 +1189,7 @@ function EditBoard(props: Props) {
             {dbBoard && (
               <div ref={elementRef}>
                 <Card
-                  className="!bg-cover !bg-repeat-round pt-8 pb-6 p-2"
+                  className="!bg-cover !bg-repeat-round  pb-6 p-2"
                   sx={{
                     width: 345,
                     display: "flex",
@@ -1204,35 +1204,38 @@ function EditBoard(props: Props) {
                 >
                   <CardContent>
                     <div className="w-full font-['Comix'] flex flex-col items-center weekly-times ">
-                      <img
-                        src="https://res.cloudinary.com/dwdpgwxqv/image/upload/v1740129840/sdxe8aewqqxmbisvi0hz.png"
-                        alt=""
-                        loading="lazy"
-                        className="h-14 absolute left-20 top-14"
-                      />
                       <div className="w-full font-['Comix'] flex justify-end text-xl font-bold">
-                        <div className=" text-[12px] mb-2  w-24  flex flex-col p-1">
-                          <div className="w-full h-3  flex justify-between">
-                            <span>
-                              {dbBoard.isSetShabatTime?.isActive
-                                ? dbBoard.isSetShabatTime.enter
-                                : props.shabatTimes.candles}
-                            </span>
-                            <span> :כניסת שבת </span>
-                          </div>
-                          <div className="w-full h-3 flex justify-between">
-                            <span>
-                              {dbBoard.isSetShabatTime?.isActive
-                                ? dbBoard.isSetShabatTime.exit
-                                : props.shabatTimes.havdalah}
-                            </span>
-                            <span> :יציאת שבת</span>
+                        <img
+                          src="https://res.cloudinary.com/dwdpgwxqv/image/upload/v1740129840/sdxe8aewqqxmbisvi0hz.png"
+                          alt=""
+                          loading="lazy"
+                          className="h-14 "
+                        />
+                        <div className="flex flex-col pr-[33px] leading-5 pt-3 justify-center items-end">
+                          <span className="  flex items-center text-right">
+                            {dbBoard.boardName}
+                          </span>
+                          <div className=" text-right text-[12px] mb-2  w-24  flex flex-col p-1">
+                            <div className="w-full h-3  flex justify-between">
+                              <span>
+                                {dbBoard.isSetShabatTime?.isActive
+                                  ? dbBoard.isSetShabatTime.enter
+                                  : props.shabatTimes.candles}
+                              </span>
+                              <span> :כניסת שבת </span>
+                            </div>
+                            <div className="w-full h-3 flex justify-between">
+                              <span>
+                                {dbBoard.isSetShabatTime?.isActive
+                                  ? dbBoard.isSetShabatTime.exit
+                                  : props.shabatTimes.havdalah}
+                              </span>
+                              <span> :יציאת שבת</span>
+                            </div>
                           </div>
                         </div>
-                        <span className="pr-[33px]  flex items-center text-right">
-                          {dbBoard.boardName}
-                        </span>
                       </div>
+
                       <div className="flex flex-col items-center justify-center px-2 w-[85%]">
                         <table dir="rtl" className="">
                           <tr>
